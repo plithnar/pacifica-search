@@ -7,6 +7,6 @@
         "squizlabs/php_codesniffer": "*"
     },
     "require": {
-        "symfony/symfony": "3.1.*"
+        "symfony/symfony": "3.3.*"
     }
 }
