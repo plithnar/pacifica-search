@@ -1,0 +1,106 @@
+version: '2'
+services:
+# Nginx proxy pass frontends
+    search_frontend:
+        container_name: search_frontend
+        image: nginx
+        command: ["nginx-debug", "-g", "daemon off;"]
+        links:
+            - searchsite
+        volumes_from:
+            - searchsite
+        volumes:
+            - ./docker/nginx/application_new.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./docker/nginx/fastcgi_params:/etc/nginx/fastcgi_params:ro
+        ports:
+            - 80:80
+        # environment:
+        #     UPLOAD_STATUS_ADDR: statusbackend
+        #     UPLOAD_STATUS_PORT: 80
+        #     FILE_REDIRECT_ADDR: archiveinterface
+        #     FILE_REDIRECT_PORT: 8080
+
+# Search testing
+    searchsite:
+        container_name: searchsite
+        build:
+            context: ./docker/searchsite
+        environment:
+            TIMEZONE: America/Los_Angeles
+        volumes:
+            - ./docker/searchsite/php.ini:/usr/local/etc/php/php.ini:ro
+            # - ./docker/searchsite/fpm-options.conf:/usr/local/etc/php-fpm.d/fpm-options.conf
+            - ./application:/var/www/html
+        links:
+            - search_metadataserver:metadata
+            - search_policyserver:policy
+            - search_sitedb:sitedb
+        ports:
+            - 9000:9000
+        environment:
+            METADATA_PORT: tcp://metadata:8121
+            POLICY_PORT: tcp://policy:8181
+            SITEDB_ADDR: sitedb
+            SITEDB_PORT: 5432
+            SITEDB_USER: search
+            SITEDB_PASSWORD: search
+            SITEDB_DB_NAME: search
+            SITEDB_DBDRIVER: postgre
+
+    search_sitedb:
+        container_name: search_sitedb
+        image: postgres
+        environment:
+            POSTGRES_PASSWORD: search
+            POSTGRES_DB: search
+            POSTGRES_USER: search
+        ports:
+            - 55432:5432
+
+# Metadata and policy servers
+    search_metadataserver:
+        build:
+            context: ../metadata
+            dockerfile: Dockerfile
+        container_name: search_metadataserver
+        links:
+            - search_metadatadb:postgres
+            - search_elasticdb:elasticdb
+        ports:
+            - 8121:8121
+        environment:
+            ELASTICDB_PORT: tcp://elasticdb:9200
+            POSTGRES_ENV_POSTGRES_DB: pacifica_metadata
+            POSTGRES_ENV_POSTGRES_USER: pacifica
+            POSTGRES_PORT_5432_TCP_ADDR: postgres
+            POSTGRES_PORT_5432_TCP_PORT: 5432
+            POSTGRES_ENV_POSTGRES_PASSWORD: pacifica
+
+    search_policyserver:
+        build:
+            context: ../policy
+            dockerfile: Dockerfile
+        container_name: search_policyserver
+        restart: unless-stopped
+        links:
+            - search_metadataserver:metadata
+        ports:
+            - 8181:8181
+        environment:
+            METADATA_PORT: tcp://metadata:8121
+
+    search_metadatadb:
+        image: postgres
+        container_name: search_metadatadb
+        environment:
+            POSTGRES_PASSWORD: pacifica
+            POSTGRES_DB: pacifica_metadata
+            POSTGRES_USER: pacifica
+        ports:
+            - 5432:5432
+
+    search_elasticdb:
+        image: elasticsearch:2.4
+        container_name: search_elasticdb
+        ports:
+            - 9200:9200
