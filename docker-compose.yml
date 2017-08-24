@@ -4,21 +4,15 @@ services:
     search_frontend:
         container_name: search_frontend
         image: nginx
-        command: ["nginx-debug", "-g", "daemon off;"]
         links:
             - searchsite
         volumes_from:
             - searchsite
         volumes:
-            - ./docker/nginx/application_new.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./docker/nginx/application.conf:/etc/nginx/conf.d/default.conf:ro
             - ./docker/nginx/fastcgi_params:/etc/nginx/fastcgi_params:ro
         ports:
             - 80:80
-        # environment:
-        #     UPLOAD_STATUS_ADDR: statusbackend
-        #     UPLOAD_STATUS_PORT: 80
-        #     FILE_REDIRECT_ADDR: archiveinterface
-        #     FILE_REDIRECT_PORT: 8080
 
 # Search testing
     searchsite:
@@ -35,8 +29,6 @@ services:
             - search_metadataserver:metadata
             - search_policyserver:policy
             - search_sitedb:sitedb
-        ports:
-            - 9000:9000
         environment:
             METADATA_PORT: tcp://metadata:8121
             POLICY_PORT: tcp://policy:8181
