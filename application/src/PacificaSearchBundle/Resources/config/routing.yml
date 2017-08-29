@@ -1,0 +1,3 @@
+pacifica_search_homepage:
+    path:     /
+    defaults: { _controller: PacificaSearchBundle:Search:index }
