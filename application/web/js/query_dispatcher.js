@@ -15,7 +15,7 @@
     function _getClient() {
         if (!_client) {
             _client = new $.es.Client({
-                host: "localhost:9200"
+                host: "elasticdb:9200"
             });
 
             // Confirm that the client is able to reach the ES cluster. This is asynchronous, but we'll be optimistic and

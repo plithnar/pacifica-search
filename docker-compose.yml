@@ -19,8 +19,6 @@ services:
         container_name: searchsite
         build:
             context: ./docker/searchsite
-        environment:
-            TIMEZONE: America/Los_Angeles
         volumes:
             - ./docker/searchsite/php.ini:/usr/local/etc/php/php.ini:ro
             # - ./docker/searchsite/fpm-options.conf:/usr/local/etc/php-fpm.d/fpm-options.conf
@@ -29,7 +27,9 @@ services:
             - search_metadataserver:metadata
             - search_policyserver:policy
             - search_sitedb:sitedb
+            - search_elasticdb:elasticdb
         environment:
+            TIMEZONE: America/Los_Angeles
             METADATA_PORT: tcp://metadata:8121
             POLICY_PORT: tcp://policy:8181
             SITEDB_ADDR: sitedb
@@ -92,7 +92,19 @@ services:
             - 5432:5432
 
     search_elasticdb:
-        image: elasticsearch:2.4
-        container_name: search_elasticdb
-        ports:
-            - 9200:9200
+      build:
+        context: ../metadata
+        dockerfile: docker-compose/Dockerfile.elastic
+      container_name: search_elasticdb
+      ports:
+          - 9200:9200
+      environment:
+        - cluster.name=pacifica-cluster
+        - bootstrap.memory_lock=true
+        - xpack.security.enabled=false
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      ulimits:
+        memlock:
+          soft: -1
+          hard: -1
+        mem_limit: 1g
