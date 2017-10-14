@@ -3,84 +3,25 @@
 <head>
     <meta charset="utf-8">
     <title>Pacifica Search</title>
-    <link rel="stylesheet" href="css/select2.css">
     <link rel="stylesheet" href="css/search_layout.css">
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
     <script src="js/namespace.js"></script>
     <script src="js/utilities.js"></script>
-    <script src="js/lib/elasticsearch.jquery.js"></script>
-    <script src="js/lib/select2.full.js"></script>
-    <script src="js/query_dispatcher.js"></script>
-    <script src="js/filter_query.js"></script>
-    <script src="js/filter_query_to_content.js"></script>
-    <script src="js/query.js"></script>
-    <script src="js/result.js"></script>
-    <script src="js/transaction_filter.js"></script>
-
+    <script src="js/filter.js"></script>
     <script src="js/pacifica_search.js"></script>
 </head>
 <body>
-    <button id="pacifica_search_button" type="submit">Search</button>
+    <button id="pacifica_search_button">Search</button>
 
-    <div class="search_results_block">
-        <label for="InstrumentGroup">Instrument type (<span data-record-count>...</span>)</label>
-        <select id="InstrumentGroup" multiple data-pacifica-search-container="InstrumentGroup" data-is-filter>
-            <!-- This element's contents are generated in JavaScript -->
-        </select>
-    </div>
-
-    <div class="search_results_block">
-        <label for="Instruments">Instrument (<span data-record-count>...</span>)</label>
-        <select id="Instruments" multiple data-pacifica-search-container="Instruments" data-is-filter>
-            <!-- This element's contents are generated in JavaScript -->
-        </select>
-    </div>
-
-    <div class="search_results_block">
-        <label for="Institutions">Institution (<span data-record-count>...</span>)</label>
-        <select id="Institutions" multiple data-pacifica-search-container="Institutions" data-is-filter>
-            <!-- This element's contents are generated in JavaScript -->
-        </select>
-    </div>
-    <div class="search_results_block">
-        <label for="Users">User (<span data-record-count>...</span>)</label>
-        <select id="Users" multiple data-pacifica-search-container="Users" data-is-filter>
-            <!-- This element's contents are generated in JavaScript -->
-        </select>
-    </div>
-    <div class="search_results_block">
-        <label for="Proposals">Proposal (<span data-record-count>...</span>)</label>
-        <select id="Proposals" multiple data-pacifica-search-container="Proposals" data-is-filter>
-            <!-- This element's contents are generated in JavaScript -->
-        </select>
-    </div>
-
-    <label for="Files">File (<span data-record-count>...</span>)</label>
-    <select style="height: 450px" id="Files" multiple data-pacifica-search-container="Files">
-        <!-- This element's contents are generated in JavaScript -->
-    </select>
-
-    <!-- Templates - these are used in pacifica_search.js to inject content into the page -->
-    <div style="display: none">
-        <div data-pacifica-search-template="InstrumentGroup">
-            <option value="%id%">%name%</option>
-        </div>
-        <div data-pacifica-search-template="Instruments">
-            <option value="%id%">%name%</option>
-        </div>
-        <div data-pacifica-search-template="Institutions">
-            <option value="%id%">%name%</option>
-        </div>
-        <div data-pacifica-search-template="Proposals">
-            <option value="%id%">%name%</option>
-        </div>
-        <div data-pacifica-search-template="Users">
-            <option value="%id%">%name%</option>
-        </div>
-        <div data-pacifica-search-template="Files">
-            <option value="%id%">%name%</option>
-        </div>
-    </div>
-
+    {% for type, results in filterResults %}
+        <fieldset data-type="{{ type }}">
+            <label>{{ sectionLabels[type] }}</label>
+            {% for result in results %}
+                {% set input_id = type ~ "_" ~ result.id %}
+                <label for="{{ input_id }}">{{ result.name }}</label>
+                <input type="checkbox" id="{{ input_id }}" data-id="{{ result.id }}">
+            {% endfor %}
+        </fieldset>
+    {% endfor %}
 </body>
 </html>
