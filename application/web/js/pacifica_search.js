@@ -18,7 +18,16 @@
                 data: JSON.stringify(filter.toObj())
             }).then(function () {
                 $.get('/results', function (results) {
-debugger; // TODO: This is where development left off
+                    Object.keys(results).forEach(function (type) {
+                        var resultsForType = results[type];
+                        var inputs = $$('fieldset[data-type="' + type + '"] input');
+
+                        inputs.attr('disabled', true);
+
+                        resultsForType.forEach(function (result) {
+                            $$(inputs.filter('[data-id="' + result.id + '"]')).removeAttr('disabled');
+                        });
+                    });
                 });
             });
         }
