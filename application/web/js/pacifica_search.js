@@ -2,6 +2,8 @@
     "use strict";
 
     var Filter = PacificaSearch.Filter;
+    var DomMgr = PacificaSearch.DomManager;
+    var attr = PacificaSearch.Utilities.assertAttributeExists;
 
     $(function () {
         $$('#pacifica_search_button').on('click', function () {
@@ -20,12 +22,15 @@
                 $.get('/results', function (results) {
                     Object.keys(results).forEach(function (type) {
                         var resultsForType = results[type];
-                        var inputs = $$('fieldset[data-type="' + type + '"] input');
 
-                        inputs.attr('disabled', true);
+                        var idsToEnable = resultsForType.map(function (result) {
+                            return result.id;
+                        });
 
-                        resultsForType.forEach(function (result) {
-                            $$(inputs.filter('[data-id="' + result.id + '"]')).removeAttr('disabled');
+                        DomMgr.FacetedSearchFilter.getInputsByType(type).each(function () {
+                            var id = attr(this, 'data-id');
+                            var disable = (idsToEnable.indexOf(id) === -1);
+                            $(this).attr('disabled', disable);
                         });
                     });
                 });
@@ -38,12 +43,12 @@
         function _getFilter() {
             var filter = new Filter();
 
-            $$('fieldset[data-type]').each(function() {
+            DomMgr.FacetedSearchFilter.getAllInputs().each(function() {
                 var selectedFilterIds = $(this).find('input:checked').map(function () {
-                    return $(this).attr('data-id');
+                    return attr(this, 'data-id');
                 }).get();
 
-                filter.set($(this).attr('data-type'), selectedFilterIds);
+                filter.set(attr(this, 'data-type'), selectedFilterIds);
             });
 
             console.log("Current filter: " + JSON.stringify(filter));

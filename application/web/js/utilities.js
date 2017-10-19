@@ -9,6 +9,7 @@
         /**
          * Generate an error if a jQuery selector fails to find a match, otherwise return its result
          * @param selector
+         * @returns {string}
          */
         assertElementExists: function (selector) {
             var result = $(selector);
@@ -16,6 +17,24 @@
                 throw new Error("Selector '" + selector + "' did not match any element");
             }
             return result;
+        },
+
+        /**
+         * Generate an error if the an attribute is not defined for an element (or the element doesn't exist), otherwise
+         * returns that attribute's value.
+         *
+         * @param {jQuery|string} selector
+         * @param {string} attribute
+         * @return {string}
+         */
+        assertAttributeExists: function (selector, attribute) {
+            var attrValue = this.assertElementExists(selector).attr(attribute);
+
+            if (undefined === attrValue) {
+                throw new Error("Attribute '" + attribute + "' not found");
+            }
+
+            return attrValue;
         },
 
         /**
@@ -50,14 +69,14 @@
             var deferred = $.Deferred();
             var numUnresolved = promises.length;
 
-            if (numUnresolved == 0) {
+            if (numUnresolved === 0) {
                 deferred.resolve();
             }
 
             promises.forEach(function (promise) {
                 promise.then(function () {
                     numUnresolved--;
-                    if (numUnresolved == 0) {
+                    if (numUnresolved === 0) {
                         deferred.resolve();
                     }
                 });
@@ -66,4 +85,10 @@
             return deferred.promise();
         }
     };
+
+    Object.keys(PacificaSearch.Utilities).forEach(function (key) {
+        if (typeof(PacificaSearch.Utilities[key]) === 'function') {
+            PacificaSearch.Utilities[key] = PacificaSearch.Utilities[key].bind(PacificaSearch.Utilities);
+        }
+    });
 })(jQuery);
