@@ -30,7 +30,19 @@
              * @returns {jQuery}
              */
             getAllInputs : function() {
-                return $$('fieldset[data-type"] input');
+                return $$('fieldset[data-type] input');
+            },
+
+            /**
+             * Gets all of the types for which filter inputs are present on the page
+             * @returns {string[]}
+             */
+            getAllTypes : function() {
+                var types = [];
+                $$('fieldset[data-type]').each(function () {
+                    types.push($(this).attr('data-type'));
+                });
+                return types;
             }
         }
 

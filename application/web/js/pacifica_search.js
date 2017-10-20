@@ -43,12 +43,12 @@
         function _getFilter() {
             var filter = new Filter();
 
-            DomMgr.FacetedSearchFilter.getAllInputs().each(function() {
-                var selectedFilterIds = $(this).find('input:checked').map(function () {
+            DomMgr.FacetedSearchFilter.getAllTypes().forEach(function (type) {
+                var selectedFilterIds = DomMgr.FacetedSearchFilter.getInputsByType(type).map(function () {
                     return attr(this, 'data-id');
                 }).get();
 
-                filter.set(attr(this, 'data-type'), selectedFilterIds);
+                filter.set(type, selectedFilterIds);
             });
 
             console.log("Current filter: " + JSON.stringify(filter));
