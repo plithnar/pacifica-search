@@ -1,10 +1,9 @@
-.search_results_block {
-    margin-top: 1em;
+label {
+    display: block;
+    padding-bottom: 5px;
 }
 
-.search_results_block select {
-    width:100%;
-    padding:2px 10px;
-    border-radius:5px;
-    border: 2px solid #ccc;
+fieldset {
+    float: left;
+    margin: 10px;
 }

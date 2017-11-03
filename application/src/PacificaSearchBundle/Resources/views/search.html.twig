@@ -14,13 +14,15 @@
 <body>
     <button id="pacifica_search_button">Search</button>
 
-    {% for type, results in filterResults %}
-        <fieldset data-type="{{ type }}">
-            <label>{{ sectionLabels[type] }}</label>
-            {% for result in results %}
-                {% set input_id = type ~ "_" ~ result.id %}
-                <label for="{{ input_id }}">{{ result.name }}</label>
-                <input type="checkbox" id="{{ input_id }}" data-id="{{ result.id }}">
+    {% for collection in filters %}
+        <fieldset data-type="{{ collection.machineName }}">
+            <h2>{{ collection.typeDisplayName }}</h2>
+            {% for instance in collection.instances %}
+                {% set input_id = collection.machineName ~ "_" ~ instance.id %}
+                <label for="{{ input_id }}">
+                    {{ instance.displayName }}
+                    <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
+                </label>
             {% endfor %}
         </fieldset>
     {% endfor %}

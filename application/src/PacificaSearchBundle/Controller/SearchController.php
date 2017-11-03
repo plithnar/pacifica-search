@@ -2,29 +2,23 @@
 
 namespace PacificaSearchBundle\Controller;
 
-use PacificaSearchBundle\Repository\FilterResultsRepository;
+use PacificaSearchBundle\Repository\InstrumentTypeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class SearchController extends Controller
 {
     public function indexAction()
     {
-        $resultsRepo = $this->container->get(FilterResultsRepository::class);
-        $filter = null; // TODO:
-        $filterResults = $resultsRepo->getResults($filter);
-        $sectionLabels = [
-            'instrument_types' => 'Instrument Type',
-            'instruments' => 'Instrument',
-            'institutions' => 'Institution',
-            'users' => 'User',
-            'proposals' => 'Proposal'
-        ];
+        /** @var InstrumentTypeRepository $instrumentTypeRepo */
+        $instrumentTypeRepo = $this->container->get(InstrumentTypeRepository::class);
+        $instrumentTypes = $instrumentTypeRepo->getAllInstrumentTypes();
 
         return $this->render(
             'PacificaSearchBundle::search.html.twig',
             [
-                'filterResults' => $filterResults,
-                'sectionLabels' => $sectionLabels
+                'filters' => [
+                    $instrumentTypes
+                ]
             ]
         );
     }
