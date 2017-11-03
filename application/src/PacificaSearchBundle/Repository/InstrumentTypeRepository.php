@@ -10,7 +10,7 @@ use PacificaSearchBundle\Model\InstrumentType;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 use PacificaSearchBundle\Service\SearchService;
 
-class InstrumentTypeRepository
+class InstrumentTypeRepository extends Repository
 {
     /** @var SearchService */
     protected $searchService;
@@ -24,7 +24,7 @@ class InstrumentTypeRepository
      * @param Filter|null $filter
      * @return ElasticSearchTypeCollection
      */
-    public function getAllInstrumentTypes(Filter $filter = null)
+    public function getAll(Filter $filter = null)
     {
         $qb = $this->searchService
             ->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_GROUP)

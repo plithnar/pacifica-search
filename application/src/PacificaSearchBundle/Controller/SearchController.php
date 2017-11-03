@@ -11,7 +11,7 @@ class SearchController extends Controller
     {
         /** @var InstrumentTypeRepository $instrumentTypeRepo */
         $instrumentTypeRepo = $this->container->get(InstrumentTypeRepository::class);
-        $instrumentTypes = $instrumentTypeRepo->getAllInstrumentTypes();
+        $instrumentTypes = $instrumentTypeRepo->getAll();
 
         return $this->render(
             'PacificaSearchBundle::search.html.twig',
