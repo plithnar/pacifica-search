@@ -38,7 +38,7 @@ abstract class ConventionalElasticSearchType extends ElasticSearchType
     public static function getTypeDisplayName()
     {
         // The display name, by convention, is "Class Name" for class ClassName
-        return preg_replace('/[A-Z]/', ' $0', static::getClassNameWithoutNamespace());
+        return preg_replace('/(?<!^)[A-Z]/', ' $0', static::getClassNameWithoutNamespace());
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class ConventionalElasticSearchType extends ElasticSearchType
     public static function getMachineName()
     {
         // The machine name, by convention, is "class_name" for class "ClassName"
-        $withUnderscores = preg_replace('/[A-Z]/', '_$0', static::getClassNameWithoutNamespace());
+        $withUnderscores = preg_replace('/(?<!^)[A-Z]/', '_$0', static::getClassNameWithoutNamespace());
         return strtolower($withUnderscores);
     }
 
