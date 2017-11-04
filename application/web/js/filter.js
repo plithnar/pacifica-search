@@ -9,19 +9,19 @@
             /**
              * @value {Number[]}
              */
-            instrument_types : [],
+            instrument_type : [],
 
             /** @value {Number[]} */
-            instruments : [],
+            instrument : [],
 
             /** @value {Number[]} */
-            institutions : [],
+            institution : [],
 
             /** @value {Number[]} */
-            users : [],
+            user : [],
 
             /** @value {Number[]} */
-            proposals : []
+            proposal : []
         };
     };
 
