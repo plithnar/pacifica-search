@@ -17,7 +17,8 @@ class SearchController extends Controller
         $filters = array_map(function ($repoClass) {
             /** @var Repository $repo */
             $repo = $this->container->get($repoClass);
-            return $repo->getAll();
+            $instances = $repo->getAll()->sortByDisplayName();
+            return $instances;
         }, [
             InstrumentTypeRepository::class,
             InstrumentRepository::class,

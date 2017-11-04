@@ -28,6 +28,7 @@ class ElasticSearchTypeCollection implements \Iterator
 
     /**
      * @param ElasticSearchType $item
+     * @return ElasticSearchTypeCollection
      */
     public function add(ElasticSearchType $item) {
         // Enforce that all items in a collection have to be of the same class
@@ -36,6 +37,8 @@ class ElasticSearchTypeCollection implements \Iterator
         }
 
         $this->instances[] = $item;
+
+        return $this;
     }
 
     /**
@@ -44,6 +47,20 @@ class ElasticSearchTypeCollection implements \Iterator
     public function getInstances()
     {
         return $this->instances;
+    }
+
+    /**
+     * Reorders the wrapped instances to be alphabetical by display name
+     */
+    public function sortByDisplayName()
+    {
+        usort($this->instances, function ($a, $b) {
+            /** @var $a ElasticSearchType */
+            /** @var $b ElasticSearchType */
+            return strcmp($a->getDisplayName(), $b->getDisplayName());
+        });
+
+        return $this;
     }
 
     /**
