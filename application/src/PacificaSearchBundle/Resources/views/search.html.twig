@@ -12,7 +12,9 @@
     <script src="js/pacifica_search.js"></script>
 </head>
 <body>
-    <button id="pacifica_search_button">Search</button>
+    <p>
+        <button id="pacifica_search_button">Search</button>
+    </p>
 
     {% for collection in filters %}
         <fieldset data-type="{{ collection.machineName }}">
@@ -20,8 +22,8 @@
             {% for instance in collection.instances %}
                 {% set input_id = collection.machineName ~ "_" ~ instance.id %}
                 <label for="{{ input_id }}">
-                    {{ instance.displayName }}
                     <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
+                    {{ instance.displayName }}
                 </label>
             {% endfor %}
         </fieldset>

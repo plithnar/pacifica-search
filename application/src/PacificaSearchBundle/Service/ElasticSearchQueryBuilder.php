@@ -11,6 +11,10 @@ class ElasticSearchQueryBuilder
      * actually a subset of the records from type Group in Elasticsearch.
      */
     const TYPE_GROUP = 'Groups';
+    const TYPE_INSTRUMENT = 'Instruments';
+    const TYPE_INSITUTION = 'Institutions';
+    const TYPE_USER = 'Users';
+    const TYPE_PROPOSAL = 'Proposals';
 
     /**
      * A parameter array suitable to be passed to the Elasticsearch\Client::search() method
@@ -25,11 +29,7 @@ class ElasticSearchQueryBuilder
         $this->params = [
             'index' => $index,
             'size' =>  1000,
-            'type' => $type,
-            'body' => [
-                'query' => [
-                ]
-            ]
+            'type' => $type
         ];
     }
 
@@ -45,7 +45,8 @@ class ElasticSearchQueryBuilder
         $fieldParts = explode('.', $field);
         $path = reset($fieldParts);
 
-        $this->params['body']['query'] = [
+        $this->params['body'] = [
+            'query' => [
                 'nested' => [
                     'path' => $path,
                     'query' => [
@@ -58,6 +59,7 @@ class ElasticSearchQueryBuilder
                         ]
                     ]
                 ]
+            ]
         ];
 
         return $this;
@@ -71,7 +73,11 @@ class ElasticSearchQueryBuilder
     private function assertValidType($type)
     {
         $validTypes = [
-            self::TYPE_GROUP
+            self::TYPE_GROUP,
+            self::TYPE_INSITUTION,
+            self::TYPE_INSTRUMENT,
+            self::TYPE_PROPOSAL,
+            self::TYPE_USER
         ];
 
         if (!in_array($type, $validTypes)) {

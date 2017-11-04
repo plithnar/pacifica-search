@@ -4,3 +4,11 @@ services:
 
     PacificaSearchBundle\Repository\InstrumentTypeRepository:
         arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+    PacificaSearchBundle\Repository\InstrumentRepository:
+        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+    PacificaSearchBundle\Repository\InstitutionRepository:
+        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+    PacificaSearchBundle\Repository\UserRepository:
+        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+    PacificaSearchBundle\Repository\ProposalRepository:
+        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]

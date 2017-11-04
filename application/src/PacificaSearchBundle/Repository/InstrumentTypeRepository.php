@@ -2,42 +2,25 @@
 
 namespace PacificaSearchBundle\Repository;
 
-require_once(__DIR__ . '/../../../vendor/autoload.php');
-
-use PacificaSearchBundle\Filter;
-use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
-use PacificaSearchBundle\Model\InstrumentType;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
-use PacificaSearchBundle\Service\SearchService;
 
 class InstrumentTypeRepository extends Repository
 {
-    /** @var SearchService */
-    protected $searchService;
-
-    public function __construct(SearchService $searchService)
+    /**
+     * @inheritdoc
+     */
+    protected function getType()
     {
-        $this->searchService = $searchService;
+        // TYPE_GROUP is not intuitive, but InstrumentType isn't a type of its own in ElasticSearch. Rather, it is the
+        // subset of Group entries that have a relationship with the Instruments type
+        return ElasticSearchQueryBuilder::TYPE_GROUP;
     }
 
     /**
-     * @param Filter|null $filter
-     * @return ElasticSearchTypeCollection
+     * @inheritdoc
      */
-    public function getAll(Filter $filter = null)
+    protected function getQueryBuilderForAllRecords()
     {
-        $qb = $this->searchService
-            ->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_GROUP)
-            ->whereNestedFieldExists('instrument_members.instrument_id');
-
-        $response = $this->searchService->getResults($qb);
-
-        $instrumentTypes = new ElasticSearchTypeCollection();
-        foreach ($response['hits']['hits'] as $curHit) {
-            $instrumentType = new InstrumentType($curHit['_id'], $curHit['_source']['name']);
-            $instrumentTypes->add($instrumentType);
-        }
-
-        return $instrumentTypes;
+        return parent::getQueryBuilderForAllRecords()->whereNestedFieldExists('instrument_members.instrument_id');
     }
 }

@@ -1,9 +1,18 @@
 label {
     display: block;
     padding-bottom: 5px;
+    width: 185px;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 fieldset {
     float: left;
     margin: 10px;
+    width: 200px;
+}
+
+input[type="checkbox"] {
+    float: left;
+    margin-right: 5px;
 }
