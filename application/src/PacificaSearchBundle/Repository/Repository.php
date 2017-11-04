@@ -72,14 +72,14 @@ abstract class Repository
     {
         $response = $this->searchService->getResults($this->getQueryBuilderForAllRecords());
 
-        $instruments = new ElasticSearchTypeCollection();
+        $instances = new ElasticSearchTypeCollection();
         foreach ($response['hits']['hits'] as $curHit) {
             $modelClass = static::getModelClass();
-            $instrumentType = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
-            $instruments->add($instrumentType);
+            $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
+            $instances->add($instance);
         }
 
-        return $instruments;
+        return $instances;
     }
 
     /**
