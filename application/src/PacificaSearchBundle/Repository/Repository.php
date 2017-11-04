@@ -1,7 +1,6 @@
 <?php
 
 namespace PacificaSearchBundle\Repository;
-use PacificaSearchBundle\Model\ConventionalElasticSearchType;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Service\SearchService;
 
