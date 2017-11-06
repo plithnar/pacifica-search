@@ -20,6 +20,27 @@ abstract class Repository
     }
 
     /**
+     * Implements the most common form of getAll(), which presumes that our Type is a ConventionalElasticSearchType
+     * and that our ElasticSearch objects contain ID and name fields in the expected places - if any of this is not
+     * true then you should implement your own version of getAll()
+     *
+     * @return ElasticSearchTypeCollection
+     */
+    public function getAll()
+    {
+        $response = $this->searchService->getResults($this->getQueryBuilderForAllRecords());
+
+        $instances = new ElasticSearchTypeCollection();
+        foreach ($response['hits']['hits'] as $curHit) {
+            $modelClass = static::getModelClass();
+            $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
+            $instances->add($instance);
+        }
+
+        return $instances;
+    }
+
+    /**
      * Gets a query builder that, when submitted to the SearchService, will return all records of the type this
      * repository is responsible for.
      *
@@ -58,27 +79,6 @@ abstract class Repository
         }
 
         return $modelClassName;
-    }
-
-    /**
-     * Implements the most common form of getAll(), which presumes that our Type is a ConventionalElasticSearchType
-     * and that our ElasticSearch objects contain ID and name fields in the expected places - if any of this is not
-     * true then you should implement your own version of getAll()
-     *
-     * @return ElasticSearchTypeCollection
-     */
-    public function getAll()
-    {
-        $response = $this->searchService->getResults($this->getQueryBuilderForAllRecords());
-
-        $instances = new ElasticSearchTypeCollection();
-        foreach ($response['hits']['hits'] as $curHit) {
-            $modelClass = static::getModelClass();
-            $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
-            $instances->add($instance);
-        }
-
-        return $instances;
     }
 
     /**
