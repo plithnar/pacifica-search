@@ -17,3 +17,7 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret: ThisTokenIsNotSoSecretChangeIt
+
+    # Values below are for the Pacifica Search project
+    elasticsearch_host: '130.20.88.88:9200'
+    elasticsearch_index: 'pacifica'
