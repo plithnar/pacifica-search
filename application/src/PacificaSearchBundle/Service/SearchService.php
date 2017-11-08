@@ -23,6 +23,14 @@ class SearchService
      */
     public function __construct($host, $index)
     {
+        // Convenience for the development environment: You can specify your host option as "devserver:PORT" and the
+        // "devserver" bit will automatically be set to the machine hosting your client, which will also be the ES
+        // server in the Docker dev environment. This is nice because your IP address can change from network to network
+        // and it's annoying to have to update your parameters file every time.
+        if (strpos($host, 'devserver') === 0) {
+            $host = str_replace('devserver', $_SERVER['REMOTE_ADDR'], $host);
+        }
+
         $this->host = $host;
         $this->index = $index;
     }

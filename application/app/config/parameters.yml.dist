@@ -19,5 +19,5 @@ parameters:
     secret: ThisTokenIsNotSoSecretChangeIt
 
     # Values below are for the Pacifica Search project
-    elasticsearch_host: '130.20.88.88:9200'
+    elasticsearch_host: 'IP_ADDRESS:9200' # Set to "devserver" for a development environment
     elasticsearch_index: 'pacifica'
