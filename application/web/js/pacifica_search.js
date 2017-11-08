@@ -44,7 +44,7 @@
             var filter = new Filter();
 
             DomMgr.FacetedSearchFilter.getAllTypes().forEach(function (type) {
-                var selectedFilterIds = DomMgr.FacetedSearchFilter.getInputsByType(type).map(function () {
+                var selectedFilterIds = DomMgr.FacetedSearchFilter.getInputsByType(type, true).map(function () {
                     return attr(this, 'data-id');
                 }).get();
 

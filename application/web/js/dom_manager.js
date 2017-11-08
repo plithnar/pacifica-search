@@ -19,10 +19,15 @@
             /**
              * Retrieves the inputs used to toggle filter options on and off for a given filter type
              * @param {string} type Must be one of the PacificaSearch.TYPE.* constants
+             * @param {boolean=} selected Only return selected inputs
              * @returns {jQuery}
              */
-            getInputsByType : function(type) {
-                return $$('fieldset[data-type="' + type + '"] input');
+            getInputsByType : function(type, selected) {
+                var inputs = $$('fieldset[data-type="' + type + '"] input');
+                if (selected) {
+                    inputs = inputs.filter(':checked');
+                }
+                return inputs;
             },
 
             /**
