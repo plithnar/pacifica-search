@@ -28,20 +28,6 @@ class SearchService
     }
 
     /**
-     * @return Client
-     */
-    public function getClient()
-    {
-        if (!$this->client) {
-            $this->client = ClientBuilder::create()
-                ->setHosts([$this->host])
-                ->build();
-        }
-
-        return $this->client;
-    }
-
-    /**
      * Factory method that creates a new instance of ElasticSearchQueryBuilder
      * @param string $type One of the ElasticSearchQueryBuilder::TYPE_* constants
      * @return ElasticSearchQueryBuilder
@@ -60,6 +46,37 @@ class SearchService
     {
         $client = $this->getClient();
         $request = $queryBuilder->toArray();
-        return $client->search($request);
+        $response = $client->search($request);
+        return $response['hits']['hits'];
+    }
+
+    /**
+     * Retrieve only the IDs of the fields matched by a query
+     * @param ElasticSearchQueryBuilder $queryBuilder
+     * @return int[]
+     */
+    public function getIds(ElasticSearchQueryBuilder $queryBuilder)
+    {
+        $results = $this->getResults($queryBuilder->fetchOnlyMetaData());
+
+        $ids = array_map(function ($result) {
+            return $result['_id'];
+        }, $results);
+
+        return array_unique($ids);
+    }
+
+    /**
+     * @return Client
+     */
+    protected function getClient()
+    {
+        if (!$this->client) {
+            $this->client = ClientBuilder::create()
+                ->setHosts([$this->host])
+                ->build();
+        }
+
+        return $this->client;
     }
 }

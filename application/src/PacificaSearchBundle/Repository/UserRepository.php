@@ -3,10 +3,19 @@
 namespace PacificaSearchBundle\Repository;
 
 
+use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 
 class UserRepository extends Repository
 {
+    /**
+     * @inheritdoc
+     */
+    public function getFilteredIds(Filter $filter)
+    {
+        return [];
+    }
+
     /**
      * @inheritdoc
      */
@@ -28,5 +37,18 @@ class UserRepository extends Repository
         $middleInitial = $result['_source']['middle_initial'];
 
         return "$lastName, $firstName" . ($middleInitial ? " $middleInitial." : '');
+    }
+
+    /**
+     * Gets the IDs of all users associated with a set of institutions
+     * @param int[] $institutionIds
+     * @return int[]
+     */
+    public function getIdsByInstitution(array $institutionIds)
+    {
+        $qb = $this->getQueryBuilder()->whereIn('institutions.institution_id', $institutionIds);
+        $results = $this->searchService->getIds($qb);
+
+        return $results;
     }
 }

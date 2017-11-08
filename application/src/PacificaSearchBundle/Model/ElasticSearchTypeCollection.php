@@ -9,7 +9,7 @@ namespace PacificaSearchBundle\Model;
  * ElasticSearchType instances of the same type, which exists to abstract some of the logic of rendering those
  * collections out of the template.
  */
-class ElasticSearchTypeCollection implements \Iterator
+class ElasticSearchTypeCollection implements \Iterator, \Countable
 {
     /**
      * @var ElasticSearchType[]
@@ -51,6 +51,7 @@ class ElasticSearchTypeCollection implements \Iterator
 
     /**
      * Reorders the wrapped instances to be alphabetical by display name
+     * @return ElasticSearchTypeCollection
      */
     public function sortByDisplayName()
     {
@@ -108,5 +109,10 @@ class ElasticSearchTypeCollection implements \Iterator
     public function rewind()
     {
         return reset($this->instances);
+    }
+
+    public function count()
+    {
+        return count($this->instances);
     }
 }

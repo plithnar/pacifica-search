@@ -1,6 +1,7 @@
 <?php
 
 namespace PacificaSearchBundle\Repository;
+use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Service\SearchService;
 
@@ -14,56 +15,59 @@ abstract class Repository
     /** @var SearchService */
     protected $searchService;
 
+    /**
+     * We store names of implementing classes statically on the assumption that we aren't dynamically declaring new
+     * Repository classes, because that would be insane.
+     * @var string[]
+     */
+    private static $implementingClassNames;
+
     public function __construct(SearchService $searchService)
     {
         $this->searchService = $searchService;
     }
 
     /**
-     * Implements the most common form of getAll(), which presumes that our Type is a ConventionalElasticSearchType
-     * and that our ElasticSearch objects contain ID and name fields in the expected places - if any of this is not
-     * true then you should implement your own version of getAll()
+     * Retrieve the IDs of all instances that could be added to the passed filter without resulting in an empty result.
+     * It is important to note that each repository must ignore filters of its own type. That is to say, if an
+     * Institution is selected, that should not prohibit the addition of further Institutions to the Filter - only
+     * adding Filter items of other types should impact the options of a given type.
      *
-     * @return ElasticSearchTypeCollection
+     * @param Filter $filter
+     * @return array
      */
-    public function getAll()
-    {
-        $response = $this->searchService->getResults($this->getQueryBuilderForAllRecords());
+    abstract public function getFilteredIds(Filter $filter);
 
-        $instances = new ElasticSearchTypeCollection();
-        foreach ($response['hits']['hits'] as $curHit) {
-            $modelClass = static::getModelClass();
-            $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
-            $instances->add($instance);
+    /**
+     * Returns an array of the names of all classes that extend this class
+     * @return string[]
+     */
+    public static function getImplementingClassNames()
+    {
+        if (self::$implementingClassNames === null) {
+            // Make sure all of the classes have been declared - otherwise get_declared_classes() will only return the
+            // classes that happen to have been autoloaded
+            foreach (glob(__DIR__ . "/*.php") as $filename) {
+                require_once($filename);
+            }
+
+            self::$implementingClassNames = [];
+            foreach( get_declared_classes() as $class ) {
+                if( is_subclass_of( $class, self::class ) ) {
+                    self::$implementingClassNames[] = $class;
+                }
+            }
         }
 
-        return $instances;
+        return self::$implementingClassNames;
     }
-
-    /**
-     * Gets a query builder that, when submitted to the SearchService, will return all records of the type this
-     * repository is responsible for.
-     *
-     * @return \PacificaSearchBundle\Service\ElasticSearchQueryBuilder
-     */
-    protected function getQueryBuilderForAllRecords()
-    {
-        return $this->searchService
-            ->getQueryBuilder($this->getType());
-    }
-
-    /**
-     * Gets the type (one of the ElasticSearchQueryBuilder::TYPE_* constants) that this repository is responsible for
-     * @return string
-     */
-    abstract protected function getType();
 
     /**
      * Gets the name of the model class of the type that this repository is responsible for. Will attempt to find the
      * class by the convention that repository classes are named <ModelClass>Repository, override this method if that's
      * not the case.
      */
-    protected static function getModelClass()
+    public static function getModelClass()
     {
         // Remove the "Repository" suffix from the repo's class name
         $modelClassName = preg_replace('/Repository$/', '', static::class);
@@ -80,6 +84,60 @@ abstract class Repository
 
         return $modelClassName;
     }
+
+    /**
+     * Implements the most common form of getAll(), which presumes that our Type is a ConventionalElasticSearchType
+     * and that our ElasticSearch objects contain ID and name fields in the expected places - if any of this is not
+     * true then you should implement your own version of getAll()
+     *
+     * @return ElasticSearchTypeCollection
+     */
+    public function getAll()
+    {
+        $response = $this->searchService->getResults($this->getQueryBuilder());
+        return $this->resultsToTypeCollection($response);
+    }
+
+    public function getById($ids)
+    {
+        if (!is_array($ids)){
+            $ids = [$ids];
+        }
+
+        $response = $this->searchService->getResults($this->getQueryBuilder()->whereIn('id', $ids));
+        return $this->resultsToTypeCollection($response);
+    }
+
+    private function resultsToTypeCollection(array $results)
+    {
+        $instances = new ElasticSearchTypeCollection();
+        foreach ($results as $curHit) {
+            $modelClass = static::getModelClass();
+            $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
+            $instances->add($instance);
+        }
+
+        return $instances;
+    }
+
+    /**
+     * Gets a query builder that, when submitted to the SearchService, will return all records of the type this
+     * repository is responsible for. Further filters can then be added by calling additional methods on the query
+     * builder.
+     *
+     * @return \PacificaSearchBundle\Service\ElasticSearchQueryBuilder
+     */
+    protected function getQueryBuilder()
+    {
+        return $this->searchService
+            ->getQueryBuilder($this->getType());
+    }
+
+    /**
+     * Gets the type (one of the ElasticSearchQueryBuilder::TYPE_* constants) that this repository is responsible for
+     * @return string
+     */
+    abstract protected function getType();
 
     /**
      * Given a single result (an entry from the "hits" field of an Elastic Search results object), returns a string

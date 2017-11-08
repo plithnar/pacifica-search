@@ -2,6 +2,10 @@ pacifica_search_homepage:
     path:     /
     defaults: { _controller: PacificaSearchBundle:Search:index }
 
+test:
+    path: /test
+    defaults: { _controller: PacificaSearchBundle:Search:test }
+
 rest:
     type: rest
     resource: PacificaSearchBundle\Controller\RestController

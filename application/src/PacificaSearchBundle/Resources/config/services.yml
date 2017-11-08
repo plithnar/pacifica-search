@@ -12,3 +12,8 @@ services:
         arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
     PacificaSearchBundle\Repository\ProposalRepository:
         arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+    PacificaSearchBundle\Repository\TransactionRepository:
+        arguments:
+            - "@PacificaSearchBundle\\Service\\SearchService"
+            - "@PacificaSearchBundle\\Repository\\UserRepository"
+            - "@PacificaSearchBundle\\Repository\\InstrumentRepository"

@@ -4,33 +4,41 @@ namespace PacificaSearchBundle\Controller;
 
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
-use PacificaSearchBundle\Repository\FilterResultsRepository;
+use PacificaSearchBundle\Filter;
+use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
+use PacificaSearchBundle\Repository\Repository;
 
 class RestController extends FOSRestController
 {
     /**
-     * Retrieves the results of the current filter. The returned object is formatted like:
+     * Retrieves the ids of filter options that are valid given the current state of the filter.
+     * The returned object is formatted like:
      *
      * {
-     *   "instrument_types" : [
-     *     {
-     *       "id" : "12",
-     *       "TODO..." : ...
-     *     },
-     *     ...
-     *   ],
-     *   "instruments" : [],
-     *   "institutions" : [],
-     *   "users" : [],
-     *   "proposals" : []
+     *   "instrument_types" : [ "12", "15", "23" ],
+     *   "instruments" : [...],
+     *   "institutions" : [...],
+     *   "users" : [...],
+     *   "proposals" : [...]
      * }
+     *
+     * The IDs indicate those filter options that can be added to the current filter without resulting in a filter
+     * that returns no results at all.
      */
-    public function getResultsAction()
+    public function getValid_filter_idsAction()
     {
-        /** @var FilterResultsRepository $resultsRepo */
-        $resultsRepo = $this->container->get(FilterResultsRepository::class);
-        $filter = null; // TODO
-        return $this->handleView(View::create($resultsRepo->getResults($filter)));
+        $filter = new Filter();
+
+        /** @var $filterIds ElasticSearchTypeCollection[] */
+        $filterIds = [];
+
+        foreach (Repository::getImplementingClassNames() as $repoClass) {
+            /** @var Repository $repo */
+            $repo = $this->container->get($repoClass);
+            $filterIds[$repo::getModelClass()::getMachineName()] = $repo->getFilteredIds($filter);
+        }
+
+        return $this->handleView(View::create($filterIds));
     }
 
     /**

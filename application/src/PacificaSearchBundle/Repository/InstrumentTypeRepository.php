@@ -2,10 +2,19 @@
 
 namespace PacificaSearchBundle\Repository;
 
+use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 
 class InstrumentTypeRepository extends Repository
 {
+    /**
+     * @inheritdoc
+     */
+    public function getFilteredIds(Filter $filter)
+    {
+        return [];
+    }
+
     /**
      * @inheritdoc
      */
@@ -19,8 +28,8 @@ class InstrumentTypeRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getQueryBuilderForAllRecords()
+    protected function getQueryBuilder()
     {
-        return parent::getQueryBuilderForAllRecords()->whereNestedFieldExists('instrument_members.instrument_id');
+        return parent::getQueryBuilder()->whereNestedFieldExists('instrument_members.instrument_id');
     }
 }
