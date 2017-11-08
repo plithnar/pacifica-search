@@ -19,18 +19,20 @@
                 contentType: 'application/json',
                 data: JSON.stringify(filter.toObj())
             }).then(function () {
-                $.get('/results', function (results) {
+                $.get('/valid_filter_ids', function (results) {
                     Object.keys(results).forEach(function (type) {
-                        var resultsForType = results[type];
-
-                        var idsToEnable = resultsForType.map(function (result) {
-                            return result.id;
-                        });
+                        var idsToEnable = results[type];
 
                         DomMgr.FacetedSearchFilter.getInputsByType(type).each(function () {
                             var id = attr(this, 'data-id');
-                            var disable = (idsToEnable.indexOf(id) === -1);
+                            var disable = (idsToEnable.indexOf(parseInt(id)) === -1);
+
                             $(this).attr('disabled', disable);
+                            if (disable) {
+                                $(this).closest('label').addClass('disabled');
+                            } else {
+                                $(this).closest('label').removeClass('disabled');
+                            }
                         });
                     });
                 });

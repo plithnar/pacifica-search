@@ -6,6 +6,10 @@ label {
     white-space: nowrap;
 }
 
+label.disabled {
+    color: lightgrey;
+}
+
 fieldset {
     float: left;
     margin: 10px;
