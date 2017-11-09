@@ -39,6 +39,9 @@ class RestController extends FOSRestController
             /** @var Repository $repo */
             $repo = $this->container->get($repoClass);
             $filteredIds = $repo->getFilteredIds($filter);
+
+            // NULL represents a case where no filtering was performed - we exclude these from the results, meaning
+            // that all items of that type are still valid options
             if (null !== $filteredIds) {
                 $filterIds[$repo::getModelClass()::getMachineName()] = $filteredIds;
             }
@@ -70,15 +73,6 @@ class RestController extends FOSRestController
         $this->getSession()->set('filter', $filter);
 
         return $this->handleView(View::create([ 'result' => 'Ok']));
-    }
-
-    /**
-     * Retrieves the current state of the filter. The form of the returned object is the same as the
-     * object expected by putFilterAction()
-     */
-    public function getFilterAction()
-    {
-        return $this->handleView(View::create([]));
     }
 
     /**
