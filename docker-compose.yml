@@ -38,6 +38,8 @@ services:
             SITEDB_PASSWORD: search
             SITEDB_DB_NAME: search
             SITEDB_DBDRIVER: postgre
+            XDEBUG_CONFIG: remote_host=130.20.88.88
+            PHP_IDE_CONFIG: serverName=PacificaSearch
 
     search_sitedb:
         container_name: search_sitedb

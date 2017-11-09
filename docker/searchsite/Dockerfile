@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y \
         intl \
         opcache
 
+RUN yes | pecl install xdebug \
+    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini
+
 # Permission fix
 RUN usermod -u 1000 www-data
 RUN mkdir -p /var/log/php-fpm
