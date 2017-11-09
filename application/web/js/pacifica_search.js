@@ -20,12 +20,12 @@
                 data: JSON.stringify(filter.toObj())
             }).then(function () {
                 $.get('/valid_filter_ids', function (results) {
-                    Object.keys(results).forEach(function (type) {
+                    ['instrument_type', 'instrument', 'institution', 'user', 'proposal'].forEach(function (type) {
                         var idsToEnable = results[type];
 
                         DomMgr.FacetedSearchFilter.getInputsByType(type).each(function () {
                             var id = attr(this, 'data-id');
-                            var disable = (idsToEnable.indexOf(parseInt(id)) === -1);
+                            var disable = idsToEnable && (idsToEnable.indexOf(parseInt(id)) === -1);
 
                             $(this).attr('disabled', disable);
                             if (disable) {
