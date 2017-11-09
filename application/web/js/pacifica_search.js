@@ -27,11 +27,12 @@
                             var id = attr(this, 'data-id');
                             var disable = idsToEnable && (idsToEnable.indexOf(parseInt(id)) === -1);
 
-                            $(this).attr('disabled', disable);
                             if (disable) {
                                 $(this).closest('label').addClass('disabled');
+                                $(this).attr('disabled', true);
                             } else {
                                 $(this).closest('label').removeClass('disabled');
+                                $(this).removeAttr('disabled');
                             }
                         });
                     });
