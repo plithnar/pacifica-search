@@ -11,14 +11,6 @@ class UserRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function getFilteredIds(Filter $filter)
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
     protected function getType()
     {
         return ElasticSearchQueryBuilder::TYPE_USER;
@@ -50,5 +42,16 @@ class UserRepository extends Repository
         $results = $this->searchService->getIds($qb);
 
         return $results;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwnIdsFromTransactionResults(array $transactionResults)
+    {
+        $ids = array_map(function ($result) {
+            return $result['_source']['submitter'];
+        }, $transactionResults);
+        return $ids;
     }
 }

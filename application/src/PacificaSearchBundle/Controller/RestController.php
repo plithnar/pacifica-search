@@ -7,6 +7,9 @@ use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Repository\Repository;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class RestController extends FOSRestController
 {
@@ -27,7 +30,7 @@ class RestController extends FOSRestController
      */
     public function getValid_filter_idsAction()
     {
-        $filter = new Filter();
+        $filter = $this->getSession()->get('filter');
 
         /** @var $filterIds ElasticSearchTypeCollection[] */
         $filterIds = [];
@@ -35,7 +38,10 @@ class RestController extends FOSRestController
         foreach (Repository::getImplementingClassNames() as $repoClass) {
             /** @var Repository $repo */
             $repo = $this->container->get($repoClass);
-            $filterIds[$repo::getModelClass()::getMachineName()] = $repo->getFilteredIds($filter);
+            $filteredIds = $repo->getFilteredIds($filter);
+            if (null !== $filteredIds) {
+                $filterIds[$repo::getModelClass()::getMachineName()] = $filteredIds;
+            }
         }
 
         return $this->handleView(View::create($filterIds));
@@ -52,9 +58,17 @@ class RestController extends FOSRestController
      *   "users" : ["5"],
      *   "proposals" : []
      * }
+     *
+     * @param Request $request
+     * @return Response
      */
-    public function putFilterAction()
+    public function putFilterAction(Request $request)
     {
+        $filterValues = json_decode($request->getContent(), true);
+
+        $filter = Filter::fromArray($filterValues);
+        $this->getSession()->set('filter', $filter);
+
         return $this->handleView(View::create([ 'result' => 'Ok']));
     }
 
@@ -65,5 +79,13 @@ class RestController extends FOSRestController
     public function getFilterAction()
     {
         return $this->handleView(View::create([]));
+    }
+
+    /**
+     * @return Session
+     */
+    private function getSession()
+    {
+        return $this->container->get('session');
     }
 }

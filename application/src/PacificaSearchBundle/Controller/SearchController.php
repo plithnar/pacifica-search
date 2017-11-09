@@ -19,7 +19,7 @@ class SearchController extends Controller
 
             // TODO: If it turns out the production database has no orphaned records, use this statement instead of
             // the transaction repo method below, and remove that method
-//            $instances = $repo->getAll()->sortByDisplayName();
+    //            $instances = $repo->getAll()->sortByDisplayName();
 
             // TODO: Either refactor this for readability/prettiness or remove it, depending on whether we find out
             // that there are no orphaned records in the production database.
@@ -30,7 +30,7 @@ class SearchController extends Controller
             if (!count($instances)) {
                 throw new \RuntimeException(
                     "No records found for $repoClass, this is probably an error in your Elastic Search "
-                  . "configuration or the corresponding type in your Elastic Search database is not populated"
+                    . "configuration or the corresponding type in your Elastic Search database is not populated"
                 );
             }
 

@@ -112,7 +112,7 @@ class ElasticSearchQueryBuilder
             $this->fields[$fieldName] = [];
         }
 
-        $this->fields[$fieldName] = array_merge($this->fields[$fieldName], $newValues);
+        $this->fields[$fieldName] = array_merge($this->fields[$fieldName], array_values($newValues));
 
         return $this;
     }
@@ -199,7 +199,7 @@ class ElasticSearchQueryBuilder
         }
 
         if ($this->nestedFieldExists) {
-            $array['body']['query']['nested'][] = [
+            $array['body']['query']['nested'] = [
                 'path' => $this->nestedFieldExists['path'],
                 'query' => [
                     'bool' => [

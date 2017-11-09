@@ -55,6 +55,7 @@ class SearchService
         $client = $this->getClient();
         $request = $queryBuilder->toArray();
         $response = $client->search($request);
+
         return $response['hits']['hits'];
     }
 

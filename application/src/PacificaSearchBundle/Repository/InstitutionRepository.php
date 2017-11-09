@@ -9,11 +9,27 @@ use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 class InstitutionRepository extends Repository
 {
     /**
+     * Gets the IDs of a set of Institutions associated with a set of Users
+     * @param int[] $userIds
+     * @return int[]
+     */
+    public function getIdsByUserIds(array $userIds)
+    {
+        $qb = $this->getQueryBuilder()->whereIn('users.person_id', $userIds);
+        $ids = $this->searchService->getIds($qb);
+        return $ids;
+    }
+
+    /**
      * @inheritdoc
      */
-    public function getFilteredIds(Filter $filter)
+    protected function getOwnIdsFromTransactionResults(array $transactionResults)
     {
-        return [];
+        $userRepo = $this->repositoryManager->getUserRepository();
+
+        $userIds = $userRepo->getOwnIdsFromTransactionResults($transactionResults);
+        $ids = $this->getIdsByUserIds($userIds);
+        return $ids;
     }
 
     /**

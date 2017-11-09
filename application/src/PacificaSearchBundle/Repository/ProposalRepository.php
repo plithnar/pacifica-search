@@ -11,9 +11,12 @@ class ProposalRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function getFilteredIds(Filter $filter)
+    public function getOwnIdsFromTransactionResults(array $transactionResults)
     {
-        return [];
+        $ids = array_map(function ($result) {
+            return $result['_source']['proposal'];
+        }, $transactionResults);
+        return $ids;
     }
 
     /**

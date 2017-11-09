@@ -11,9 +11,13 @@ class InstrumentRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function getFilteredIds(Filter $filter)
+    public function getOwnIdsFromTransactionResults(array $transactionResults)
     {
-        return [];
+        $ids = array_map(function ($result) {
+            return $result['_source']['instrument'];
+        }, $transactionResults);
+        // TODO: Figure out how to make the original request unique instead of doing this here
+        return array_values(array_unique($ids));
     }
 
     /**

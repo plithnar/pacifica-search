@@ -2,18 +2,17 @@ services:
     PacificaSearchBundle\Service\SearchService:
         arguments: ["%elasticsearch_host%", "%elasticsearch_index%"]
 
+    PacificaSearchBundle\Service\RepositoryManager:
+        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
     PacificaSearchBundle\Repository\InstrumentTypeRepository:
-        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+        factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getInstrumentTypeRepository"]
     PacificaSearchBundle\Repository\InstrumentRepository:
-        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+        factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getInstrumentRepository"]
     PacificaSearchBundle\Repository\InstitutionRepository:
-        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+        factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getInstitutionRepository"]
     PacificaSearchBundle\Repository\UserRepository:
-        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+        factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getUserRepository"]
     PacificaSearchBundle\Repository\ProposalRepository:
-        arguments: ["@PacificaSearchBundle\\Service\\SearchService"]
+        factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getProposalRepository"]
     PacificaSearchBundle\Repository\TransactionRepository:
-        arguments:
-            - "@PacificaSearchBundle\\Service\\SearchService"
-            - "@PacificaSearchBundle\\Repository\\UserRepository"
-            - "@PacificaSearchBundle\\Repository\\InstrumentRepository"
+        factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getTransactionRepository"]

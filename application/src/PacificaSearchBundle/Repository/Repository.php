@@ -3,6 +3,8 @@
 namespace PacificaSearchBundle\Repository;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
+use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
+use PacificaSearchBundle\Service\RepositoryManager;
 use PacificaSearchBundle\Service\SearchService;
 
 /**
@@ -15,6 +17,9 @@ abstract class Repository
     /** @var SearchService */
     protected $searchService;
 
+    /** @var RepositoryManager */
+    protected $repositoryManager;
+
     /**
      * We store names of implementing classes statically on the assumption that we aren't dynamically declaring new
      * Repository classes, because that would be insane.
@@ -22,9 +27,10 @@ abstract class Repository
      */
     private static $implementingClassNames;
 
-    public function __construct(SearchService $searchService)
+    public function __construct(SearchService $searchService, RepositoryManager $repositoryManager)
     {
         $this->searchService = $searchService;
+        $this->repositoryManager = $repositoryManager;
     }
 
     /**
@@ -34,9 +40,51 @@ abstract class Repository
      * adding Filter items of other types should impact the options of a given type.
      *
      * @param Filter $filter
+     * @return array|NULL NULL indicates that no filtering was performed because the filter was empty (possibly after
+     *   removing all of the Repository's own model class's items)
+     */
+    public function getFilteredIds(Filter $filter)
+    {
+        // Clone the filter before making any changes so that the caller's filter doesn't get changed
+        $filter = clone $filter;
+
+        // Remove filters of own type - you can't restrict Users by picking a User
+        $filter->setIdsByType(self::getModelClass(), []);
+
+        // We don't do any filtering if the filter contains no values
+        if ($filter->isEmpty()) {
+            return null;
+        }
+
+        $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
+        $userIds = $this->getIdsByTransactionIds($transactionIds);
+
+        return $userIds;
+    }
+
+    /**
+     * Gets IDs of this type that are associated with a set of transaction IDs
+     *
+     * TODO: Figure out how to make the query here unique by the required field so that we don't have to process a
+     * large number of redundant results.
+     *
+     * @param array $transactionIds
      * @return array
      */
-    abstract public function getFilteredIds(Filter $filter);
+    protected function getIdsByTransactionIds(array $transactionIds)
+    {
+        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
+        $results = $this->searchService->getResults($qb);
+        $ids = $this->getOwnIdsFromTransactionResults($results);
+        return array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
+    }
+
+    /**
+     * @param array $transactionResults An array returned by SearchService when given a query for TYPE_TRANSACTION
+     * @return int[] Array containing all IDs of this Repository's type that correspond to the returned transaction
+     * records
+     */
+    abstract protected function getOwnIdsFromTransactionResults(array $transactionResults);
 
     /**
      * Returns an array of the names of all classes that extend this class

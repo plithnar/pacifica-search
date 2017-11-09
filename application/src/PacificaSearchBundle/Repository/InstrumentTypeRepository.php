@@ -8,11 +8,29 @@ use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 class InstrumentTypeRepository extends Repository
 {
     /**
+     * Gets the IDs of a set of InstrumentTypes associated with a set of Instruments
+     * @param int[] $instrumentIds
+     * @return int[]
+     */
+    public function getIdsByInstrumentIds(array $instrumentIds)
+    {
+        $qb = $this->getQueryBuilder()->whereIn('instrument_members.instrument_id', $instrumentIds);
+
+        $ids = $this->searchService->getIds($qb);
+
+        // TODO: Figure out how to make this a unique query instead of uniquing it afterward
+        return array_values(array_unique($ids));
+    }
+
+    /**
      * @inheritdoc
      */
-    public function getFilteredIds(Filter $filter)
+    protected function getOwnIdsFromTransactionResults(array $transactionResults)
     {
-        return [];
+        $instrumentRepository = $this->repositoryManager->getInstrumentRepository();
+        $instrumentIds = $instrumentRepository->getOwnIdsFromTransactionResults($transactionResults);
+        $ids = $this->getIdsByInstrumentIds($instrumentIds);
+        return $ids;
     }
 
     /**

@@ -10,6 +10,7 @@ use PacificaSearchBundle\Model\InstrumentType;
 use PacificaSearchBundle\Model\Proposal;
 use PacificaSearchBundle\Model\User;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
+use PacificaSearchBundle\Service\RepositoryManager;
 use PacificaSearchBundle\Service\SearchService;
 
 /**
@@ -25,11 +26,8 @@ class TransactionRepository
     /** @var SearchService */
     protected $searchService;
 
-    /** @var InstitutionRepository */
-    protected $userRepository;
-
-    /** @var InstrumentTypeRepository */
-    protected $instrumentRepository;
+    /** @var RepositoryManager */
+    protected $repositoryManager;
 
     /**
      * @var array[] in the form
@@ -44,12 +42,10 @@ class TransactionRepository
 
     public function __construct(
         SearchService $searchService,
-        UserRepository $userRepository,
-        InstrumentRepository $instrumentRepository
+        RepositoryManager $repositoryManager
     ) {
         $this->searchService = $searchService;
-        $this->userRepository = $userRepository;
-        $this->instrumentRepository = $instrumentRepository;
+        $this->repositoryManager = $repositoryManager;
     }
 
     /**
@@ -65,6 +61,11 @@ class TransactionRepository
         if (!$this->idsByModel) {
             $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
             $results = $this->searchService->getResults($qb);
+
+            if (empty($results)) {
+                throw new \RuntimeException("The Transactions type in the Elasticsearch DB appears to be empty.");
+            }
+
             foreach($results as $result) {
                 $vals = $result['_source'];
                 $this->idsByModel[User::class][$vals['submitter']] = $vals['submitter'];
@@ -114,7 +115,7 @@ class TransactionRepository
         if (!count($instrumentIds)) {
             $instrumentTypeIds = $filter->getInstrumentTypeIds();
             if (count($instrumentTypeIds)) {
-                $instrumentIds = $this->instrumentRepository->getIdsByType($instrumentTypeIds);
+                $instrumentIds = $this->repositoryManager->getInstrumentRepository()->getIdsByType($instrumentTypeIds);
             }
         }
         if (count($instrumentIds)) {
@@ -128,7 +129,7 @@ class TransactionRepository
         if (!count($userIds)) {
             $institutionIds = $filter->getInstitutionIds();
             if (count($institutionIds)) {
-                $userIds = $this->userRepository->getIdsByInstitution($institutionIds);
+                $userIds = $this->repositoryManager->getUserRepository()->getIdsByInstitution($institutionIds);
             }
         }
         if (count($userIds)) {
