@@ -4,6 +4,7 @@ namespace PacificaSearchBundle\Repository;
 
 
 use PacificaSearchBundle\Filter;
+use PacificaSearchBundle\Model\File;
 use PacificaSearchBundle\Model\Institution;
 use PacificaSearchBundle\Model\Instrument;
 use PacificaSearchBundle\Model\InstrumentType;
@@ -80,6 +81,8 @@ class TransactionRepository
             $institutionQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_INSITUTION)
                 ->whereIn('users.person_id', $this->idsByModel[User::class]);
             $this->idsByModel[Institution::class] = $this->searchService->getIds($institutionQb);
+
+            $this->idsByModel[File::class] = []; // Not relevant since all files have a transaction, this is just to circumvent the otherwise helpful error message below
         }
 
         if (!isset($this->idsByModel[$modelClass])) {

@@ -59,7 +59,7 @@ class SearchService
         if ($response['hits']['total'] > $request['size']) {
             // TODO: For now we are just setting the size really really large, but we'll need to make our query builder
             // able to handle arbitrarily large responses.
-            throw new \RuntimeException('Response was larger than the requested size - records will be missing.');
+            //throw new \RuntimeException('Response was larger than the requested size - records will be missing.');
         }
 
         return $response['hits']['hits'];
@@ -75,7 +75,7 @@ class SearchService
         $results = $this->getResults($queryBuilder->fetchOnlyMetaData());
 
         $ids = array_map(function ($result) {
-            return $result['_id'];
+            return (int) $result['_id'];
         }, $results);
 
         return array_unique($ids);

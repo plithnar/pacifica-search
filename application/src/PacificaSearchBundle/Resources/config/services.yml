@@ -16,3 +16,5 @@ services:
         factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getProposalRepository"]
     PacificaSearchBundle\Repository\TransactionRepository:
         factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getTransactionRepository"]
+    PacificaSearchBundle\Repository\FileRepository:
+        factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getFileRepository"]

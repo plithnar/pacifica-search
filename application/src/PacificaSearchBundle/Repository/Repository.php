@@ -20,13 +20,6 @@ abstract class Repository
     /** @var RepositoryManager */
     protected $repositoryManager;
 
-    /**
-     * We store names of implementing classes statically on the assumption that we aren't dynamically declaring new
-     * Repository classes, because that would be insane.
-     * @var string[]
-     */
-    private static $implementingClassNames;
-
     public function __construct(SearchService $searchService, RepositoryManager $repositoryManager)
     {
         $this->searchService = $searchService;
@@ -48,8 +41,10 @@ abstract class Repository
         // Clone the filter before making any changes so that the caller's filter doesn't get changed
         $filter = clone $filter;
 
-        // Remove filters of own type - you can't restrict Users by picking a User
-        $filter->setIdsByType(self::getModelClass(), []);
+        // Remove filters of own type if applicable - you can't restrict Users by picking a User
+        if ($this instanceof FilterRepository) {
+            $filter->setIdsByType(self::getModelClass(), []);
+        }
 
         // We don't do any filtering if the filter contains no values
         if ($filter->isEmpty()) {
@@ -57,9 +52,9 @@ abstract class Repository
         }
 
         $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
-        $userIds = $this->getIdsByTransactionIds($transactionIds);
+        $ownIds = $this->getIdsByTransactionIds($transactionIds);
 
-        return $userIds;
+        return $ownIds;
     }
 
     /**
@@ -77,9 +72,6 @@ abstract class Repository
         $results = $this->searchService->getResults($qb);
         $ids = $this->getOwnIdsFromTransactionResults($results);
         $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
-        $ids = array_map(function ($id) {
-            return (int) $id;
-        }, $ids);
         return $ids;
     }
 
@@ -89,30 +81,6 @@ abstract class Repository
      * records
      */
     abstract protected function getOwnIdsFromTransactionResults(array $transactionResults);
-
-    /**
-     * Returns an array of the names of all classes that extend this class
-     * @return string[]
-     */
-    public static function getImplementingClassNames()
-    {
-        if (self::$implementingClassNames === null) {
-            // Make sure all of the classes have been declared - otherwise get_declared_classes() will only return the
-            // classes that happen to have been autoloaded
-            foreach (glob(__DIR__ . "/*.php") as $filename) {
-                require_once($filename);
-            }
-
-            self::$implementingClassNames = [];
-            foreach( get_declared_classes() as $class ) {
-                if( is_subclass_of( $class, self::class ) ) {
-                    self::$implementingClassNames[] = $class;
-                }
-            }
-        }
-
-        return self::$implementingClassNames;
-    }
 
     /**
      * Gets the name of the model class of the type that this repository is responsible for. Will attempt to find the

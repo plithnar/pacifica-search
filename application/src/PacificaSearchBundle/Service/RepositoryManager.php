@@ -1,6 +1,8 @@
 <?php
 
 namespace PacificaSearchBundle\Service;
+
+use PacificaSearchBundle\Repository\FileRepository;
 use PacificaSearchBundle\Repository\InstitutionRepository;
 use PacificaSearchBundle\Repository\InstrumentRepository;
 use PacificaSearchBundle\Repository\InstrumentTypeRepository;
@@ -36,6 +38,9 @@ class RepositoryManager
 
     /** @var TransactionRepository */
     private $transactionRepository;
+
+    /** @var FileRepository */
+    private $fileRepository;
 
     public function __construct(SearchService $searchService)
     {
@@ -112,5 +117,17 @@ class RepositoryManager
         }
 
         return $this->transactionRepository;
+    }
+
+    /**
+     * @return FileRepository
+     */
+    public function getFileRepository() : FileRepository
+    {
+        if ($this->fileRepository === null) {
+            $this->fileRepository = new FileRepository($this->searchService, $this);
+        }
+
+        return $this->fileRepository;
     }
 }

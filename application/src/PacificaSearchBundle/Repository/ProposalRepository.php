@@ -6,7 +6,7 @@ namespace PacificaSearchBundle\Repository;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 
-class ProposalRepository extends Repository
+class ProposalRepository extends FilterRepository
 {
     /**
      * @inheritdoc

@@ -16,6 +16,7 @@ class ElasticSearchQueryBuilder
     const TYPE_USER = 'Users';
     const TYPE_PROPOSAL = 'Proposals';
     const TYPE_TRANSACTION = 'Transactions';
+    const TYPE_FILE = 'Files';
 
     /**
      * Defines values of fields that must be present in a record for it to be returned
@@ -224,7 +225,8 @@ class ElasticSearchQueryBuilder
             self::TYPE_INSTRUMENT,
             self::TYPE_PROPOSAL,
             self::TYPE_USER,
-            self::TYPE_TRANSACTION
+            self::TYPE_TRANSACTION,
+            self::TYPE_FILE
         ];
 
         if (!in_array($type, $validTypes)) {

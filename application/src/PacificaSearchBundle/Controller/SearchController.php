@@ -3,7 +3,9 @@
 namespace PacificaSearchBundle\Controller;
 
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
-use PacificaSearchBundle\Model\User;
+use PacificaSearchBundle\Repository\FileRepository;
+use PacificaSearchBundle\Repository\FilterRepository;
+use PacificaSearchBundle\Repository\InstitutionRepository;
 use PacificaSearchBundle\Repository\Repository;
 use PacificaSearchBundle\Repository\TransactionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -14,7 +16,7 @@ class SearchController extends Controller
     {
         /** @var ElasticSearchTypeCollection[] */
         $filters = array_map(function ($repoClass) {
-            /** @var Repository $repo */
+            /** @var FilterRepository $repo */
             $repo = $this->container->get($repoClass);
 
             // TODO: If it turns out the production database has no orphaned records, use this statement instead of
@@ -35,7 +37,7 @@ class SearchController extends Controller
             }
 
             return $instances;
-        }, Repository::getImplementingClassNames());
+        }, FilterRepository::getImplementingClassNames());
 
         return $this->render(
             'PacificaSearchBundle::search.html.twig',
@@ -47,9 +49,9 @@ class SearchController extends Controller
 
     public function testAction()
     {
-        /** @var TransactionRepository $r */
-        $r = $this->container->get(TransactionRepository::class);
-        $r->getIdsOfTypeAssociatedWithAtLeastOneTransaction(User::class);
+        /** @var InstitutionRepository $r */
+        $r = $this->container->get(InstitutionRepository::class);
+        $res = $r->getById(43256);
 
         echo "<pre><code>";
         print_r($res);

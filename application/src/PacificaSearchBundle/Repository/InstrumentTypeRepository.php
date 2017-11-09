@@ -5,7 +5,7 @@ namespace PacificaSearchBundle\Repository;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 
-class InstrumentTypeRepository extends Repository
+class InstrumentTypeRepository extends FilterRepository
 {
     /**
      * Gets the IDs of a set of InstrumentTypes associated with a set of Instruments

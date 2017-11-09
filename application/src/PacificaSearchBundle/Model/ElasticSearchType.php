@@ -30,6 +30,17 @@ abstract class ElasticSearchType
     }
 
     /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getDisplayName()
+        ];
+    }
+
+    /**
      * Returns a string that can represent the Type instance in the GUI
      * @return string
      */

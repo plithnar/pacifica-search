@@ -6,6 +6,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
+use PacificaSearchBundle\Repository\FileRepository;
+use PacificaSearchBundle\Repository\FilterRepository;
 use PacificaSearchBundle\Repository\Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,7 +37,7 @@ class RestController extends FOSRestController
         /** @var $filterIds ElasticSearchTypeCollection[] */
         $filterIds = [];
 
-        foreach (Repository::getImplementingClassNames() as $repoClass) {
+        foreach (FilterRepository::getImplementingClassNames() as $repoClass) {
             /** @var Repository $repo */
             $repo = $this->container->get($repoClass);
             $filteredIds = $repo->getFilteredIds($filter);
@@ -48,6 +50,26 @@ class RestController extends FOSRestController
         }
 
         return $this->handleView(View::create($filterIds));
+    }
+    /**
+     * Retrieves files that fit the current filter
+     */
+    public function getFilesAction()
+    {
+        /** @var Filter $filter */
+        $filter = $this->getSession()->get('filter');
+
+        /** @var FileRepository $repo */
+        $repo = $this->container->get(FileRepository::class);
+        $fileIds = $repo->getFilteredIds($filter);
+        $files = $repo->getById($fileIds);
+
+        $response = [];
+        foreach ($files->getInstances() as $file) {
+            $response[] = $file->toArray();
+        }
+
+        return $this->handleView(View::create($response));
     }
 
     /**

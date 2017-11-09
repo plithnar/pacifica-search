@@ -13,6 +13,8 @@
         function _updateOptions() {
             var filter = _getFilter();
 
+            $$('#files').find('p').detach();
+
             $.ajax({
                 url: '/filter',
                 type: 'PUT',
@@ -35,6 +37,15 @@
                                 $(this).removeAttr('disabled');
                             }
                         });
+                    });
+                });
+
+                $.get('/files', function (results) {
+                    var fileTemplate = $$('#file_template').children();
+                    results.forEach(function(result) {
+                        var fileEntry = fileTemplate.clone();
+                        $$(fileEntry.find('[data-is-file-name-container]')).html(result['name']);
+                        $$('#files').append(fileEntry);
                     });
                 });
             });
