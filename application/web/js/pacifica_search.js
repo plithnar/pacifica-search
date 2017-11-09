@@ -6,7 +6,7 @@
     var attr = PacificaSearch.Utilities.assertAttributeExists;
 
     $(function () {
-        $$('#pacifica_search_button').on('click', function () {
+        $$('#search_filter').on('change', 'input', function () {
             _updateOptions();
         });
 

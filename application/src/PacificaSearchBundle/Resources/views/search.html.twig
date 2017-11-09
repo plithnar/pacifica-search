@@ -12,21 +12,19 @@
     <script src="js/pacifica_search.js"></script>
 </head>
 <body>
-    <p>
-        <button id="pacifica_search_button">Search</button>
-    </p>
-
-    {% for collection in filters %}
-        <fieldset data-type="{{ collection.machineName }}">
-            <h2>{{ collection.typeDisplayName }}</h2>
-            {% for instance in collection.instances %}
-                {% set input_id = collection.machineName ~ "_" ~ instance.id %}
-                <label for="{{ input_id }}">
-                    <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
-                    {{ instance.displayName }}
-                </label>
-            {% endfor %}
-        </fieldset>
-    {% endfor %}
+    <section id="search_filter">
+        {% for collection in filters %}
+            <fieldset data-type="{{ collection.machineName }}">
+                <h2>{{ collection.typeDisplayName }}</h2>
+                {% for instance in collection.instances %}
+                    {% set input_id = collection.machineName ~ "_" ~ instance.id %}
+                    <label for="{{ input_id }}">
+                        <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
+                        {{ instance.displayName }}
+                    </label>
+                {% endfor %}
+            </fieldset>
+        {% endfor %}
+    </section>
 </body>
 </html>
