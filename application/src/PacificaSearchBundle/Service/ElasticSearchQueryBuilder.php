@@ -156,7 +156,7 @@ class ElasticSearchQueryBuilder
     {
         $array = [
             'index' => $this->index,
-            'size' =>  50000,
+            'size' =>  10000,
             'type' => $this->type
         ];
 
