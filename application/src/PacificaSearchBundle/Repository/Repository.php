@@ -69,14 +69,18 @@ abstract class Repository
      * large number of redundant results.
      *
      * @param array $transactionIds
-     * @return array
+     * @return int[]
      */
     protected function getIdsByTransactionIds(array $transactionIds)
     {
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
         $results = $this->searchService->getResults($qb);
         $ids = $this->getOwnIdsFromTransactionResults($results);
-        return array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
+        $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
+        $ids = array_map(function ($id) {
+            return (int) $id;
+        }, $ids);
+        return $ids;
     }
 
     /**
