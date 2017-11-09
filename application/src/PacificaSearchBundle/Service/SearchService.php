@@ -56,6 +56,12 @@ class SearchService
         $request = $queryBuilder->toArray();
         $response = $client->search($request);
 
+        if ($response['hits']['total'] > $request['size']) {
+            // TODO: For now we are just setting the size really really large, but we'll need to make our query builder
+            // able to handle arbitrarily large responses.
+            throw new \RuntimeException('Response was larger than the requested size - records will be missing.');
+        }
+
         return $response['hits']['hits'];
     }
 
