@@ -14,7 +14,7 @@ class ProposalRepository extends FilterRepository
     public function getOwnIdsFromTransactionResults(array $transactionResults)
     {
         $ids = array_map(function ($result) {
-            return $result['_source']['proposal'];
+            return (int) $result['_source']['proposal'];
         }, $transactionResults);
         return $ids;
     }
