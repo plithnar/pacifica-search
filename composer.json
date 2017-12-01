@@ -6,10 +6,5 @@
         "phpunit/php-code-coverage": "^4.0",
         "squizlabs/php_codesniffer": "*",
         "symfony/debug-bundle": "*"
-    },
-    "require": {
-        "guzzlehttp/guzzle": "*",
-        "symfony/symfony": "3.3.*",
-        "symfony/intl": "^3.3"
     }
 }
