@@ -66,12 +66,12 @@ class ElasticSearchTypeCollection implements \Iterator, \Countable
 
     /**
      * Returns the string that represents the contained Type in the GUI
-     * @return string|null NULL if no items have been added
+     * @return string|NULL NULL if no items have been added
      */
     public function getTypeDisplayName()
     {
         if (empty($this->instances)) {
-            return null;
+            return NULL;
         }
 
         return $this->instances[0]::getTypeDisplayName();

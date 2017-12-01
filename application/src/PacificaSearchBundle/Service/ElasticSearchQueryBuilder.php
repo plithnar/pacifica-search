@@ -63,7 +63,7 @@ class ElasticSearchQueryBuilder
      *
      * @var bool
      */
-    private $metadataOnly = false;
+    private $metadataOnly = FALSE;
 
     public function __construct($index, $type)
     {
@@ -82,7 +82,7 @@ class ElasticSearchQueryBuilder
     {
         // This is probably not hard to implement but it's not required at the moment so I'm skipping supporting it for
         // the sake of time.
-        if ($this->nestedFieldExists !== null) {
+        if ($this->nestedFieldExists !== NULL) {
             throw new \RuntimeException("This class does not currently support multiple must-exist nested fields");
         }
 
@@ -149,7 +149,7 @@ class ElasticSearchQueryBuilder
      */
     public function fetchOnlyMetaData()
     {
-        $this->metadataOnly = true;
+        $this->metadataOnly = TRUE;
         return $this;
     }
 
@@ -162,7 +162,7 @@ class ElasticSearchQueryBuilder
         ];
 
         if ($this->metadataOnly) {
-            $array['body']['_source'] = false;
+            $array['body']['_source'] = FALSE;
         }
 
         if ($this->ids) {
@@ -181,7 +181,7 @@ class ElasticSearchQueryBuilder
         foreach ($this->fields as $fieldName => $fieldValues) {
             // Check for a nested field name, which requires a different query structure
             $nestedFieldPath = $this->getNestedFieldPath($fieldName);
-            if ($nestedFieldPath !== null) {
+            if ($nestedFieldPath !== NULL) {
                 $array['body']['query']['nested'] = [
                     'path' => $nestedFieldPath,
                     'query' => [
@@ -241,8 +241,8 @@ class ElasticSearchQueryBuilder
      */
     private function getNestedFieldPath($field)
     {
-        if (strpos($field, '.') === false) {
-            return null;
+        if (strpos($field, '.') === FALSE) {
+            return NULL;
         }
 
         $fieldParts = explode('.', $field);

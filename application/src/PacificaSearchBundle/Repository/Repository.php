@@ -48,7 +48,7 @@ abstract class Repository
 
         // We don't do any filtering if the filter contains no values
         if ($filter->isEmpty()) {
-            return null;
+            return NULL;
         }
 
         $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);

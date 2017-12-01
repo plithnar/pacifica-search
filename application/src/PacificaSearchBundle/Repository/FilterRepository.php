@@ -22,7 +22,7 @@ abstract class FilterRepository extends Repository
      */
     public static function getImplementingClassNames()
     {
-        if (self::$implementingClassNames === null) {
+        if (self::$implementingClassNames === NULL) {
             // Make sure all of the classes have been declared - otherwise get_declared_classes() will only return the
             // classes that happen to have been autoloaded
             foreach (glob(__DIR__ . "/*.php") as $filename) {

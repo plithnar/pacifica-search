@@ -52,7 +52,7 @@ class RepositoryManager
      */
     public function getInstitutionRepository() : InstitutionRepository
     {
-        if ($this->institutionRepository === null) {
+        if ($this->institutionRepository === NULL) {
             $this->institutionRepository = new InstitutionRepository($this->searchService, $this);
         }
 
@@ -64,7 +64,7 @@ class RepositoryManager
      */
     public function getInstrumentRepository() : InstrumentRepository
     {
-        if ($this->instrumentRepository === null) {
+        if ($this->instrumentRepository === NULL) {
             $this->instrumentRepository = new InstrumentRepository($this->searchService, $this);
         }
 
@@ -76,7 +76,7 @@ class RepositoryManager
      */
     public function getInstrumentTypeRepository() : InstrumentTypeRepository
     {
-        if ($this->instrumentTypeRepository === null) {
+        if ($this->instrumentTypeRepository === NULL) {
             $this->instrumentTypeRepository = new InstrumentTypeRepository($this->searchService, $this);
         }
 
@@ -88,7 +88,7 @@ class RepositoryManager
      */
     public function getProposalRepository() : ProposalRepository
     {
-        if ($this->proposalRepository === null) {
+        if ($this->proposalRepository === NULL) {
             $this->proposalRepository = new ProposalRepository($this->searchService, $this);
         }
 
@@ -100,7 +100,7 @@ class RepositoryManager
      */
     public function getUserRepository() : UserRepository
     {
-        if ($this->userRepository === null) {
+        if ($this->userRepository === NULL) {
             $this->userRepository = new UserRepository($this->searchService, $this);
         }
 
@@ -112,7 +112,7 @@ class RepositoryManager
      */
     public function getTransactionRepository() : TransactionRepository
     {
-        if ($this->transactionRepository === null) {
+        if ($this->transactionRepository === NULL) {
             $this->transactionRepository = new TransactionRepository($this->searchService, $this);
         }
 
@@ -124,7 +124,7 @@ class RepositoryManager
      */
     public function getFileRepository() : FileRepository
     {
-        if ($this->fileRepository === null) {
+        if ($this->fileRepository === NULL) {
             $this->fileRepository = new FileRepository($this->searchService, $this);
         }
 

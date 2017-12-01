@@ -102,11 +102,11 @@ class Filter
     {
         foreach ($this->toArray() as $vals) {
             if (!empty($vals)) {
-                return false;
+                return FALSE;
             }
         }
 
-        return true;
+        return TRUE;
     }
 
     /**
