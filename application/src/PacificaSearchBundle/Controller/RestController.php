@@ -29,6 +29,8 @@ class RestController extends FOSRestController
      *
      * The IDs indicate those filter options that can be added to the current filter without resulting in a filter
      * that returns no results at all.
+     *
+     * @return Response
      */
     public function getValid_filter_idsAction()
     {
@@ -45,14 +47,17 @@ class RestController extends FOSRestController
             // NULL represents a case where no filtering was performed - we exclude these from the results, meaning
             // that all items of that type are still valid options
             if (null !== $filteredIds) {
-                $filterIds[$repo::getModelClass()::getMachineName()] = $filteredIds;
+                $filterIdsphp[$repo::getModelClass()::getMachineName()] = $filteredIds;
             }
         }
 
         return $this->handleView(View::create($filterIds));
     }
+
     /**
      * Retrieves files that fit the current filter
+     *
+     * @return Response
      */
     public function getFilesAction()
     {
