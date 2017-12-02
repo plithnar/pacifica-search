@@ -23,11 +23,7 @@ abstract class FilterRepository extends Repository
     public static function getImplementingClassNames()
     {
         if (self::$implementingClassNames === null) {
-            // Make sure all of the classes have been declared - otherwise get_declared_classes() will only return the
-            // classes that happen to have been autoloaded
-            foreach (glob(__DIR__ . "/*.php") as $filename) {
-                require_once($filename);
-            }
+            self::requireAllRelatedClassFiles();
 
             self::$implementingClassNames = [];
             foreach (get_declared_classes() as $class) {
@@ -38,5 +34,15 @@ abstract class FilterRepository extends Repository
         }
 
         return self::$implementingClassNames;
+    }
+
+    /**
+     * Ensure that all files declaring classes that implement this base class are included
+     */
+    private static function requireAllRelatedClassFiles()
+    {
+        foreach (glob(__DIR__ . "/*.php") as $filename) {
+            require_once($filename);
+        }
     }
 }
