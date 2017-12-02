@@ -47,18 +47,18 @@ class SearchService
 
     /**
      * @param ElasticSearchQueryBuilder $queryBuilder
+     * @param bool $assertResultsFound Pass TRUE to throw an exception if results aren't found - useful for early
+     *   detection of a misconfigured or misconnected database for queries that we know should always return results.
      * @return array The results of the search
      */
-    public function getResults(ElasticSearchQueryBuilder $queryBuilder)
+    public function getResults(ElasticSearchQueryBuilder $queryBuilder, $assertResultsFound = false)
     {
         $client = $this->getClient();
         $request = $queryBuilder->toArray();
         $response = $client->search($request);
 
-        if ($response['hits']['total'] > $request['size']) {
-            // TODO: For now we are just setting the size really really large, but we'll need to make our query builder
-            // able to handle arbitrarily large responses.
-            //throw new \RuntimeException('Response was larger than the requested size - records will be missing.');
+        if ($assertResultsFound && $response['hits']['total'] === '0') {
+            throw new \RuntimeException("The " . $queryBuilder->getType() . " type in the Elasticsearch DB appears to be empty.");
         }
 
         return $response['hits']['hits'];

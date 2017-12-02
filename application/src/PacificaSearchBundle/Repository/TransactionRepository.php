@@ -60,11 +60,7 @@ class TransactionRepository
         // this is just going to be a brute force retrieval.
         if (!$this->idsByModel) {
             $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
-            $results = $this->searchService->getResults($qb);
-
-            if (empty($results)) {
-                throw new \RuntimeException("The Transactions type in the Elasticsearch DB appears to be empty.");
-            }
+            $results = $this->searchService->getResults($qb, true);
 
             foreach ($results as $result) {
                 $vals = $result['_source'];

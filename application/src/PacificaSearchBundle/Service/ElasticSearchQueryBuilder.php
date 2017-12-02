@@ -73,6 +73,14 @@ class ElasticSearchQueryBuilder
     }
 
     /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Add to the query the requirement that the passed nested field must exist and have a non-empty value
      * @param string $field e.g. "instrument_members.instrument_id"
      * @return ElasticSearchQueryBuilder
