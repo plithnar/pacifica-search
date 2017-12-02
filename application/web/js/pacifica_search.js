@@ -21,32 +21,45 @@
                 contentType: 'application/json',
                 data: JSON.stringify(filter.toObj())
             }).then(function () {
-                $.get('/valid_filter_ids', function (results) {
-                    ['instrument_type', 'instrument', 'institution', 'user', 'proposal'].forEach(function (type) {
-                        var idsToEnable = results[type];
+                _enableAndDisableFilterOptions();
+                _updateFileList();
+            });
+        }
 
-                        DomMgr.FacetedSearchFilter.getInputsByType(type).each(function () {
-                            var id = attr(this, 'data-id');
-                            var disable = idsToEnable && (idsToEnable.indexOf(parseInt(id)) === -1);
+        /**
+         * Retrieve valid filter IDs from the server and mark each filter option as enabled or disabled accordingly
+         */
+        function _enableAndDisableFilterOptions() {
+            $.get('/valid_filter_ids', function (results) {
+                ['instrument_type', 'instrument', 'institution', 'user', 'proposal'].forEach(function (type) {
+                    var idsToEnable = results[type];
 
-                            if (disable) {
-                                $(this).closest('label').addClass('disabled');
-                                $(this).attr('disabled', true);
-                            } else {
-                                $(this).closest('label').removeClass('disabled');
-                                $(this).removeAttr('disabled');
-                            }
-                        });
+                    DomMgr.FacetedSearchFilter.getInputsByType(type).each(function () {
+                        var id = attr(this, 'data-id');
+                        var disable = idsToEnable && (idsToEnable.indexOf(parseInt(id)) === -1);
+
+                        if (disable) {
+                            $(this).closest('label').addClass('disabled');
+                            $(this).attr('disabled', true);
+                        } else {
+                            $(this).closest('label').removeClass('disabled');
+                            $(this).removeAttr('disabled');
+                        }
                     });
                 });
+            });
+        }
 
-                $.get('/files', function (results) {
-                    var fileTemplate = $$('#file_template').children();
-                    results.forEach(function(result) {
-                        var fileEntry = fileTemplate.clone();
-                        $$(fileEntry.find('[data-is-file-name-container]')).html(result['name']);
-                        $$('#files').append(fileEntry);
-                    });
+        /**
+         * Retrieve the list of files fitting the current filter and update the list shown to the user accordingly
+         */
+        function _updateFileList() {
+            $.get('/files', function (results) {
+                var fileTemplate = $$('#file_template').children();
+                results.forEach(function(result) {
+                    var fileEntry = fileTemplate.clone();
+                    $$(fileEntry.find('[data-is-file-name-container]')).html(result['name']);
+                    $$('#files').append(fileEntry);
                 });
             });
         }
