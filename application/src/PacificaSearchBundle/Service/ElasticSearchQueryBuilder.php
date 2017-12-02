@@ -2,7 +2,6 @@
 
 namespace PacificaSearchBundle\Service;
 
-
 class ElasticSearchQueryBuilder
 {
     /**
@@ -63,7 +62,7 @@ class ElasticSearchQueryBuilder
      *
      * @var bool
      */
-    private $metadataOnly = FALSE;
+    private $metadataOnly = false;
 
     public function __construct($index, $type)
     {
@@ -82,7 +81,7 @@ class ElasticSearchQueryBuilder
     {
         // This is probably not hard to implement but it's not required at the moment so I'm skipping supporting it for
         // the sake of time.
-        if ($this->nestedFieldExists !== NULL) {
+        if ($this->nestedFieldExists !== null) {
             throw new \RuntimeException("This class does not currently support multiple must-exist nested fields");
         }
 
@@ -124,7 +123,8 @@ class ElasticSearchQueryBuilder
      * @param $values
      * @return ElasticSearchQueryBuilder
      */
-    public function whereIn($fieldName, $values) {
+    public function whereIn($fieldName, $values)
+    {
         return $this->whereEq($fieldName, $values);
     }
 
@@ -149,7 +149,7 @@ class ElasticSearchQueryBuilder
      */
     public function fetchOnlyMetaData()
     {
-        $this->metadataOnly = TRUE;
+        $this->metadataOnly = true;
         return $this;
     }
 
@@ -162,7 +162,7 @@ class ElasticSearchQueryBuilder
         ];
 
         if ($this->metadataOnly) {
-            $array['body']['_source'] = FALSE;
+            $array['body']['_source'] = false;
         }
 
         if ($this->ids) {
@@ -181,7 +181,7 @@ class ElasticSearchQueryBuilder
         foreach ($this->fields as $fieldName => $fieldValues) {
             // Check for a nested field name, which requires a different query structure
             $nestedFieldPath = $this->getNestedFieldPath($fieldName);
-            if ($nestedFieldPath !== NULL) {
+            if ($nestedFieldPath !== null) {
                 $array['body']['query']['nested'] = [
                     'path' => $nestedFieldPath,
                     'query' => [
@@ -241,8 +241,8 @@ class ElasticSearchQueryBuilder
      */
     private function getNestedFieldPath($field)
     {
-        if (strpos($field, '.') === FALSE) {
-            return NULL;
+        if (strpos($field, '.') === false) {
+            return null;
         }
 
         $fieldParts = explode('.', $field);

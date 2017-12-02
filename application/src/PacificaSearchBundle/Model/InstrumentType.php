@@ -7,4 +7,7 @@ namespace PacificaSearchBundle\Model;
  *
  * Note that this model maps to the "Group" ElasticSearch type by way of the "InstrumentGroup" type.
  */
-class InstrumentType extends ConventionalElasticSearchType {}
+class InstrumentType extends ConventionalElasticSearchType
+{
+
+}

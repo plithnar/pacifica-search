@@ -5,4 +5,7 @@ namespace PacificaSearchBundle\Model;
 /**
  * Class User
  */
-class User extends ConventionalElasticSearchType {}
+class User extends ConventionalElasticSearchType
+{
+
+}

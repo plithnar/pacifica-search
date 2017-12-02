@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+// Annotations - IDE marks "unused" but they are not
+use FOS\RestBundle\Controller\Annotations\Get;
+
 class RestController extends FOSRestController
 {
     /**
@@ -30,9 +33,11 @@ class RestController extends FOSRestController
      * The IDs indicate those filter options that can be added to the current filter without resulting in a filter
      * that returns no results at all.
      *
+     * @Get("/valid_filter_ids")
+     *
      * @return Response
      */
-    public function getValid_filter_idsAction()
+    public function getValidFilterIdsAction()
     {
         $filter = $this->getSession()->get('filter');
 
@@ -46,7 +51,7 @@ class RestController extends FOSRestController
 
             // NULL represents a case where no filtering was performed - we exclude these from the results, meaning
             // that all items of that type are still valid options
-            if (NULL !== $filteredIds) {
+            if (null !== $filteredIds) {
                 $filterIdsphp[$repo::getModelClass()::getMachineName()] = $filteredIds;
             }
         }
@@ -94,7 +99,7 @@ class RestController extends FOSRestController
      */
     public function putFilterAction(Request $request)
     {
-        $filterValues = json_decode($request->getContent(), TRUE);
+        $filterValues = json_decode($request->getContent(), true);
 
         $filter = Filter::fromArray($filterValues);
         $this->getSession()->set('filter', $filter);

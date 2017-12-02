@@ -5,4 +5,7 @@ namespace PacificaSearchBundle\Model;
 /**
  * Class Instrument
  */
-class Instrument extends ConventionalElasticSearchType {}
+class Instrument extends ConventionalElasticSearchType
+{
+
+}

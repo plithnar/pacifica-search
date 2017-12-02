@@ -1,6 +1,7 @@
 <?php
 
 namespace PacificaSearchBundle\Repository;
+
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
@@ -48,7 +49,7 @@ abstract class Repository
 
         // We don't do any filtering if the filter contains no values
         if ($filter->isEmpty()) {
-            return NULL;
+            return null;
         }
 
         $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
@@ -120,7 +121,7 @@ abstract class Repository
 
     public function getById($ids)
     {
-        if (!is_array($ids)){
+        if (!is_array($ids)) {
             $ids = [$ids];
         }
 

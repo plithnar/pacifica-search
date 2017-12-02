@@ -9,6 +9,8 @@
  * @link     https://github.com/pacifica/pacifica-search
  */
 
+namespace Pacifica\Search\Tests;
+
 /**
  * Selenium PHP Driver Index.php tests
  *
@@ -18,7 +20,7 @@
  * @license  https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html GNU Lesser General Public License, version 2.1
  * @link     https://github.com/pacifica/pacifica-search
  */
-class WebTest extends PHPUnit_Extensions_Selenium2TestCase
+class WebTest extends \PHPUnit_Extensions_Selenium2TestCase
 {
     protected $coverageScriptUrl = 'http://localhost:8193/phpunit_coverage.php';
 
@@ -49,4 +51,3 @@ class WebTest extends PHPUnit_Extensions_Selenium2TestCase
         $this->assertEquals('List of Posts', $this->title());
     }
 }
-?>

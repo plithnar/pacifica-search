@@ -2,7 +2,6 @@
 
 namespace PacificaSearchBundle\Repository;
 
-
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 

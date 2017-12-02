@@ -5,4 +5,7 @@ namespace PacificaSearchBundle\Model;
 /**
  * Class Institution
  */
-class Proposal extends ConventionalElasticSearchType {}
+class Proposal extends ConventionalElasticSearchType
+{
+
+}

@@ -2,7 +2,6 @@
 
 namespace PacificaSearchBundle\Service;
 
-
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 

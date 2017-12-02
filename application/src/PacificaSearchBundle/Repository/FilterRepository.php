@@ -22,7 +22,7 @@ abstract class FilterRepository extends Repository
      */
     public static function getImplementingClassNames()
     {
-        if (self::$implementingClassNames === NULL) {
+        if (self::$implementingClassNames === null) {
             // Make sure all of the classes have been declared - otherwise get_declared_classes() will only return the
             // classes that happen to have been autoloaded
             foreach (glob(__DIR__ . "/*.php") as $filename) {
@@ -30,8 +30,8 @@ abstract class FilterRepository extends Repository
             }
 
             self::$implementingClassNames = [];
-            foreach( get_declared_classes() as $class ) {
-                if( is_subclass_of( $class, self::class ) ) {
+            foreach (get_declared_classes() as $class) {
+                if (is_subclass_of($class, self::class)) {
                     self::$implementingClassNames[] = $class;
                 }
             }

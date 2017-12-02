@@ -30,7 +30,8 @@ class ElasticSearchTypeCollection implements \Iterator, \Countable
      * @param ElasticSearchType $item
      * @return ElasticSearchTypeCollection
      */
-    public function add(ElasticSearchType $item) {
+    public function add(ElasticSearchType $item)
+    {
         // Enforce that all items in a collection have to be of the same class
         if (!empty($this->instances) && !($item instanceof $this->instances[0])) {
             throw new \InvalidArgumentException('All items in a FilterItemCollection must be of the same class');
@@ -71,7 +72,7 @@ class ElasticSearchTypeCollection implements \Iterator, \Countable
     public function getTypeDisplayName()
     {
         if (empty($this->instances)) {
-            return NULL;
+            return null;
         }
 
         return $this->instances[0]::getTypeDisplayName();

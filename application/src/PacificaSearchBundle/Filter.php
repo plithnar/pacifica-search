@@ -1,6 +1,7 @@
 <?php
 
 namespace PacificaSearchBundle;
+
 use PacificaSearchBundle\Model\ElasticSearchType;
 use PacificaSearchBundle\Model\Institution;
 use PacificaSearchBundle\Model\Instrument;
@@ -102,11 +103,11 @@ class Filter
     {
         foreach ($this->toArray() as $vals) {
             if (!empty($vals)) {
-                return FALSE;
+                return false;
             }
         }
 
-        return TRUE;
+        return true;
     }
 
     /**

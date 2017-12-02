@@ -5,4 +5,7 @@ namespace PacificaSearchBundle\Model;
 /**
  * Class File
  */
-class File extends ConventionalElasticSearchType {}
+class File extends ConventionalElasticSearchType
+{
+
+}

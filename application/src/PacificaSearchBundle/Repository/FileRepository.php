@@ -2,7 +2,6 @@
 
 namespace PacificaSearchBundle\Repository;
 
-
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 
@@ -13,7 +12,7 @@ class FileRepository extends Repository
      */
     protected function getOwnIdsFromTransactionResults(array $transactionResults)
     {
-        $transactionIds = array_map(function($result) {
+        $transactionIds = array_map(function ($result) {
             return (int) $result['_id'];
         }, $transactionResults);
 

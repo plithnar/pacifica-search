@@ -2,7 +2,6 @@
 
 namespace PacificaSearchBundle\Repository;
 
-
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\File;
 use PacificaSearchBundle\Model\Institution;
@@ -67,7 +66,7 @@ class TransactionRepository
                 throw new \RuntimeException("The Transactions type in the Elasticsearch DB appears to be empty.");
             }
 
-            foreach($results as $result) {
+            foreach ($results as $result) {
                 $vals = $result['_source'];
                 $this->idsByModel[User::class][$vals['submitter']] = $vals['submitter'];
                 $this->idsByModel[Instrument::class][$vals['instrument']] = $vals['instrument'];
