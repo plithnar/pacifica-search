@@ -19,10 +19,6 @@ class SearchController extends Controller
             /** @var FilterRepository $repo */
             $repo = $this->container->get($repoClass);
 
-            // TODO: If it turns out the production database has no orphaned records, use this statement instead of
-            // the transaction repo method below, and remove that method
-    //            $instances = $repo->getAll()->sortByDisplayName();
-
             // TODO: Either refactor this for readability/prettiness or remove it, depending on whether we find out
             // that there are no orphaned records in the production database.
             $ids = $this->container->get(TransactionRepository::class)->getIdsOfTypeAssociatedWithAtLeastOneTransaction($repoClass::getModelClass());
