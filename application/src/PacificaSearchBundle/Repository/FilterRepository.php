@@ -25,12 +25,9 @@ abstract class FilterRepository extends Repository
         if (self::$implementingClassNames === null) {
             self::requireAllRelatedClassFiles();
 
-            self::$implementingClassNames = [];
-            foreach (get_declared_classes() as $class) {
-                if (is_subclass_of($class, self::class)) {
-                    self::$implementingClassNames[] = $class;
-                }
-            }
+            self::$implementingClassNames = array_filter(get_declared_classes(), function ($class) {
+                return is_subclass_of($class, self::class);
+            });
         }
 
         return self::$implementingClassNames;
