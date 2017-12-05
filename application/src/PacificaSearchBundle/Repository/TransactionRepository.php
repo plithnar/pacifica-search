@@ -98,20 +98,41 @@ class TransactionRepository
     {
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
 
-        // Proposals
-        $proposalIds = $filter->getProposalIds();
+        $this->addWhereClauseForProposals($qb, $filter->getProposalIds());
+        $this->addWhereClauseForInstruments($qb, $filter->getInstrumentIds(), $filter->getInstrumentTypeIds());
+        $this->addWhereClauseForUsers($qb, $filter->getUserIds(), $filter->getInstitutionIds());
+        $transactionIds = $this->searchService->getIds($qb);
+
+        return $transactionIds;
+    }
+
+    /**
+     * Add a WHERE clause to a query builder so that it filters on a set of proposals
+     * @param ElasticSearchQueryBuilder $qb
+     * @param array $proposalIds
+     */
+    private function addWhereClauseForProposals(ElasticSearchQueryBuilder $qb, array $proposalIds)
+    {
         if (count($proposalIds)) {
             $qb->whereEq('proposal', $proposalIds);
         }
+    }
 
+    /**
+     * Add a WHERE clause to a query builder so that it filters on a set of instruments, based either on an explicit
+     * list of instrument IDs or, failing that, on a list of instrument types
+     * @param ElasticSearchQueryBuilder $qb
+     * @param array $instrumentIds
+     * @param array $instrumentTypeIds
+     */
+    private function addWhereClauseForInstruments(ElasticSearchQueryBuilder $qb, array $instrumentIds, array $instrumentTypeIds)
+    {
         // Instruments/Instrument Types
         // If both Instruments and Instrument Types are included in the filter, we disregard the Instrument Types, since
         // Instrument Types are essentially just groups of Instruments, and the result of combining them is always either
-        // the same as just filtering by Instruments, or an empty set (if only users not belonging to any institution in
+        // the same as just filtering by Instruments, or an empty set (if only instruments not belonging to any type in
         // the filter are passed).
-        $instrumentIds = $filter->getInstrumentIds();
         if (!count($instrumentIds)) {
-            $instrumentTypeIds = $filter->getInstrumentTypeIds();
             if (count($instrumentTypeIds)) {
                 $instrumentIds = $this->repositoryManager->getInstrumentRepository()->getIdsByType($instrumentTypeIds);
             }
@@ -119,13 +140,21 @@ class TransactionRepository
         if (count($instrumentIds)) {
             $qb->whereEq('instrument', $instrumentIds);
         }
+    }
 
+    /**
+     * Add a WHERE clause to a query builder so that it filters on a set of users, based either on an explicit list of
+     * user IDs or, failing that, on a list of institutions
+     * @param ElasticSearchQueryBuilder $qb
+     * @param array $userIds
+     * @param array $institutionIds
+     */
+    private function addWhereClauseForUsers(ElasticSearchQueryBuilder $qb, array $userIds, array $institutionIds)
+    {
         // Users/Institutions
-        // Similar to Instruments and Instrument Types, If both institutions and users are included in the filter, then
-        // we disregard the institutions.
-        $userIds = $filter->getUserIds();
+        // Similar to Instruments and Instrument Types (see addWhereClauseForInstruments()), If both institutions and
+        // users are included in the filter, then we disregard the institutions.
         if (!count($userIds)) {
-            $institutionIds = $filter->getInstitutionIds();
             if (count($institutionIds)) {
                 $userIds = $this->repositoryManager->getUserRepository()->getIdsByInstitution($institutionIds);
             }
@@ -133,8 +162,5 @@ class TransactionRepository
         if (count($userIds)) {
             $qb->whereEq('submitter', $userIds);
         }
-
-        $transactionIds = $this->searchService->getIds($qb);
-        return $transactionIds;
     }
 }
