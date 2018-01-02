@@ -42,16 +42,4 @@ class SearchController extends Controller
             ]
         );
     }
-
-    public function testAction()
-    {
-        /** @var InstitutionRepository $r */
-        $r = $this->container->get(InstitutionRepository::class);
-        $res = $r->getById(43256);
-
-        echo "<pre><code>";
-        print_r($res);
-        echo "</pre></code>";
-        die();
-    }
 }
