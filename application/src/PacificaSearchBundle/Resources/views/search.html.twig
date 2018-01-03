@@ -1,40 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Pacifica Search</title>
-    <link rel="stylesheet" href="css/search_layout.css">
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <script src="js/namespace.js"></script>
-    <script src="js/utilities.js"></script>
-    <script src="js/dom_manager.js"></script>
-    <script src="js/filter.js"></script>
-    <script src="js/pacifica_search.js"></script>
-</head>
-<body>
-    <section id="search_filter">
-        {% for collection in filters %}
-            <fieldset data-type="{{ collection.machineName }}">
-                <h2>{{ collection.typeDisplayName }}</h2>
-                {% for instance in collection.instances %}
-                    {% set input_id = collection.machineName ~ "_" ~ instance.id %}
-                    <label for="{{ input_id }}">
-                        <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
-                        {{ instance.displayName }}
-                    </label>
-                {% endfor %}
-            </fieldset>
-        {% endfor %}
-    </section>
+{% extends 'base.html.twig' %}
 
-    <div id="files" style="border: 1px black solid;">
-        <h2>Files</h2>
-        <!-- This element's remaining contents are generated in JavaScript -->
-    </div>
-    <div id="file_template" style="display:none">
-        <p>
-            <span class="file_name" data-is-file-name-container></span>
-        </p>
-    </div>
-</body>
-</html>
+{% block site_id %}pacifica{% endblock %}
+{% block title %}search{% endblock %}
+{% block stylesheets %}
+        {{ parent() }}
+        <link rel="stylesheet" href="{{ asset('css/search_layout.css') }}">
+{% endblock %}
+{% block javascripts %}
+        {{ parent() }}
+        <script src="{{ asset('js/namespace.js') }}"></script>
+        <script src="{{ asset('js/utilities.js') }}"></script>
+        <script src="{{ asset('js/dom_manager.js') }}"></script>
+        <script src="{{ asset('js/filter.js') }}"></script>
+        <script src="{{ asset('js/pacifica_search.js') }}"></script>
+{% endblock %}
+{% block body %}
+<section id="search_filter">
+    {% for collection in filters %}
+        <fieldset data-type="{{ collection.machineName }}">
+            <h2>{{ collection.typeDisplayName }}</h2>
+            {% for instance in collection.instances %}
+                {% set input_id = collection.machineName ~ "_" ~ instance.id %}
+                <label for="{{ input_id }}">
+                    <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
+                    {{ instance.displayName }}
+                </label>
+            {% endfor %}
+        </fieldset>
+    {% endfor %}
+</section>
+
+<p style="clear:both"></p>
+
+<div id="files" style="border: 1px black solid;">
+    <h2>Files</h2>
+    <!-- This element's remaining contents are generated in JavaScript -->
+</div>
+<div id="file_template" style="display:none">
+    <p>
+        <span class="file_name" data-is-file-name-container></span>
+    </p>
+</div>
+{% endblock %}

@@ -38,7 +38,9 @@ framework:
 twig:
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
-
+    globals:
+        site_name: "Pacifica"
+        site_identifier: "Data Management for Science"
 # Doctrine Configuration
 doctrine:
     dbal:
