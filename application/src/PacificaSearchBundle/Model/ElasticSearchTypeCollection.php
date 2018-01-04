@@ -75,7 +75,7 @@ class ElasticSearchTypeCollection implements \Iterator, \Countable
             return null;
         }
 
-        return $this->instances[0]::getTypeDisplayName();
+        return $this->instances[0]->getTypeDisplayName();
     }
 
     /**
@@ -84,7 +84,7 @@ class ElasticSearchTypeCollection implements \Iterator, \Countable
      */
     public function getMachineName()
     {
-        return $this->instances[0]::getMachineName();
+        return $this->instances[0]->getMachineName();
     }
 
     public function current()

@@ -50,11 +50,11 @@ abstract class ElasticSearchType
      * Returns the string that represents the Type in the REST API
      * @return string
      */
-    abstract public static function getMachineName();
+    abstract public function getMachineName();
 
     /**
      * Returns the string that represents the Type in the GUI
      * @return string
      */
-    abstract public static function getTypeDisplayName();
+    abstract public function getTypeDisplayName();
 }
