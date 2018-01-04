@@ -52,7 +52,7 @@ class RestController extends FOSRestController
             // NULL represents a case where no filtering was performed - we exclude these from the results, meaning
             // that all items of that type are still valid options
             if (null !== $filteredIds) {
-                $filterIds[$repo::getModelClass()::getMachineName()] = $filteredIds;
+                $filterIds[$repo->getModelClass()::getMachineName()] = $filteredIds;
             }
         }
 

@@ -21,7 +21,7 @@ abstract class Repository
     /** @var RepositoryManager */
     protected $repositoryManager;
 
-    public function __construct(SearchService $searchService, RepositoryManager $repositoryManager)
+    final public function __construct(SearchService $searchService, RepositoryManager $repositoryManager)
     {
         $this->searchService = $searchService;
         $this->repositoryManager = $repositoryManager;
@@ -44,7 +44,7 @@ abstract class Repository
 
         // Remove filters of own type if applicable - you can't restrict Users by picking a User
         if ($this instanceof FilterRepository) {
-            $filter->setIdsByType(self::getModelClass(), []);
+            $filter->setIdsByType($this->getModelClass(), []);
         }
 
         // We don't do any filtering if the filter contains no values
@@ -88,7 +88,7 @@ abstract class Repository
      * class by the convention that repository classes are named <ModelClass>Repository, override this method if that's
      * not the case.
      */
-    public static function getModelClass()
+    public function getModelClass()
     {
         // Remove the "Repository" suffix from the repo's class name
         $modelClassName = preg_replace('/Repository$/', '', static::class);
@@ -119,6 +119,10 @@ abstract class Repository
         return $this->resultsToTypeCollection($response);
     }
 
+    /**
+     * @param int|int[] $ids
+     * @return ElasticSearchTypeCollection
+     */
     public function getById($ids)
     {
         if (!is_array($ids)) {
@@ -133,7 +137,7 @@ abstract class Repository
     {
         $instances = new ElasticSearchTypeCollection();
         foreach ($results as $curHit) {
-            $modelClass = static::getModelClass();
+            $modelClass = $this->getModelClass();
             $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
             $instances->add($instance);
         }
