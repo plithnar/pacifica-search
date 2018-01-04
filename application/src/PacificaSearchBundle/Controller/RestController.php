@@ -7,7 +7,6 @@ use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Repository\FileRepository;
-use PacificaSearchBundle\Repository\FilterRepository;
 use PacificaSearchBundle\Repository\Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +15,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 // Annotations - IDE marks "unused" but they are not
 use FOS\RestBundle\Controller\Annotations\Get;
 
+/**
+ * @codeCoverageIgnore - Because this controller relies on functionality provided by the FOSRestController there is
+ * no practical way for us to convert it to use dependency injection and so it cannot be unit tested.
+ */
 class RestController extends FOSRestController
 {
     /**
