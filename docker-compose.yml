@@ -11,6 +11,7 @@ services:
         volumes:
             - ./docker/nginx/application.conf:/etc/nginx/conf.d/default.conf:ro
             - ./docker/nginx/fastcgi_params:/etc/nginx/fastcgi_params:ro
+            - ./docker/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
         ports:
             - 80:80
 
