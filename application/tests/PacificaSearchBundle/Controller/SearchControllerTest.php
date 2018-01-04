@@ -1,7 +1,8 @@
 <?php
 
-namespace Pacifica\Search\Tests;
+namespace Pacifica\Search\Tests\Controller;
 
+use Pacifica\Search\Tests\TestCase;
 use PacificaSearchBundle\Controller\SearchController;
 use PacificaSearchBundle\Exception\NoRecordsFoundException;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
