@@ -12,11 +12,10 @@ use PacificaSearchBundle\Repository\Repository;
 use PacificaSearchBundle\Repository\TransactionRepository;
 use PacificaSearchBundle\Repository\UserRepository;
 use PacificaSearchBundle\Service\RepositoryManager;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
 
-class SearchController extends Controller
+class SearchController
 {
     /** @var InstitutionRepository */
     protected $institutionRepository;
