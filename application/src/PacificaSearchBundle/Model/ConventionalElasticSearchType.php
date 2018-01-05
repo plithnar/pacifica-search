@@ -35,26 +35,26 @@ abstract class ConventionalElasticSearchType extends ElasticSearchType
     /**
      * @inheritdoc
      */
-    public function getTypeDisplayName()
+    public static function getTypeDisplayName()
     {
         // The display name, by convention, is "Class Name" for class ClassName
-        return preg_replace('/(?<!^)[A-Z]/', ' $0', $this->getClassNameWithoutNamespace());
+        return preg_replace('/(?<!^)[A-Z]/', ' $0', static::getClassNameWithoutNamespace());
     }
 
     /**
      * @inheritdoc
      */
-    public function getMachineName()
+    public static function getMachineName()
     {
         // The machine name, by convention, is "class_name" for class "ClassName"
-        $withUnderscores = preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassNameWithoutNamespace());
+        $withUnderscores = preg_replace('/(?<!^)[A-Z]/', '_$0', static::getClassNameWithoutNamespace());
         return strtolower($withUnderscores);
     }
 
     /**
      * @return string
      */
-    private function getClassNameWithoutNamespace()
+    private static function getClassNameWithoutNamespace()
     {
         if ($pos = strrpos(static::class, '\\')) {
             return substr(static::class, $pos + 1);
