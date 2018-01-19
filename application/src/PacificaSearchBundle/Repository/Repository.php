@@ -5,8 +5,8 @@ namespace PacificaSearchBundle\Repository;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
-use PacificaSearchBundle\Service\RepositoryManager;
-use PacificaSearchBundle\Service\SearchService;
+use PacificaSearchBundle\Service\RepositoryManagerInterface;
+use PacificaSearchBundle\Service\SearchServiceInterface;
 
 /**
  * Class Repository
@@ -15,13 +15,13 @@ use PacificaSearchBundle\Service\SearchService;
  */
 abstract class Repository
 {
-    /** @var SearchService */
+    /** @var SearchServiceInterface */
     protected $searchService;
 
-    /** @var RepositoryManager */
+    /** @var RepositoryManagerInterface */
     protected $repositoryManager;
 
-    final public function __construct(SearchService $searchService, RepositoryManager $repositoryManager)
+    final public function __construct(SearchServiceInterface $searchService, RepositoryManagerInterface $repositoryManager)
     {
         $this->searchService = $searchService;
         $this->repositoryManager = $repositoryManager;
@@ -57,7 +57,7 @@ abstract class Repository
         $filter = clone $filter;
 
         // Remove filters of own type if applicable - you can't restrict Users by picking a User
-        if ($this instanceof FilterRepository) {
+        if ($this->isFilterRepository()) {
             $filter->setIdsByType($this->getModelClass(), []);
         }
 
@@ -70,31 +70,6 @@ abstract class Repository
 
         return $transactionIds;
     }
-
-    /**
-     * Gets IDs of this type that are associated with a set of transaction IDs
-     *
-     * TODO: Figure out how to make the query here unique by the required field so that we don't have to process a
-     * large number of redundant results.
-     *
-     * @param array $transactionIds
-     * @return int[]
-     */
-    protected function getIdsByTransactionIds(array $transactionIds)
-    {
-        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
-        $results = $this->searchService->getResults($qb);
-        $ids = $this->getOwnIdsFromTransactionResults($results);
-        $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
-        return $ids;
-    }
-
-    /**
-     * @param array $transactionResults An array returned by SearchService when given a query for TYPE_TRANSACTION
-     * @return int[] Array containing all IDs of this Repository's type that correspond to the returned transaction
-     * records
-     */
-    abstract protected function getOwnIdsFromTransactionResults(array $transactionResults);
 
     /**
      * Gets the name of the model class of the type that this repository is responsible for. Will attempt to find the
@@ -158,6 +133,42 @@ abstract class Repository
         return $this->resultsToTypeCollection($response);
     }
 
+    /**
+     * Returns true for repositories that store objects that can be a part of a filter. Override for repositories that
+     * cannot be included in the filter to avoid triggering behavior that is specific to filter repositories.
+     *
+     * @return bool
+     */
+    protected function isFilterRepository()
+    {
+        return true;
+    }
+
+    /**
+     * Gets IDs of this type that are associated with a set of transaction IDs
+     *
+     * TODO: Figure out how to make the query here unique by the required field so that we don't have to process a
+     * large number of redundant results.
+     *
+     * @param array $transactionIds
+     * @return int[]
+     */
+    protected function getIdsByTransactionIds(array $transactionIds)
+    {
+        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
+        $results = $this->searchService->getResults($qb);
+        $ids = $this->getOwnIdsFromTransactionResults($results);
+        $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
+        return $ids;
+    }
+
+    /**
+     * @param array $transactionResults An array returned by SearchService when given a query for TYPE_TRANSACTION
+     * @return int[] Array containing all IDs of this Repository's type that correspond to the returned transaction
+     * records
+     */
+    abstract protected function getOwnIdsFromTransactionResults(array $transactionResults);
+
     private function resultsToTypeCollection(array $results)
     {
         $instances = new ElasticSearchTypeCollection();
@@ -179,8 +190,7 @@ abstract class Repository
      */
     protected function getQueryBuilder()
     {
-        return $this->searchService
-            ->getQueryBuilder($this->getType());
+        return $this->searchService->getQueryBuilder($this->getType());
     }
 
     /**

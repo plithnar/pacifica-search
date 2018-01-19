@@ -9,6 +9,7 @@ use PacificaSearchBundle\Repository\InstrumentTypeRepository;
 use PacificaSearchBundle\Repository\ProposalRepository;
 use PacificaSearchBundle\Repository\Repository;
 use PacificaSearchBundle\Repository\TransactionRepository;
+use PacificaSearchBundle\Repository\TransactionRepositoryInterface;
 use PacificaSearchBundle\Repository\UserRepository;
 use phpDocumentor\Reflection\Types\Mixed_;
 
@@ -18,9 +19,9 @@ use phpDocumentor\Reflection\Types\Mixed_;
  * We require a manager class that can be used to offer repositories access to one another because we have circular
  * relationships between some repositories that make simple dependency injection impossible
  */
-class RepositoryManager
+class RepositoryManager implements RepositoryManagerInterface
 {
-    /** @var SearchService */
+    /** @var SearchServiceInterface */
     private $searchService;
 
     /** @var InstitutionRepository */
@@ -44,15 +45,12 @@ class RepositoryManager
     /** @var FileRepository */
     private $fileRepository;
 
-    public function __construct(SearchService $searchService)
+    public function __construct(SearchServiceInterface $searchService)
     {
         $this->searchService = $searchService;
     }
 
-    /**
-     * @return InstitutionRepository
-     */
-    public function getInstitutionRepository() : InstitutionRepository
+    public function getInstitutionRepository() : Repository
     {
         if ($this->institutionRepository === null) {
             $this->institutionRepository = new InstitutionRepository($this->searchService, $this);
@@ -61,10 +59,7 @@ class RepositoryManager
         return $this->institutionRepository;
     }
 
-    /**
-     * @return InstrumentRepository
-     */
-    public function getInstrumentRepository() : InstrumentRepository
+    public function getInstrumentRepository() : Repository
     {
         if ($this->instrumentRepository === null) {
             $this->instrumentRepository = new InstrumentRepository($this->searchService, $this);
@@ -73,10 +68,7 @@ class RepositoryManager
         return $this->instrumentRepository;
     }
 
-    /**
-     * @return InstrumentTypeRepository
-     */
-    public function getInstrumentTypeRepository() : InstrumentTypeRepository
+    public function getInstrumentTypeRepository() : Repository
     {
         if ($this->instrumentTypeRepository === null) {
             $this->instrumentTypeRepository = new InstrumentTypeRepository($this->searchService, $this);
@@ -85,10 +77,7 @@ class RepositoryManager
         return $this->instrumentTypeRepository;
     }
 
-    /**
-     * @return ProposalRepository
-     */
-    public function getProposalRepository() : ProposalRepository
+    public function getProposalRepository() : Repository
     {
         if ($this->proposalRepository === null) {
             $this->proposalRepository = new ProposalRepository($this->searchService, $this);
@@ -97,10 +86,7 @@ class RepositoryManager
         return $this->proposalRepository;
     }
 
-    /**
-     * @return UserRepository
-     */
-    public function getUserRepository() : UserRepository
+    public function getUserRepository() : Repository
     {
         if ($this->userRepository === null) {
             $this->userRepository = new UserRepository($this->searchService, $this);
@@ -109,10 +95,7 @@ class RepositoryManager
         return $this->userRepository;
     }
 
-    /**
-     * @return TransactionRepository
-     */
-    public function getTransactionRepository() : TransactionRepository
+    public function getTransactionRepository() : TransactionRepositoryInterface
     {
         if ($this->transactionRepository === null) {
             $this->transactionRepository = new TransactionRepository($this->searchService, $this);
@@ -121,10 +104,7 @@ class RepositoryManager
         return $this->transactionRepository;
     }
 
-    /**
-     * @return FileRepository
-     */
-    public function getFileRepository() : FileRepository
+    public function getFileRepository() : Repository
     {
         if ($this->fileRepository === null) {
             $this->fileRepository = new FileRepository($this->searchService, $this);

@@ -5,7 +5,7 @@ namespace PacificaSearchBundle\Service;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 
-class SearchService
+class SearchService implements SearchServiceInterface
 {
     /** @var string */
     private $host;
@@ -57,7 +57,7 @@ class SearchService
         $request = $queryBuilder->toArray();
         $response = $client->search($request);
 
-        if ($assertResultsFound && $response['hits']['total'] === '0') {
+        if ($assertResultsFound && $response['hits']['total'] === 0) {
             throw new \RuntimeException("The " . $queryBuilder->getType() . " type in the Elasticsearch DB appears to be empty.");
         }
 

@@ -7,10 +7,14 @@ use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Repository\FileRepository;
-use PacificaSearchBundle\Repository\Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use PacificaSearchBundle\Repository\InstitutionRepository;
+use PacificaSearchBundle\Repository\InstrumentRepository;
+use PacificaSearchBundle\Repository\InstrumentTypeRepository;
+use PacificaSearchBundle\Repository\ProposalRepository;
+use PacificaSearchBundle\Repository\UserRepository;
 
 // Annotations - IDE marks "unused" but they are not
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -21,6 +25,24 @@ use FOS\RestBundle\Controller\Annotations\Get;
  */
 class RestController extends FOSRestController
 {
+    use FilterAwareController;
+
+    public function __construct(
+        InstitutionRepository $institutionRepository,
+        InstrumentRepository $instrumentRepository,
+        InstrumentTypeRepository $instrumentTypeRepository,
+        ProposalRepository $proposalRepository,
+        UserRepository $userRepository
+    ) {
+        $this->initFilterableRepositories(
+            $institutionRepository,
+            $instrumentRepository,
+            $instrumentTypeRepository,
+            $proposalRepository,
+            $userRepository
+        );
+    }
+
     /**
      * Retrieves the ids of filter options that are valid given the current state of the filter.
      * The returned object is formatted like:
@@ -47,9 +69,7 @@ class RestController extends FOSRestController
         /** @var $filterIds ElasticSearchTypeCollection[] */
         $filterIds = [];
 
-        foreach (FilterRepository::getImplementingClassNames() as $repoClass) {
-            /** @var Repository $repo */
-            $repo = $this->container->get($repoClass);
+        foreach ($this->getFilterableRepositories() as $repo) {
             $filteredIds = $repo->getFilteredIds($filter);
 
             // NULL represents a case where no filtering was performed - we exclude these from the results, meaning

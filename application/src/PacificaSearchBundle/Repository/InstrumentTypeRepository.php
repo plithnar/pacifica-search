@@ -13,7 +13,7 @@ class InstrumentTypeRepository extends Repository
      */
     public function getIdsByInstrumentIds(array $instrumentIds)
     {
-        $qb = $this->getQueryBuilder()->whereIn('instrument_members.instrument_id', $instrumentIds);
+        $qb = $this->getQueryBuilder()->whereIn('instrument_id', $instrumentIds);
 
         $ids = $this->searchService->getIds($qb);
 
@@ -40,13 +40,5 @@ class InstrumentTypeRepository extends Repository
         // TYPE_GROUP is not intuitive, but InstrumentType isn't a type of its own in ElasticSearch. Rather, it is the
         // subset of Group entries that have a relationship with the Instruments type
         return ElasticSearchQueryBuilder::TYPE_GROUP;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getQueryBuilder()
-    {
-        return parent::getQueryBuilder()->whereNestedFieldExists('instrument_members.instrument_id');
     }
 }

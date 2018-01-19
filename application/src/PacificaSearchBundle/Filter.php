@@ -3,6 +3,7 @@
 namespace PacificaSearchBundle;
 
 use PacificaSearchBundle\Model\ElasticSearchType;
+use PacificaSearchBundle\Model\File;
 use PacificaSearchBundle\Model\Institution;
 use PacificaSearchBundle\Model\Instrument;
 use PacificaSearchBundle\Model\InstrumentType;

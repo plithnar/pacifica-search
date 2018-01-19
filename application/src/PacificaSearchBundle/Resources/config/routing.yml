@@ -1,8 +1,8 @@
 pacifica_search_homepage:
     path:     /
     # Note: Since we use the Symfony convention of naming our services after their fully-namespaced classes, this is a
-    # reference to the SearchController *service*, not directly a reference to the class.
-    defaults: { _controller: "PacificaSearchBundle\\Controller\\SearchController:indexAction" }
+    # reference to the GuiController *service*, not directly a reference to the class.
+    defaults: { _controller: "PacificaSearchBundle\\Controller\\GuiController:indexAction" }
 
 rest:
     type: rest
