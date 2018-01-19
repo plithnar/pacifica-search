@@ -29,4 +29,14 @@ class FileRepository extends Repository
     {
         return ElasticSearchQueryBuilder::TYPE_FILE;
     }
+
+    /**
+     * Files can be the results of a filter, but they cannot be filtered on themselves
+     *
+     * @inheritdoct
+     */
+    protected function isFilterRepository()
+    {
+        return false;
+    }
 }

@@ -11,32 +11,15 @@ use PacificaSearchBundle\Repository\ProposalRepository;
 use PacificaSearchBundle\Repository\Repository;
 use PacificaSearchBundle\Repository\TransactionRepository;
 use PacificaSearchBundle\Repository\UserRepository;
-use PacificaSearchBundle\Service\RepositoryManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
 
 class SearchController
 {
-    /** @var InstitutionRepository */
-    protected $institutionRepository;
-
-    /** @var InstrumentRepository */
-    protected $instrumentRepository;
-
-    /** @var InstrumentTypeRepository */
-    protected $instrumentTypeRepository;
-
-    /** @var ProposalRepository */
-    protected $proposalRepository;
-
-    /** @var UserRepository */
-    protected $userRepository;
+    use FilterAwareController;
 
     /** @var TransactionRepository */
     protected $transactionRepository;
-
-    /** @var RepositoryManager */
-    protected $repositoryManager;
 
     /** @var EngineInterface */
     protected $renderingEngine;
@@ -50,11 +33,14 @@ class SearchController
         TransactionRepository $transactionRepository,
         EngineInterface $renderingEngine
     ) {
-        $this->institutionRepository = $institutionRepository;
-        $this->instrumentRepository = $instrumentRepository;
-        $this->instrumentTypeRepository = $instrumentTypeRepository;
-        $this->proposalRepository = $proposalRepository;
-        $this->userRepository = $userRepository;
+        $this->initFilterableRepositories(
+            $institutionRepository,
+            $instrumentRepository,
+            $instrumentTypeRepository,
+            $proposalRepository,
+            $userRepository
+        );
+
         $this->transactionRepository = $transactionRepository;
         $this->renderingEngine = $renderingEngine;
     }

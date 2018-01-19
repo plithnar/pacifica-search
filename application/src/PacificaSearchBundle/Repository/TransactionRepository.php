@@ -10,8 +10,8 @@ use PacificaSearchBundle\Model\InstrumentType;
 use PacificaSearchBundle\Model\Proposal;
 use PacificaSearchBundle\Model\User;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
-use PacificaSearchBundle\Service\RepositoryManager;
-use PacificaSearchBundle\Service\SearchService;
+use PacificaSearchBundle\Service\RepositoryManagerInterface;
+use PacificaSearchBundle\Service\SearchServiceInterface;
 
 /**
  * Class TransactionRepository
@@ -21,12 +21,12 @@ use PacificaSearchBundle\Service\SearchService;
  * corresponding Model class to represent them, and this class doesn't have to perform any of the duties the other
  * repositories have to do.
  */
-class TransactionRepository
+class TransactionRepository implements TransactionRepositoryInterface
 {
-    /** @var SearchService */
+    /** @var SearchServiceInterface */
     protected $searchService;
 
-    /** @var RepositoryManager */
+    /** @var RepositoryManagerInterface */
     protected $repositoryManager;
 
     /**
@@ -41,8 +41,8 @@ class TransactionRepository
     private $idsByModel;
 
     public function __construct(
-        SearchService $searchService,
-        RepositoryManager $repositoryManager
+        SearchServiceInterface $searchService,
+        RepositoryManagerInterface $repositoryManager
     ) {
         $this->searchService = $searchService;
         $this->repositoryManager = $repositoryManager;
@@ -52,7 +52,7 @@ class TransactionRepository
      * @param string $modelClass Pass e.g. InstitutionRepository::class
      * @return int[]
      */
-    public function getIdsOfTypeAssociatedWithAtLeastOneTransaction($modelClass)
+    public function getIdsOfTypeAssociatedWithAtLeastOneTransaction($modelClass) : array
     {
         // TODO: This is an optimization problem. At the very least we need to turn this into a scan & scroll operation,
         // but with a very large database we really should just ensure that there are no records not associated with at
@@ -70,11 +70,11 @@ class TransactionRepository
             }
 
             $instrumentTypeQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_GROUP)
-                ->whereIn('instrument_members.instrument_id', $this->idsByModel[Instrument::class]);
+                ->whereIn('instrument_members', $this->idsByModel[Instrument::class]);
             $this->idsByModel[InstrumentType::class] = $this->searchService->getIds($instrumentTypeQb);
 
             $institutionQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_INSITUTION)
-                ->whereIn('users.person_id', $this->idsByModel[User::class]);
+                ->whereIn('users', $this->idsByModel[User::class]);
             $this->idsByModel[Institution::class] = $this->searchService->getIds($institutionQb);
 
             $this->idsByModel[File::class] = []; // Not relevant since all files have a transaction, this is just to circumvent the otherwise helpful error message below
@@ -94,7 +94,7 @@ class TransactionRepository
      * @param Filter $filter
      * @return int[]
      */
-    public function getIdsByFilter(Filter $filter)
+    public function getIdsByFilter(Filter $filter) : array
     {
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
 

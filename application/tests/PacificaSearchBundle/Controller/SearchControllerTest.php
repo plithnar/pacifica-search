@@ -2,6 +2,7 @@
 
 namespace Pacifica\Search\Tests\Controller;
 
+use Pacifica\Search\Tests\Repository\MockRepositoryManager;
 use Pacifica\Search\Tests\TestCase;
 use PacificaSearchBundle\Controller\SearchController;
 use PacificaSearchBundle\Exception\NoRecordsFoundException;
@@ -58,9 +59,7 @@ class SearchControllerTest extends TestCase
             ->setConstructorArgs(['dummyHost', 'dummyIndex'])
             ->getMock();
 
-        $this->mockRepositoryManager = $this->getMockBuilder('\\PacificaSearchBundle\\Service\\RepositoryManager')
-            ->setConstructorArgs([ $this->mockSearchService ])
-            ->getMock();
+        $this->mockRepositoryManager = new MockRepositoryManager($this->mockSearchService, $this);
 
         $this->mockInstitutionRepository    = $this->getMockRepository(InstitutionRepository::class);
         $this->mockInstrumentRepository     = $this->getMockRepository(InstrumentRepository::class);

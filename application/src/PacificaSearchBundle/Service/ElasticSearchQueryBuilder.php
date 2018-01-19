@@ -25,16 +25,6 @@ class ElasticSearchQueryBuilder
     private $fields = [];
 
     /**
-     * Defines nested fields for which a "must exist" filter is defined
-     *
-     * @var array [
-     *   'path' => The name of the child in which the field's value is stored (For child.value, this would be "child")
-     *   'field' => The full name of the field (For child.value, this would be "child.value")
-     * ]
-     */
-    private $nestedFieldExists;
-
-    /**
      * The Elasticsearch index that will be queried
      *
      * @var string
@@ -78,27 +68,6 @@ class ElasticSearchQueryBuilder
     public function getType()
     {
         return $this->type;
-    }
-
-    /**
-     * Add to the query the requirement that the passed nested field must exist and have a non-empty value
-     * @param string $field e.g. "instrument_members.instrument_id"
-     * @return ElasticSearchQueryBuilder
-     */
-    public function whereNestedFieldExists($field)
-    {
-        // This is probably not hard to implement but it's not required at the moment so I'm skipping supporting it for
-        // the sake of time.
-        if ($this->nestedFieldExists !== null) {
-            throw new \RuntimeException("This class does not currently support multiple must-exist nested fields");
-        }
-
-        $this->nestedFieldExists = [
-            'path' => $this->getNestedFieldPath($field),
-            'field' => $field
-        ];
-
-        return $this;
     }
 
     /**
@@ -187,39 +156,7 @@ class ElasticSearchQueryBuilder
         }
 
         foreach ($this->fields as $fieldName => $fieldValues) {
-            // Check for a nested field name, which requires a different query structure
-            $nestedFieldPath = $this->getNestedFieldPath($fieldName);
-            if ($nestedFieldPath !== null) {
-                $array['body']['query']['nested'] = [
-                    'path' => $nestedFieldPath,
-                    'query' => [
-                        'bool' => [
-                            'filter' => [
-                                'terms' => [
-                                    $fieldName => $fieldValues
-                                ]
-                            ]
-                        ]
-                    ]
-                ];
-            } else {
-                $array['body']['query']['bool']['filter'][] = ['terms' => [$fieldName => $fieldValues]];
-            }
-        }
-
-        if ($this->nestedFieldExists) {
-            $array['body']['query']['nested'] = [
-                'path' => $this->nestedFieldExists['path'],
-                'query' => [
-                    'bool' => [
-                        'filter' => [
-                            'exists' => [
-                                'field' => $this->nestedFieldExists['field']
-                            ]
-                        ]
-                    ]
-                ]
-            ];
+            $array['body']['query']['bool']['filter'][] = ['terms' => [$fieldName => $fieldValues]];
         }
 
         return $array;
@@ -240,26 +177,5 @@ class ElasticSearchQueryBuilder
         if (!in_array($type, $validTypes)) {
             throw new \Exception("Type '$type' is not a valid value. Allowed values are '" . implode(',', $validTypes) . "'");
         }
-    }
-
-    /**
-     * Given a field name like "path.nestedfield", returns "path". Given a non-nested field name, will return NULL.
-     * @param string $field
-     * @return string|NULL
-     */
-    private function getNestedFieldPath($field)
-    {
-        if (strpos($field, '.') === false) {
-            return null;
-        }
-
-        $fieldParts = explode('.', $field);
-
-        if (count($fieldParts) != 2) {
-            throw new \InvalidArgumentException("Badly formatted nested field, should be in the format [PATH].[FIELD_NAME]");
-        }
-
-        $path = reset($fieldParts);
-        return $path;
     }
 }
