@@ -46,6 +46,7 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
+     * @throws \RuntimeException
      * @param ElasticSearchQueryBuilder $queryBuilder
      * @param bool $assertResultsFound Pass TRUE to throw an exception if results aren't found - useful for early
      *   detection of a misconfigured or misconnected database for queries that we know should always return results.
@@ -55,7 +56,12 @@ class SearchService implements SearchServiceInterface
     {
         $client = $this->getClient();
         $request = $queryBuilder->toArray();
-        $response = $client->search($request);
+
+        try {
+            $response = $client->search($request);
+        } catch (\Exception $e) {
+            throw new \RuntimeException("ES search request failed. Request was \n\n" . json_encode($request) . "\n\nException message:" . $e->getMessage());
+        }
 
         if ($assertResultsFound && $response['hits']['total'] === 0) {
             throw new \RuntimeException("The " . $queryBuilder->getType() . " type in the Elasticsearch DB appears to be empty.");
