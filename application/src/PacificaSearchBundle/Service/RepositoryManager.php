@@ -115,7 +115,7 @@ class RepositoryManager implements RepositoryManagerInterface
 
     /**
      * @param string
-     * @return Repository|TransactionRepository
+     * @return Repository|TransactionRepositoryInterface
      */
     public function getRepositoryByClass($class)
     {

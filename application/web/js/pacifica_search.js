@@ -6,9 +6,16 @@
     var attr = PacificaSearch.Utilities.assertAttributeExists;
 
     $(function () {
-        $$('#search_filter').on('change', 'input', function () {
-            _updateOptions();
-        });
+        $$('#search_filter')
+            .on('change', 'input', function () {
+                _updateOptions();
+            })
+            .on('click', '.prev_page', function () {
+                _handlePageChangeClick(this, -1);
+            })
+            .on('click', '.next_page', function () {
+                _handlePageChangeClick(this, 1);
+            });
 
         function _updateOptions() {
             var filter = _getFilter();
@@ -24,6 +31,35 @@
                 _enableAndDisableFilterOptions();
                 _updateFileList();
             });
+        }
+
+        function _handlePageChangeClick(element, howManyPages) {
+            element = $(element);
+            var type = _getTypeByElement(element);
+            var pageNumberContainer = $$(element.closest('fieldset').find('.page_number'));
+            var curPage = parseInt(pageNumberContainer.text());
+            var newPage = curPage + howManyPages;
+
+            console.log("Change " + type + " from " + curPage + " to " + (curPage + howManyPages));
+            $.get(
+                '/filters/' + type + '/pages/' + newPage,
+                function (results) {
+                    var optionContainer = element.closest('fieldset').find('.option_container');
+                    optionContainer.html('');
+
+                    if (results.instances) {
+                        results.instances.forEach(function (instance) {
+                            var inputId = type + '_' + instance.id;
+                            var input = $('<input type="checkbox">').attr('id', inputId).attr('data-id', instance.id);
+                            var label = $('<label>').attr('for', inputId).append(input).append(instance.name);
+
+                            optionContainer.append(label);
+                        });
+                    }
+
+                    pageNumberContainer.text(newPage);
+                }
+            );
         }
 
         /**
@@ -81,6 +117,17 @@
             console.log("Current filter: " + JSON.stringify(filter));
 
             return filter;
+        }
+
+        /**
+         * For any element inside a filter <fieldset> element, returns the type associated with that fieldset
+         *
+         * @param {jQuery|string} element
+         * @returns string
+         */
+        function _getTypeByElement (element) {
+            var fieldset = $$($(element).closest('fieldset'));
+            return attr(fieldset, 'data-type');
         }
     });
 })(jQuery, PacificaSearch.Utilities.assertElementExists);

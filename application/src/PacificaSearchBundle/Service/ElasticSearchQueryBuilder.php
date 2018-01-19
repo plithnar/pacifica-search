@@ -45,6 +45,12 @@ class ElasticSearchQueryBuilder
      */
     private $ids;
 
+    /** @var int */
+    private $pageNumber;
+
+    /** @var int */
+    private $pageSize;
+
     /**
      * If TRUE then field values will not be returned by the query, instead only metadata will be returned. This is
      * useful primarily for queries that only need to retrieve the ID of a record and don't care about the rest of the
@@ -60,6 +66,11 @@ class ElasticSearchQueryBuilder
 
         $this->index = $index;
         $this->type = $type;
+
+        // Set defaults for pagination - The first page but with a very large page size, which is equivalent to
+        // having no pagination but a sane maximum number of results.
+        $this->pageNumber = 1;
+        $this->pageSize = 10000;
     }
 
     /**
@@ -121,6 +132,18 @@ class ElasticSearchQueryBuilder
     }
 
     /**
+     * Makes the query a paginated query
+     *
+     * @param int $pageNumber
+     * @param int $pageSize
+     */
+    public function paginate($pageNumber, $pageSize)
+    {
+        $this->pageNumber = $pageNumber;
+        $this->pageSize = $pageSize;
+    }
+
+    /**
      * Restricts the query so that it will only retrieve the IDs of the matching fields
      * @return ElasticSearchQueryBuilder
      */
@@ -134,7 +157,8 @@ class ElasticSearchQueryBuilder
     {
         $array = [
             'index' => $this->index,
-            'size' =>  10000,
+            'size' =>  $this->pageSize,
+            'from' => ($this->pageNumber-1) * $this->pageSize, // The -1 is necessary because pageSize is 1-based
             'type' => $this->type
         ];
 
