@@ -18,7 +18,7 @@ services:
     PacificaSearchBundle\Repository\FileRepository:
         factory: ["@PacificaSearchBundle\\Service\\RepositoryManager", "getFileRepository"]
 
-    PacificaSearchBundle\Controller\SearchController:
+    PacificaSearchBundle\Controller\GuiController:
         arguments:
             - "@PacificaSearchBundle\\Repository\\InstitutionRepository"
             - "@PacificaSearchBundle\\Repository\\InstrumentRepository"

@@ -4,7 +4,7 @@ namespace Pacifica\Search\Tests\Controller;
 
 use Pacifica\Search\Tests\Repository\MockRepositoryManager;
 use Pacifica\Search\Tests\TestCase;
-use PacificaSearchBundle\Controller\SearchController;
+use PacificaSearchBundle\Controller\GuiController;
 use PacificaSearchBundle\Exception\NoRecordsFoundException;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Repository\InstitutionRepository;
@@ -17,7 +17,7 @@ use PacificaSearchBundle\Repository\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Twig\TwigEngine;
 
-class SearchControllerTest extends TestCase
+class GuiControllerTest extends TestCase
 {
     /** @var MockObject */
     private $mockSearchService;
@@ -46,7 +46,7 @@ class SearchControllerTest extends TestCase
     /**
      * The class being tested
      *
-     * @var SearchController
+     * @var GuiController
      */
     private $controller;
 
@@ -71,7 +71,7 @@ class SearchControllerTest extends TestCase
         // Repository (because it works very differently from other repository types)
         $this->mockTransactionRepository = $this->createMock(TransactionRepository::class);
 
-        $this->controller = new SearchController(
+        $this->controller = new GuiController(
             $this->mockInstitutionRepository,
             $this->mockInstrumentRepository,
             $this->mockInstrumentTypeRepository,
@@ -105,7 +105,7 @@ class SearchControllerTest extends TestCase
         ];
         /** @var MockObject $repository */
         foreach ($repositoriesNeedingFixtures as $mockRepo) {
-            // The SearchController renders a template that expects each ElasticSearchTypeCollection it receives (which
+            // The GuiController renders a template that expects each ElasticSearchTypeCollection it receives (which
             // are returned by the repositories' getById() methods) to return a display and machine name, but we don't
             // care what those names are for the purposes of our tests
             $mockElasticSearchTypeCollection = $this->createMock(ElasticSearchTypeCollection::class);

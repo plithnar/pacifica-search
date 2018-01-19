@@ -14,7 +14,7 @@ use PacificaSearchBundle\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
 
-class SearchController
+class GuiController
 {
     use FilterAwareController;
 
