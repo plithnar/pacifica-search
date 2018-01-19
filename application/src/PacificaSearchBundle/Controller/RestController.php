@@ -7,7 +7,6 @@ use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Repository\FileRepository;
-use PacificaSearchBundle\Repository\Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
