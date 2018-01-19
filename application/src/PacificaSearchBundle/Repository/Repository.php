@@ -21,7 +21,7 @@ abstract class Repository
     /** @var RepositoryManager */
     protected $repositoryManager;
 
-    public function __construct(SearchService $searchService, RepositoryManager $repositoryManager)
+    final public function __construct(SearchService $searchService, RepositoryManager $repositoryManager)
     {
         $this->searchService = $searchService;
         $this->repositoryManager = $repositoryManager;
@@ -39,12 +39,26 @@ abstract class Repository
      */
     public function getFilteredIds(Filter $filter)
     {
+        $transactionIds = $this->getFilteredTransactions($filter);
+        $ownIds = $this->getIdsByTransactionIds($transactionIds);
+        return $ownIds;
+    }
+
+    /**
+     * Retrieve the IDs of all transactions matching our filter set
+     *
+     * @param Filter $filter
+     * @return array|NULL
+     *
+     */
+    public function getFilteredTransactions(Filter $filter)
+    {
         // Clone the filter before making any changes so that the caller's filter doesn't get changed
         $filter = clone $filter;
 
         // Remove filters of own type if applicable - you can't restrict Users by picking a User
         if ($this instanceof FilterRepository) {
-            $filter->setIdsByType(self::getModelClass(), []);
+            $filter->setIdsByType($this->getModelClass(), []);
         }
 
         // We don't do any filtering if the filter contains no values
@@ -53,9 +67,8 @@ abstract class Repository
         }
 
         $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
-        $ownIds = $this->getIdsByTransactionIds($transactionIds);
 
-        return $ownIds;
+        return $transactionIds;
     }
 
     /**
@@ -88,7 +101,7 @@ abstract class Repository
      * class by the convention that repository classes are named <ModelClass>Repository, override this method if that's
      * not the case.
      */
-    public static function getModelClass()
+    public function getModelClass()
     {
         // Remove the "Repository" suffix from the repo's class name
         $modelClassName = preg_replace('/Repository$/', '', static::class);
@@ -119,12 +132,28 @@ abstract class Repository
         return $this->resultsToTypeCollection($response);
     }
 
+    /**
+     * @param int|int[] $ids
+     * @return ElasticSearchTypeCollection
+     */
     public function getById($ids)
     {
         if (!is_array($ids)) {
             $ids = [$ids];
         }
+        $response = $this->searchService->getResults($this->getQueryBuilder()->whereIn('id', $ids));
+        return $this->resultsToTypeCollection($response);
+    }
 
+    /**
+     * @param int|int[] $ids
+     * @return ElasticSearchTypeCollection
+     */
+    public function getTransactionsById($ids)
+    {
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
         $response = $this->searchService->getResults($this->getQueryBuilder()->whereIn('id', $ids));
         return $this->resultsToTypeCollection($response);
     }
@@ -133,7 +162,7 @@ abstract class Repository
     {
         $instances = new ElasticSearchTypeCollection();
         foreach ($results as $curHit) {
-            $modelClass = static::getModelClass();
+            $modelClass = $this->getModelClass();
             $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
             $instances->add($instance);
         }

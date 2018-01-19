@@ -1,24 +1,11 @@
 <?php
-/**
- * Selenium PHP Driver Module
- *
- * @category Module
- * @package  Tests
- * @author   David Brown <dmlb2000@gmail.com>
- * @license  https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html GNU Lesser General Public License, version 2.1
- * @link     https://github.com/pacifica/pacifica-search
- */
 
 namespace Pacifica\Search\Tests;
 
 /**
- * Selenium PHP Driver Index.php tests
+ * Class WebTest
  *
- * @category Class
- * @package  MyClass
- * @author   David Brown <dmlb2000@gmail.com>
- * @license  https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html GNU Lesser General Public License, version 2.1
- * @link     https://github.com/pacifica/pacifica-search
+ * Selenium-based in-browser functional tests for the Pacifica Search application
  */
 class WebTest extends \PHPUnit_Extensions_Selenium2TestCase
 {
@@ -29,25 +16,25 @@ class WebTest extends \PHPUnit_Extensions_Selenium2TestCase
      *
      * This function sets up the selenium browser with firefox and sets the url to
      * the correct localhost address for our testing environment.
-     *
-     * @return Nothing
      */
     protected function setUp()
     {
         $this->setBrowser('firefox');
-        $this->setBrowserUrl('http://localhost:8192/');
+        $this->setBrowserUrl('http://localhost/');
     }
 
     /**
-     * Test the title of the main page to see if it's correct.
+     * Checks against catastrophic failure: This test passes if a request to the main GUI page renders the GUI
      *
-     * This function tests the main page and checks for the title so we know it's correct.
-     *
-     * @return Nothing
+     * @test
      */
-    public function testTitle()
+    public function siteLoads()
     {
-//        $this->url('http://localhost:8192/');
-//        $this->assertEquals('List of Posts', $this->title());
+        $this->url('/');
+
+        $this->assertEquals(
+            $this->byCssSelector('fieldset[data-type="institution"] > h2')->text(),
+            'Institution'
+        );
     }
 }

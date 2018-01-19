@@ -39,7 +39,7 @@ services:
             SITEDB_PASSWORD: search
             SITEDB_DB_NAME: search
             SITEDB_DBDRIVER: postgre
-            # XDEBUG_CONFIG: remote_host=130.20.226.2
+            XDEBUG_CONFIG: remote_host=docker.for.mac.localhost
             PHP_IDE_CONFIG: serverName=PacificaSearch
         ports:
             - 9999:9000
@@ -112,4 +112,3 @@ services:
         memlock:
           soft: -1
           hard: -1
-        mem_limit: 1g

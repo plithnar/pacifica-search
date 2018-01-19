@@ -7,8 +7,10 @@ use PacificaSearchBundle\Repository\InstitutionRepository;
 use PacificaSearchBundle\Repository\InstrumentRepository;
 use PacificaSearchBundle\Repository\InstrumentTypeRepository;
 use PacificaSearchBundle\Repository\ProposalRepository;
+use PacificaSearchBundle\Repository\Repository;
 use PacificaSearchBundle\Repository\TransactionRepository;
 use PacificaSearchBundle\Repository\UserRepository;
+use phpDocumentor\Reflection\Types\Mixed_;
 
 /**
  * Class RepositoryManager
@@ -129,5 +131,24 @@ class RepositoryManager
         }
 
         return $this->fileRepository;
+    }
+
+    /**
+     * @param string
+     * @return Repository|TransactionRepository
+     */
+    public function getRepositoryByClass($class)
+    {
+        switch ($class) {
+            case InstitutionRepository::class     : return $this->getInstitutionRepository();
+            case InstrumentRepository::class      : return $this->getInstrumentRepository();
+            case InstrumentTypeRepository::class  : return $this->getInstrumentTypeRepository();
+            case ProposalRepository::class        : return $this->getProposalRepository();
+            case UserRepository::class            : return $this->getUserRepository();
+            case TransactionRepository::class     : return $this->getTransactionRepository();
+            case FileRepository::class            : return $this->getFileRepository();
+        }
+
+        throw new \InvalidArgumentException("$class is not a recognized Repository class");
     }
 }

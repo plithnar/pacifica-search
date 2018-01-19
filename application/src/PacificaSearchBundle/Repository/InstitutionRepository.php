@@ -2,10 +2,9 @@
 
 namespace PacificaSearchBundle\Repository;
 
-use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 
-class InstitutionRepository extends FilterRepository
+class InstitutionRepository extends Repository
 {
     /**
      * Gets the IDs of a set of Institutions associated with a set of Users

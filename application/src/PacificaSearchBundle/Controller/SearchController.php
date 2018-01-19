@@ -2,19 +2,64 @@
 
 namespace PacificaSearchBundle\Controller;
 
+use PacificaSearchBundle\Exception\NoRecordsFoundException;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
-use PacificaSearchBundle\Repository\FileRepository;
-use PacificaSearchBundle\Repository\FilterRepository;
 use PacificaSearchBundle\Repository\InstitutionRepository;
+use PacificaSearchBundle\Repository\InstrumentRepository;
+use PacificaSearchBundle\Repository\InstrumentTypeRepository;
+use PacificaSearchBundle\Repository\ProposalRepository;
 use PacificaSearchBundle\Repository\Repository;
 use PacificaSearchBundle\Repository\TransactionRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use PacificaSearchBundle\Repository\UserRepository;
+use PacificaSearchBundle\Service\RepositoryManager;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\EngineInterface;
 
-class SearchController extends Controller
+class SearchController
 {
+    /** @var InstitutionRepository */
+    protected $institutionRepository;
+
+    /** @var InstrumentRepository */
+    protected $instrumentRepository;
+
+    /** @var InstrumentTypeRepository */
+    protected $instrumentTypeRepository;
+
+    /** @var ProposalRepository */
+    protected $proposalRepository;
+
+    /** @var UserRepository */
+    protected $userRepository;
+
+    /** @var TransactionRepository */
+    protected $transactionRepository;
+
+    /** @var RepositoryManager */
+    protected $repositoryManager;
+
+    /** @var EngineInterface */
+    protected $renderingEngine;
+
     private $page_data = [];
-    public function __construct()
-    {
+
+    public function __construct(
+        InstitutionRepository $institutionRepository,
+        InstrumentRepository $instrumentRepository,
+        InstrumentTypeRepository $instrumentTypeRepository,
+        ProposalRepository $proposalRepository,
+        UserRepository $userRepository,
+        TransactionRepository $transactionRepository,
+        EngineInterface $renderingEngine
+    ) {
+        $this->institutionRepository = $institutionRepository;
+        $this->instrumentRepository = $instrumentRepository;
+        $this->instrumentTypeRepository = $instrumentTypeRepository;
+        $this->proposalRepository = $proposalRepository;
+        $this->userRepository = $userRepository;
+        $this->transactionRepository = $transactionRepository;
+        $this->renderingEngine = $renderingEngine;
+
         $this->page_data['script_uris'] = array(
             'js/lib/spinner/spin.min.js',
             'js/lib/fancytree/dist/jquery.fancytree-all.js',
@@ -27,35 +72,55 @@ class SearchController extends Controller
             'css/combined.css'
         );
     }
-    public function indexAction()
-    {
-        /** @var ElasticSearchTypeCollection[] */
-        $filters = array_map(function ($repoClass) {
-            /** @var FilterRepository $repo */
-            $repo = $this->container->get($repoClass);
 
-            // TODO: Either refactor this for readability/prettiness or remove it, depending on whether we find out
-            // that there are no orphaned records in the production database.
-            $ids = $this->container->get(TransactionRepository::class)->getIdsOfTypeAssociatedWithAtLeastOneTransaction($repoClass::getModelClass());
-            $instances = $repo->getById($ids);
+    /**
+     * Renders the GUI of the Pacifica Search application
+     * @return Response
+     */
+    public function indexAction() : Response
+    {
+        /** @var ElasticSearchTypeCollection[] $filters */
+        $filters = array_map(function (Repository $repository) {
+            $ids = $this->transactionRepository->getIdsOfTypeAssociatedWithAtLeastOneTransaction($repository->getModelClass());
+            $instances = $repository->getById($ids);
 
             // If a repo returns an empty set then something has gone wrong
             if (!count($instances)) {
-                throw new \RuntimeException(
-                    "No records found for $repoClass, this is probably an error in your Elastic Search "
+                $repositoryClass = get_class($repository);
+                throw new NoRecordsFoundException(
+                    "No records found for $repositoryClass, this is probably an error in your Elastic Search "
                     . "configuration or the corresponding type in your Elastic Search database is not populated"
                 );
             }
 
             return $instances;
-        }, FilterRepository::getImplementingClassNames());
+        }, $this->getFilterableRepositories());
 
-        return $this->render(
+        $renderedContent = $this->renderingEngine->render(
             'PacificaSearchBundle::search.html.twig',
             [
                 'filters' => $filters,
                 'page_data' => $this->page_data
             ]
         );
+
+        return new Response($renderedContent);
+    }
+
+    /**
+     * Gets all Repository classes that implement the FilterRepository base class, which is the same as the set of
+     * Repositories that contain items that can be filtered on in the GUI.
+     *
+     * @return Repository[]
+     */
+    protected function getFilterableRepositories() : array
+    {
+        return [
+            $this->institutionRepository,
+            $this->instrumentRepository,
+            $this->instrumentTypeRepository,
+            $this->proposalRepository,
+            $this->userRepository
+        ];
     }
 }

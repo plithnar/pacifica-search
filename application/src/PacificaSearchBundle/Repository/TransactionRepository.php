@@ -70,11 +70,11 @@ class TransactionRepository
             }
 
             $instrumentTypeQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_GROUP)
-                ->whereIn('instrument_members.instrument_id', $this->idsByModel[Instrument::class]);
+                ->whereIn('instruments', $this->idsByModel[Instrument::class]);
             $this->idsByModel[InstrumentType::class] = $this->searchService->getIds($instrumentTypeQb);
 
             $institutionQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_INSITUTION)
-                ->whereIn('users.person_id', $this->idsByModel[User::class]);
+                ->whereIn('users', $this->idsByModel[User::class]);
             $this->idsByModel[Institution::class] = $this->searchService->getIds($institutionQb);
 
             $this->idsByModel[File::class] = []; // Not relevant since all files have a transaction, this is just to circumvent the otherwise helpful error message below

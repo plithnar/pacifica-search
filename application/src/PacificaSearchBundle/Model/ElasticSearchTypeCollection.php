@@ -9,7 +9,7 @@ namespace PacificaSearchBundle\Model;
  * ElasticSearchType instances of the same type, which exists to abstract some of the logic of rendering those
  * collections out of the template.
  */
-class ElasticSearchTypeCollection implements \Iterator, \Countable
+class ElasticSearchTypeCollection implements \Countable
 {
     /**
      * @var ElasticSearchType[]
@@ -80,36 +80,15 @@ class ElasticSearchTypeCollection implements \Iterator, \Countable
 
     /**
      * Returns the string that represents the contained Type in the REST API
-     * @return string
+     * @return string|NULL NULL if no items have been added
      */
     public function getMachineName()
     {
+        if (empty($this->instances)) {
+            return null;
+        }
+
         return $this->instances[0]::getMachineName();
-    }
-
-    public function current()
-    {
-        return current($this->instances);
-    }
-
-    public function next()
-    {
-        return next($this->instances);
-    }
-
-    public function key()
-    {
-        return key($this->instances);
-    }
-
-    public function valid()
-    {
-        return isset($this->instances);
-    }
-
-    public function rewind()
-    {
-        return reset($this->instances);
     }
 
     public function count()

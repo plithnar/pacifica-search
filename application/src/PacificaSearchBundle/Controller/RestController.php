@@ -7,7 +7,6 @@ use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Repository\FileRepository;
-use PacificaSearchBundle\Repository\FilterRepository;
 use PacificaSearchBundle\Repository\Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +15,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 // Annotations - IDE marks "unused" but they are not
 use FOS\RestBundle\Controller\Annotations\Get;
 
+/**
+ * @codeCoverageIgnore - Because this controller relies on functionality provided by the FOSRestController there is
+ * no practical way for us to convert it to use dependency injection and so it cannot be unit tested.
+ */
 class RestController extends FOSRestController
 {
     /**
@@ -40,7 +43,7 @@ class RestController extends FOSRestController
     public function getValidFilterIdsAction()
     {
         $filter = $this->getSession()->get('filter');
-
+        dump($filter);
         /** @var $filterIds ElasticSearchTypeCollection[] */
         $filterIds = [];
 
@@ -52,7 +55,7 @@ class RestController extends FOSRestController
             // NULL represents a case where no filtering was performed - we exclude these from the results, meaning
             // that all items of that type are still valid options
             if (null !== $filteredIds) {
-                $filterIds[$repo::getModelClass()::getMachineName()] = $filteredIds;
+                $filterIds[$repo->getModelClass()::getMachineName()] = $filteredIds;
             }
         }
 
@@ -73,7 +76,6 @@ class RestController extends FOSRestController
         $repo = $this->container->get(FileRepository::class);
         $fileIds = $repo->getFilteredIds($filter);
         $files = $repo->getById($fileIds);
-
         $response = [];
         foreach ($files->getInstances() as $file) {
             $response[] = $file->toArray();
@@ -81,6 +83,29 @@ class RestController extends FOSRestController
 
         return $this->handleView(View::create($response));
     }
+
+    /**
+     * Retrieves transactions that fit the current filter
+     *
+     * @return Response
+     */
+    public function getTransactionsAction()
+    {
+        /** @var Filter $filter */
+        $filter = $this->getSession()->get('filter');
+
+        /** @var FileRepository $repo */
+        $repo = $this->container->get(TransactionRepository::class);
+        $transactionIds = $repo->getFilteredTransactions($filter);
+        $files = $repo->getById($fileIds);
+        $response = [];
+        foreach ($files->getInstances() as $file) {
+            $response[] = $file->toArray();
+        }
+
+        return $this->handleView(View::create($response));
+    }
+
 
     /**
      * Sets the current filter

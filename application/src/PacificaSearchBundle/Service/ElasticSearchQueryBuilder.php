@@ -188,39 +188,39 @@ class ElasticSearchQueryBuilder
 
         foreach ($this->fields as $fieldName => $fieldValues) {
             // Check for a nested field name, which requires a different query structure
-            $nestedFieldPath = $this->getNestedFieldPath($fieldName);
-            if ($nestedFieldPath !== null) {
-                $array['body']['query']['nested'] = [
-                    'path' => $nestedFieldPath,
-                    'query' => [
-                        'bool' => [
-                            'filter' => [
-                                'terms' => [
-                                    $fieldName => $fieldValues
-                                ]
-                            ]
-                        ]
-                    ]
-                ];
-            } else {
-                $array['body']['query']['bool']['filter'][] = ['terms' => [$fieldName => $fieldValues]];
-            }
+            // $nestedFieldPath = $this->getNestedFieldPath($fieldName);
+            // if ($nestedFieldPath !== null) {
+                // $array['body']['query']['nested'] = [
+                //     'path' => $nestedFieldPath,
+                //     'query' => [
+                //         'bool' => [
+                //             'filter' => [
+                //                 'terms' => [
+                //                     $fieldName => $fieldValues
+                //                 ]
+                //             ]
+                //         ]
+                //     ]
+                // ];
+            // } else {
+            $array['body']['query']['bool']['filter'][] = ['terms' => [$fieldName => $fieldValues]];
+            // }
         }
 
-        if ($this->nestedFieldExists) {
-            $array['body']['query']['nested'] = [
-                'path' => $this->nestedFieldExists['path'],
-                'query' => [
-                    'bool' => [
-                        'filter' => [
-                            'exists' => [
-                                'field' => $this->nestedFieldExists['field']
-                            ]
-                        ]
-                    ]
-                ]
-            ];
-        }
+        // if ($this->nestedFieldExists) {
+        //     $array['body']['query']['nested'] = [
+        //         'path' => $this->nestedFieldExists['path'],
+        //         'query' => [
+        //             'bool' => [
+        //                 'filter' => [
+        //                     'exists' => [
+        //                         'field' => $this->nestedFieldExists['field']
+        //                     ]
+        //                 ]
+        //             ]
+        //         ]
+        //     ];
+        // }
 
         return $array;
     }
