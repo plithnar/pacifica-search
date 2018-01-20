@@ -3,6 +3,7 @@
 namespace PacificaSearchBundle\Controller;
 
 use PacificaSearchBundle\Exception\NoRecordsFoundException;
+use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Repository\InstitutionRepository;
 use PacificaSearchBundle\Repository\InstrumentRepository;
@@ -65,10 +66,11 @@ class GuiController
      */
     public function indexAction() : Response
     {
+        $emptyFilter = new Filter();
+
         /** @var ElasticSearchTypeCollection[] $filters */
-        $filters = array_map(function (Repository $repository) {
-            $ids = $this->transactionRepository->getIdsOfTypeAssociatedWithAtLeastOneTransaction($repository->getModelClass());
-            $instances = $repository->getById($ids);
+        $filters = array_map(function (Repository $repository) use ($emptyFilter) {
+            $instances = $repository->getFilteredPage($emptyFilter, 1);
 
             // If a repo returns an empty set then something has gone wrong
             if (!count($instances)) {

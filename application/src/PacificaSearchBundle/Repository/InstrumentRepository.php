@@ -38,4 +38,13 @@ class InstrumentRepository extends Repository
 
         return $results;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function getNameFromSearchResult(array $result)
+    {
+        // We use the short name for instruments because the standard name field is much too long for the GUI
+        return $result['_source']['name_short'];
+    }
 }

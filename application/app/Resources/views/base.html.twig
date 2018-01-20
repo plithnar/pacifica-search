@@ -58,15 +58,15 @@
           </div>
         </header>
         <div id="container">
-          <div class="main">
+          <div class="main" style="position:relative;">
             <div id="header_container">
               <h1 class="underline">{% block page_header %}Default Page Header{% endblock %}</h1>
               <div id="login_id_container">
                 <em>{{ app.user.fullName|default('Anonymous Stranger') }}</em>
               </div>
             </div>
+            {% block body %}{% endblock %}
           </div>
       </div>
-        {% block body %}{% endblock %}
     </body>
 </html>

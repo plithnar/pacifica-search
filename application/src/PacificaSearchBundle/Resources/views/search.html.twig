@@ -4,7 +4,6 @@
 {% block title %}search{% endblock %}
 {% block stylesheets %}
         {{ parent() }}
-        <link rel="stylesheet" href="{{ asset('css/search_layout.css') }}">
 {% endblock %}
 {% block javascripts %}
         {{ parent() }}
@@ -15,27 +14,41 @@
         <script src="{{ asset('js/pacifica_search.js') }}"></script>
 {% endblock %}
 {% block body %}
-<section id="search_filter">
+<section id="search_filter" class="search_results_block">
     {% for collection in filters %}
         <fieldset data-type="{{ collection.machineName }}">
-            <h2>{{ collection.typeDisplayName }}</h2>
-            {% for instance in collection.instances %}
-                {% set input_id = collection.machineName ~ "_" ~ instance.id %}
-                <label for="{{ input_id }}">
-                    <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
-                    {{ instance.displayName }}
-                </label>
-            {% endfor %}
+            <legend>{{ collection.typeDisplayName }}</legend>
+            <div class="option_container">
+                {% for instance in collection.instances %}
+                    {% set input_id = collection.machineName ~ "_" ~ instance.id %}
+                    <label for="{{ input_id }}" title="{{ instance.displayName }}">
+                        <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
+                        {{ instance.displayName }}
+                    </label>
+                {% endfor %}
+            </div>
+            <div class="page_control_block">
+                <div class="next_prev_control">
+                    <a href="javascript:void(0);" class="paging_button prev_page">prev</a>
+                    <span class="page_number">1</span>
+                    <a href="javascript:void(0);" class="paging_button next_page">next</a>
+                </div>
+            </div>
+
         </fieldset>
     {% endfor %}
 </section>
 
-<p style="clear:both"></p>
-
-<div id="files" style="border: 1px black solid;">
-    <h2>Files</h2>
+<section id="files" class="search_results_block" style="float:left;">
+    <fieldset>
+        <legend>Files</legend>
+        <div class="results_instructions">
+            Select some categories from the column to the right to load results...
+        </div>
+        <div id="results_filetree" />
+    </fieldset>
     <!-- This element's remaining contents are generated in JavaScript -->
-</div>
+</section>
 <div id="file_template" style="display:none">
     <p>
         <span class="file_name" data-is-file-name-container></span>

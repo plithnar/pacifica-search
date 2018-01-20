@@ -15,6 +15,8 @@ use PacificaSearchBundle\Service\SearchServiceInterface;
  */
 abstract class Repository
 {
+    const PAGE_SIZE = 10;
+
     /** @var SearchServiceInterface */
     protected $searchService;
 
@@ -95,15 +97,23 @@ abstract class Repository
     }
 
     /**
-     * Implements the most common form of getAll(), which presumes that our Type is a ConventionalElasticSearchType
-     * and that our ElasticSearch objects contain ID and name fields in the expected places - if any of this is not
-     * true then you should implement your own version of getAll()
+     * Retrieves a page of model objects that fit the passed filter.
      *
+     * @param Filter $filter
+     * @param int $pageNumber 1-based page number
      * @return ElasticSearchTypeCollection
      */
-    public function getAll()
+    public function getFilteredPage(Filter $filter, $pageNumber)
     {
-        $response = $this->searchService->getResults($this->getQueryBuilder());
+        $qb = $this->getQueryBuilder();
+        $qb->paginate($pageNumber, self::PAGE_SIZE);
+
+        $filteredIds = $this->getFilteredTransactions($filter);
+        if (!empty($filteredIds)) {
+            $qb->byId($filteredIds);
+        }
+
+        $response = $this->searchService->getResults($qb);
         return $this->resultsToTypeCollection($response);
     }
 
@@ -155,10 +165,13 @@ abstract class Repository
      */
     protected function getIdsByTransactionIds(array $transactionIds)
     {
-        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
-        $results = $this->searchService->getResults($qb);
-        $ids = $this->getOwnIdsFromTransactionResults($results);
-        $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
+        $ids = array();
+        if($transactionIds){
+            $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
+            $results = $this->searchService->getResults($qb);
+            $ids = $this->getOwnIdsFromTransactionResults($results);
+            $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
+        }
         return $ids;
     }
 
