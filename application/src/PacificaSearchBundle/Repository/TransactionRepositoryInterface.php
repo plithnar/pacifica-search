@@ -15,4 +15,12 @@ interface TransactionRepositoryInterface
      * @return int[]
      */
     public function getIdsByFilter(Filter $filter) : array;
+
+    /**
+     * Gets a set of associative arrays representing the Transactions fitting a filter
+     *
+     * @param Filter $filter
+     * @return array
+     */
+    public function getAssocArrayByFilter(Filter $filter) : array;
 }

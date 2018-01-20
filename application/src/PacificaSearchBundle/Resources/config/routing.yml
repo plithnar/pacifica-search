@@ -7,3 +7,8 @@ pacifica_search_homepage:
 rest:
     type: rest
     resource: PacificaSearchBundle\Controller\RestController
+
+file_tree:
+    type: rest
+    prefix: file_tree
+    resource: PacificaSearchBundle\Controller\FileTreeController

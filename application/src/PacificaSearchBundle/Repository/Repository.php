@@ -15,7 +15,7 @@ use PacificaSearchBundle\Service\SearchServiceInterface;
  */
 abstract class Repository
 {
-    const PAGE_SIZE = 10;
+    const DEFAULT_PAGE_SIZE = 10;
 
     /** @var SearchServiceInterface */
     protected $searchService;
@@ -39,7 +39,7 @@ abstract class Repository
      * @return array|NULL NULL indicates that no filtering was performed because the filter was empty (possibly after
      *   removing all of the Repository's own model class's items)
      */
-    public function getFilteredIds(Filter $filter)
+    public function getIdsThatMayBeAddedToFilter(Filter $filter)
     {
         // Clone the filter before making any changes so that the caller's filter doesn't get changed
         $filter = clone $filter;
@@ -81,27 +81,6 @@ abstract class Repository
         }
 
         return $modelClassName;
-    }
-
-    /**
-     * Retrieves a page of model objects that fit the passed filter.
-     *
-     * @param Filter $filter
-     * @param int $pageNumber 1-based page number
-     * @return ElasticSearchTypeCollection
-     */
-    public function getFilteredPage(Filter $filter, $pageNumber)
-    {
-        $qb = $this->getQueryBuilder();
-        $qb->paginate($pageNumber, self::PAGE_SIZE);
-
-        $filteredIds = $this->getFilteredIds($filter);
-        if (!empty($filteredIds)) {
-            $qb->byId($filteredIds);
-        }
-
-        $response = $this->searchService->getResults($qb);
-        return $this->resultsToTypeCollection($response);
     }
 
     /**
