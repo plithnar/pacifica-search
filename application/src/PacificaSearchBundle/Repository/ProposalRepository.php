@@ -30,6 +30,6 @@ class ProposalRepository extends Repository
      */
     protected static function getNameFromSearchResult(array $result)
     {
-        return $result['_source']['title'];
+        return "Proposal #" . $result['_id'];
     }
 }
