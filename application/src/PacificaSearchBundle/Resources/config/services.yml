@@ -35,3 +35,13 @@ services:
             - "@PacificaSearchBundle\\Repository\\InstrumentTypeRepository"
             - "@PacificaSearchBundle\\Repository\\ProposalRepository"
             - "@PacificaSearchBundle\\Repository\\UserRepository"
+            - "@PacificaSearchBundle\\Repository\\TransactionRepository"
+
+    PacificaSearchBundle\Controller\FileTreeController:
+        arguments:
+            - "@PacificaSearchBundle\\Repository\\InstitutionRepository"
+            - "@PacificaSearchBundle\\Repository\\InstrumentRepository"
+            - "@PacificaSearchBundle\\Repository\\InstrumentTypeRepository"
+            - "@PacificaSearchBundle\\Repository\\ProposalRepository"
+            - "@PacificaSearchBundle\\Repository\\UserRepository"
+            - "@PacificaSearchBundle\\Repository\\TransactionRepository"

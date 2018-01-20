@@ -15,7 +15,7 @@ use PacificaSearchBundle\Service\SearchServiceInterface;
  */
 abstract class Repository
 {
-    const PAGE_SIZE = 10;
+    const DEFAULT_PAGE_SIZE = 10;
 
     /** @var SearchServiceInterface */
     protected $searchService;
@@ -39,21 +39,7 @@ abstract class Repository
      * @return array|NULL NULL indicates that no filtering was performed because the filter was empty (possibly after
      *   removing all of the Repository's own model class's items)
      */
-    public function getFilteredIds(Filter $filter)
-    {
-        $transactionIds = $this->getFilteredTransactions($filter);
-        $ownIds = $this->getIdsByTransactionIds($transactionIds);
-        return $ownIds;
-    }
-
-    /**
-     * Retrieve the IDs of all transactions matching our filter set
-     *
-     * @param Filter $filter
-     * @return array|NULL
-     *
-     */
-    public function getFilteredTransactions(Filter $filter)
+    public function getIdsThatMayBeAddedToFilter(Filter $filter)
     {
         // Clone the filter before making any changes so that the caller's filter doesn't get changed
         $filter = clone $filter;
@@ -69,8 +55,9 @@ abstract class Repository
         }
 
         $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
+        $ownIds = $this->getIdsByTransactionIds($transactionIds);
 
-        return $transactionIds;
+        return $ownIds;
     }
 
     /**
@@ -97,27 +84,6 @@ abstract class Repository
     }
 
     /**
-     * Retrieves a page of model objects that fit the passed filter.
-     *
-     * @param Filter $filter
-     * @param int $pageNumber 1-based page number
-     * @return ElasticSearchTypeCollection
-     */
-    public function getFilteredPage(Filter $filter, $pageNumber)
-    {
-        $qb = $this->getQueryBuilder();
-        $qb->paginate($pageNumber, self::PAGE_SIZE);
-
-        $filteredIds = $this->getFilteredTransactions($filter);
-        if (!empty($filteredIds)) {
-            $qb->byId($filteredIds);
-        }
-
-        $response = $this->searchService->getResults($qb);
-        return $this->resultsToTypeCollection($response);
-    }
-
-    /**
      * @param int|int[] $ids
      * @return ElasticSearchTypeCollection
      */
@@ -126,19 +92,7 @@ abstract class Repository
         if (!is_array($ids)) {
             $ids = [$ids];
         }
-        $response = $this->searchService->getResults($this->getQueryBuilder()->whereIn('id', $ids));
-        return $this->resultsToTypeCollection($response);
-    }
 
-    /**
-     * @param int|int[] $ids
-     * @return ElasticSearchTypeCollection
-     */
-    public function getTransactionsById($ids)
-    {
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
         $response = $this->searchService->getResults($this->getQueryBuilder()->whereIn('id', $ids));
         return $this->resultsToTypeCollection($response);
     }
@@ -165,13 +119,10 @@ abstract class Repository
      */
     protected function getIdsByTransactionIds(array $transactionIds)
     {
-        $ids = array();
-        if($transactionIds){
-            $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
-            $results = $this->searchService->getResults($qb);
-            $ids = $this->getOwnIdsFromTransactionResults($results);
-            $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
-        }
+        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
+        $results = $this->searchService->getResults($qb);
+        $ids = $this->getOwnIdsFromTransactionResults($results);
+        $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
         return $ids;
     }
 

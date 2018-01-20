@@ -3,6 +3,7 @@
 namespace PacificaSearchBundle\Repository;
 
 use PacificaSearchBundle\Filter;
+use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Model\File;
 use PacificaSearchBundle\Model\Institution;
 use PacificaSearchBundle\Model\Instrument;
@@ -46,14 +47,30 @@ class TransactionRepository implements TransactionRepositoryInterface
      */
     public function getIdsByFilter(Filter $filter) : array
     {
+        $qb = $this->getQueryBuilderByFilter($filter);
+        $transactionIds = $this->searchService->getIds($qb);
+        return $transactionIds;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAssocArrayByFilter(Filter $filter) : array
+    {
+        $qb = $this->getQueryBuilderByFilter($filter);
+        $transactions = $this->searchService->getResults($qb);
+        return $transactions;
+    }
+
+    private function getQueryBuilderByFilter(Filter $filter)
+    {
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
 
         $this->addWhereClauseForProposals($qb, $filter->getProposalIds());
         $this->addWhereClauseForInstruments($qb, $filter->getInstrumentIds(), $filter->getInstrumentTypeIds());
         $this->addWhereClauseForUsers($qb, $filter->getUserIds(), $filter->getInstitutionIds());
-        $transactionIds = $this->searchService->getIds($qb);
 
-        return $transactionIds;
+        return $qb;
     }
 
     /**

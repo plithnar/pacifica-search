@@ -64,6 +64,6 @@ class FileRepositoryTest extends TestCase
         $filter = $this->createMock(Filter::class);
 
         // Given an empty filter, getFilteredIds should return NULL
-        $this->assertEquals(0, $this->repository->getFilteredIds($filter));
+        $this->assertEquals(0, $this->repository->getIdsThatMayBeAddedToFilter($filter));
     }
 }
