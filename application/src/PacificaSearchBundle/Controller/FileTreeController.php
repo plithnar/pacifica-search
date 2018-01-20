@@ -234,6 +234,7 @@ class FileTreeController extends BaseRestController
                 $nodeResult['children'] = $this->convertDirectoryStructureToResponseArray($node, $path . '/' . $nodeName);
             } else { // This node is a file
                 $title = $node;
+                $nodeResult['key'] = 12345; // Dummy value for now
                 //TODO: add 'key' with file ID
             }
 
