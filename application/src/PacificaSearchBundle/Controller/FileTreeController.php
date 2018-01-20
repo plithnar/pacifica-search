@@ -4,9 +4,15 @@ namespace PacificaSearchBundle\Controller;
 
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\Instrument;
-use PacificaSearchBundle\Model\Proposal;
+use PacificaSearchBundle\Repository\FileRepository;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\View\View;
+use PacificaSearchBundle\Repository\InstitutionRepository;
+use PacificaSearchBundle\Repository\InstrumentRepository;
+use PacificaSearchBundle\Repository\InstrumentTypeRepository;
+use PacificaSearchBundle\Repository\ProposalRepository;
+use PacificaSearchBundle\Repository\TransactionRepositoryInterface;
+use PacificaSearchBundle\Repository\UserRepository;
 
 /**
  * Class FileTreeController
@@ -17,6 +23,30 @@ class FileTreeController extends BaseRestController
 {
     // Number of Proposals to include in one page of the file tree
     const PAGE_SIZE = 30;
+
+    /** @var FileRepository */
+    protected $fileRepository;
+
+    public function __construct(
+        InstitutionRepository $institutionRepository,
+        InstrumentRepository $instrumentRepository,
+        InstrumentTypeRepository $instrumentTypeRepository,
+        ProposalRepository $proposalRepository,
+        UserRepository $userRepository,
+        TransactionRepositoryInterface $transactionRepository,
+        FileRepository $fileRepository
+    ) {
+        parent::__construct(
+            $institutionRepository,
+            $instrumentRepository,
+            $instrumentTypeRepository,
+            $proposalRepository,
+            $userRepository,
+            $transactionRepository
+        );
+
+        $this->fileRepository = $fileRepository;
+    }
 
     /**
      * Gets the top level of the tree (everything excluding the files, which have to be lazy-loaded on a per-transaction
@@ -141,5 +171,77 @@ class FileTreeController extends BaseRestController
         }
 
         return $this->handleView(View::create($response));
+    }
+
+    /**
+     * Fetches the contents of a single file folder for the purpose of lazy-loading those folders on demand.
+     * The response is formatted like
+     *
+     * [
+     *     {
+     *     "fullpath": "<full path to file if a file, current fullpath otherwise>",
+     *     "title": "<subdir name if in subdir, filename otherwise>",
+     *     "key": "<file id if file, otherwise this key is absent>",
+     *     "folder": <true if not a file, otherwise this key is absent>,
+     *     "children": [
+     *         ...next layer of folder structure until we hit a file or files
+     *     ]
+     *     }, ... ( More file definitions )
+     * ]
+     *
+     * @param int $transactionId
+     * @return Response
+     */
+    public function getTransactionFilesAction($transactionId) : Response
+    {
+        if ($transactionId < 1 || intval($transactionId) != $transactionId) {
+            return $this->handleView(View::create([]));
+        }
+
+        $directories = [];
+        $files = $this->fileRepository->getByTransactionId($transactionId);
+        foreach ($files->getInstances() as $file) {
+            $filePathParts = explode('/', $file->getDisplayName());
+            $this->addToDirectoryStructure($directories, $filePathParts);
+        }
+
+        $response = $this->convertDirectoryStructureToResponseArray($directories);
+        return $this->handleView(View::create($response));
+    }
+
+    private function addToDirectoryStructure(array &$directory, array &$nodes)
+    {
+        $node = array_shift($nodes);
+        if (count($nodes)) { // $node is a directory: recurse
+            if (!array_key_exists($node, $directory)) {
+                $directory[$node] = [];
+            }
+            $this->addToDirectoryStructure($directory[$node], $nodes);
+        } else { // $node is a file
+            $directory[] = $node;
+        }
+    }
+
+    private function convertDirectoryStructureToResponseArray($nodes, $path = "")
+    {
+        $responseArray = [];
+        foreach ($nodes as $nodeName => $node) {
+            $nodeResult = [];
+
+            if (is_array($node)) { // This node is a directory: recurse
+                $title = $nodeName;
+                $nodeResult['folder'] = true;
+                $nodeResult['children'] = $this->convertDirectoryStructureToResponseArray($node, $path . '/' . $nodeName);
+            } else { // This node is a file
+                $title = $node;
+                //TODO: add 'key' with file ID
+            }
+
+            $nodeResult['title'] = $title;
+            $nodeResult['fullpath'] = $path . '/' . $title;
+
+            $responseArray[] = $nodeResult;
+        }
+        return $responseArray;
     }
 }
