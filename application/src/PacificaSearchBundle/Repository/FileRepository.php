@@ -35,7 +35,7 @@ class FileRepository extends Repository
     /**
      * Files can be the results of a filter, but they cannot be filtered on themselves
      *
-     * @inheritdoct
+     * @inheritdoc
      */
     protected function isFilterRepository()
     {
@@ -48,6 +48,29 @@ class FileRepository extends Repository
     protected static function getNameFromSearchResult(array $result)
     {
         return $result['_source']['subdir'] . '/' . $result['_source']['name'];
+    }
+
+    protected static function getFileMetadataFromSearchResult(array $result)
+    {
+        $filesize = friendlyFileSize(intval($result['_source']['size']));
+        $modtime = new DateTime($result['_source']['mtime']);
+        $modtimestring = $modtime->format('D, F jS Y \a\t g:ia');
+        return "(size: {$filesize} / last modified: {$modtimestring}";
+    }
+
+    protected static function friendlyFileSize($filesizebytes)
+    {
+        if ($bytes < 1024) {
+            return $bytes.' B';
+        } elseif ($bytes < pow(1024, 2)) {
+            return round($bytes / 1024, 0).' KB';
+        } elseif ($bytes < pow(1024, 3)) {
+            return round($bytes / pow(1024, 2), 1).' MB';
+        } elseif ($bytes < pow(1024, 4)) {
+            return round($bytes / pow(1024, 3), 2).' GB';
+        } else {
+            return round($bytes / pow(1024, 4), 2).' TB';
+        }
     }
 
     /**

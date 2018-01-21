@@ -39,13 +39,20 @@
     {% endfor %}
 </section>
 
-<section id="files" class="search_results_block" style="float:left;">
+<section id="files" class="search_results_block file_results" style="float:left;">
     <fieldset>
         <legend>Files</legend>
         <div class="results_instructions">
             Select some categories from the column to the right to load results...
         </div>
-        <div id="results_filetree" />
+        <div id="results_filetree"></div>
+        <div id="results_pager" class="page_control_block" style="display: none;">
+            <div class="next_prev_control">
+                <a href="javascript:void(0);" class="paging_button prev_page">prev</a>
+                <span class="page_number">1</span>
+                <a href="javascript:void(0);" class="paging_button next_page">next</a>
+            </div>
+        </div>
     </fieldset>
     <!-- This element's remaining contents are generated in JavaScript -->
 </section>

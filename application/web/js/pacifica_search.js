@@ -4,7 +4,7 @@
     var Filter = PacificaSearch.Filter;
     var DomMgr = PacificaSearch.DomManager;
     var attr = PacificaSearch.Utilities.assertAttributeExists;
-
+    var currTransactionPageNumber = 1;
     $(function () {
         $$('#search_filter')
             .on('change', 'input', function () {
@@ -32,6 +32,18 @@
                 _updateTransactionList();
             });
         }
+
+        $('#files .paging_button').off('click').on('click', function(event){
+            var el = $(event.target);
+            var new_page_num = currTransactionPageNumber
+            if(el.hasClass('prev_page')){
+                new_page_num = new_page_num > 1 ? new_page_num - 1 : 1;
+            }else if(el.hasClass('next_page')){
+                new_page_num++;
+            }
+            debugger;
+            _updateTransactionList(new_page_num);
+        });
 
         function _handlePageChangeClick(element, howManyPages) {
             element = $(element);
@@ -100,100 +112,65 @@
             });
         }
 
-        function _updateTransactionList() {
+        function _updateTransactionList(pageNumber) {
             // $.get('/transactions', function (results) {
+                if(pageNumber == null){
+                    pageNumber = currTransactionPageNumber;
+                }
                 $('.results_instructions').hide();
                 $('#results_filetree').fancytree({
-                    source:
-                    [
-                        {
-                            title: "Proposal #31390",
-                            key: "31390",
-                            folder: true,
-                            children: [
-                                {
-                                    title: "TOF-SIMS 2007 (Instrument ID: 34073)",
-                                    key: "34073",
-                                    folder: true,
-                                    children: [
-                                        {
-                                            title: "Files Uploaded 2017-01-02 (Transaction 37778)",
-                                            key: "37778", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-01-04 (Transaction 38110)",
-                                            key: "38110", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-01-15 (Transaction 39228)",
-                                            key: "39228", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-02-02 (Transaction 40998)",
-                                            key: "40998", folder: true, lazy: true
-                                        }
-                                    ]
-                                },
-                                {
-                                    title: "Special NMR (Instrument ID: 34075)",
-                                    key: "34075",
-                                    folder: true,
-                                    children: [
-                                        {
-                                            title: "Files Uploaded 2017-01-01 (Transaction 38990)",
-                                            key: "38990", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-01-03 (Transaction 38995)",
-                                            key: "38995", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-01-14 (Transaction 39776)",
-                                            key: "39776", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-02-12 (Transaction 41908)",
-                                            key: "41908", folder: true, lazy: true
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            title: "Proposal #2308",
-                            key: "2308",
-                            folder: true,
-                            children: [
-                                {
-                                    title: "TOF-SIMS 2007 (Instrument ID: 34073)",
-                                    key: "34073",
-                                    folder: true,
-                                    children: [
-                                        {
-                                            title: "Files Uploaded 2017-01-02 (Transaction 37780)",
-                                            key: "37780", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-01-04 (Transaction 38112)",
-                                            key: "38112", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-01-15 (Transaction 39233)",
-                                            key: "39233", folder: true, lazy: true
-                                        },
-                                        {
-                                            title: "Files Uploaded 2017-02-02 (Transaction 40999)",
-                                            key: "40999", folder: true, lazy: true
-                                        }
-                                    ]
-                                }
-                            ]
-
+                    source: {
+                        url: '/file_tree/pages/' + pageNumber,
+                        cache: false
+                    },
+                    lazyLoad: function(event, data){
+                        var node = data.node;
+                        data.result = {
+                            url: '/file_tree/transactions/' + node.key + '/files',
+                            data: {mode: 'children', parent: node.key},
+                            cache: false
                         }
-                    ]
+                    },
+                    createNode: function(event, data){
+                        if($('#results_pager').is(':hidden')){
+                            $('#results_pager').show();
+                        }
+                    }
                 });
             // });
         }
+
+        var getNextTransactionPage = function(){
+            var prevPageNum = currentTransactionPageNumber - 1;
+            prevPageNum = prevPageNum < 1 ? 1 : prevPageNum;
+            return prevPageNum;
+        };
+
+        var getPrevTransactionPage = function(){
+            return currentTransactionPageNumber + 1;
+        };
+
+
+
+//         $("#tree").fancytree({
+//   // Initial node data that sets 'lazy' flag on some leaf nodes
+//   source: [
+//     {title: "Child 1", key: "1", lazy: true},
+//     {title: "Folder 2", key: "2", folder: true, lazy: true}
+//   ],
+//   // Called when a lazy node is expanded for the first time:
+//   lazyLoad: function(event, data){
+//       var node = data.node;
+//       // Load child nodes via Ajax GET /getTreeData?mode=children&parent=1234
+//       data.result = {
+//         url: "/getTreeData",
+//         data: {mode: "children", parent: node.key},
+//         cache: false
+//       };
+//   },
+//   [...]
+// });
+
 
         /**
          * @returns {PacificaSearch.Filter}

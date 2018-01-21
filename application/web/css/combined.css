@@ -48,7 +48,7 @@ body {
     text-align: center;
     color: #555;
     font-size: 1.0em;
-    margin: 6px -4px -3px -3px;
+    margin: 6px -3px -4px -4px;
     background-color: #ddd;
     border-top: 2px #aaa solid;
 }
@@ -64,13 +64,13 @@ body {
 }
 
 .next_prev_control .prev_page {
-    left: -3px;
-    border-radius: 0 2px 2px 0;
+    left: -5px;
+    border-radius: 0 2px 2px 2px;
 }
 
 .next_prev_control .next_page {
     right: -5px;
-    border-radius: 2px 0 0 2px;
+    border-radius: 2px 0 2px 2px;
 }
 
 .next_prev_control a.paging_button:hover {
@@ -88,6 +88,29 @@ body {
 #files fieldset {
     width: 100%;
     padding: 1em;
+    padding-bottom: 4px
+}
+
+#files .page_control_block {
+    width: 25%;
+    margin: auto auto 0px auto;
+}
+
+#files .next_prev_control {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-left: 2px #aaa solid;
+    border-right: 2px #aaa solid;
+}
+
+#files .next_prev_control .prev_page {
+    margin-left: 2px;
+    border-bottom-left-radius: 0;
+}
+
+#files .next_prev_control .next_page {
+    margin-right: 2px;
+    border-bottom-right-radius: 0;
 }
 
 .results_instructions {
