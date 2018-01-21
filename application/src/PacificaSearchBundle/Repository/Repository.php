@@ -133,7 +133,7 @@ abstract class Repository
      */
     abstract protected function getOwnIdsFromTransactionResults(array $transactionResults);
 
-    private function resultsToTypeCollection(array $results)
+    protected function resultsToTypeCollection(array $results)
     {
         $instances = new ElasticSearchTypeCollection();
         foreach ($results as $curHit) {

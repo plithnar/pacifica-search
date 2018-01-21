@@ -45,3 +45,4 @@ services:
             - "@PacificaSearchBundle\\Repository\\ProposalRepository"
             - "@PacificaSearchBundle\\Repository\\UserRepository"
             - "@PacificaSearchBundle\\Repository\\TransactionRepository"
+            - "@PacificaSearchBundle\\Repository\\FileRepository"
