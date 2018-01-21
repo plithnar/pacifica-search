@@ -41,7 +41,6 @@
             }else if(el.hasClass('next_page')){
                 new_page_num++;
             }
-            debugger;
             _updateTransactionList(new_page_num);
         });
 
