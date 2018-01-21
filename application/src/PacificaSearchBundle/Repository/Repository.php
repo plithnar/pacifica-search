@@ -98,6 +98,27 @@ abstract class Repository
     }
 
     /**
+     * Retrieves a page of model objects that fit the passed filter.
+     *
+     * @param Filter $filter
+     * @param int $pageNumber 1-based page number
+     * @return ElasticSearchTypeCollection
+     */
+    public function getFilteredPage(Filter $filter, $pageNumber)
+    {
+        $qb = $this->getQueryBuilder();
+        $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
+
+        $filteredIds = $this->getIdsThatMayBeAddedToFilter($filter);
+        if (!empty($filteredIds)) {
+            $qb->byId($filteredIds);
+        }
+
+        $response = $this->searchService->getResults($qb);
+        return $this->resultsToTypeCollection($response);
+    }
+
+    /**
      * Returns true for repositories that store objects that can be a part of a filter. Override for repositories that
      * cannot be included in the filter to avoid triggering behavior that is specific to filter repositories.
      *
