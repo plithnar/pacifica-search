@@ -19,46 +19,6 @@ use FOS\RestBundle\Controller\Annotations\Get;
 class RestController extends BaseRestController
 {
     /**
-     * Retrieves the ids of filter options that are valid given the current state of the filter.
-     * The returned object is formatted like:
-     *
-     * {
-     *   "instrument_types" : [ "12", "15", "23" ],
-     *   "instruments" : [...],
-     *   "institutions" : [...],
-     *   "users" : [...],
-     *   "proposals" : [...]
-     * }
-     *
-     * The IDs indicate those filter options that can be added to the current filter without resulting in a filter
-     * that returns no results at all.
-     *
-     * @Get("/valid_filter_ids")
-     *
-     * @return Response
-     */
-    public function getValidFilterIdsAction()
-    {
-        // TODO: Instead of storing the filter in the session, pass it as a request variable
-        $filter = $this->getSession()->get('filter');
-
-        /** @var $filterIds ElasticSearchTypeCollection[] */
-        $filterIds = [];
-
-        foreach ($this->getFilterableRepositories() as $repo) {
-            $filteredIds = $repo->getIdsThatMayBeAddedToFilter($filter);
-
-            // NULL represents a case where no filtering was performed - we exclude these from the results, meaning
-            // that all items of that type are still valid options
-            if (null !== $filteredIds) {
-                $filterIds[$repo->getModelClass()::getMachineName()] = $filteredIds;
-            }
-        }
-
-        return $this->handleView(View::create($filterIds));
-    }
-
-    /**
      * Sets the current filter
      *
      * The filter is made up of collections of IDs, formatted like:
@@ -85,20 +45,6 @@ class RestController extends BaseRestController
 
     /**
      * Retrieves a page of allowable filter items based on which items are already selected in the other filter types
-     *
-     * Parameters:
-     * The body of the request defines the values to be filtered on in a hash of IDs formatted like
-     * {
-     *   "instrument_types" : ["12", "22", "23"],
-     *   "instruments" : ["1", "3"],
-     *   "institutions" : [],
-     *   "users" : ["5"],
-     *   "proposals" : []
-     * }
-     *
-     * Additional GET parameters:
-     * type - The machine name of a Model class
-     * page - The page to retrieve
      *
      * @throws \Exception
      * @param string $type
