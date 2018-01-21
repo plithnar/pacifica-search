@@ -202,23 +202,25 @@ class FileTreeController extends BaseRestController
         $files = $this->fileRepository->getByTransactionId($transactionId);
         foreach ($files->getInstances() as $file) {
             $filePathParts = explode('/', $file->getDisplayName());
-            $this->addToDirectoryStructure($directories, $filePathParts);
+            $this->addToDirectoryStructure($directories, $filePathParts, $file->getId());
         }
 
         $response = $this->convertDirectoryStructureToResponseArray($directories);
         return $this->handleView(View::create($response));
     }
 
-    private function addToDirectoryStructure(array &$directory, array &$nodes)
+    private function addToDirectoryStructure(array &$directory, array &$nodes, $fileId)
     {
         $node = array_shift($nodes);
-        if (count($nodes)) { // $node is a directory: recurse
+        if (strlen($node) === 0) { // Ignore nodes without a name
+            $this->addToDirectoryStructure( $directory, $nodes, $fileId);
+        } elseif (count($nodes)) { // $node is a directory: recurse
             if (!array_key_exists($node, $directory)) {
                 $directory[$node] = [];
             }
-            $this->addToDirectoryStructure($directory[$node], $nodes);
+            $this->addToDirectoryStructure($directory[$node], $nodes, $fileId);
         } else { // $node is a file
-            $directory[] = $node;
+            $directory[] = $node . "_*_ID_*_$fileId";
         }
     }
 
@@ -227,19 +229,25 @@ class FileTreeController extends BaseRestController
         $responseArray = [];
         foreach ($nodes as $nodeName => $node) {
             $nodeResult = [];
+            $isFolder = false;
 
             if (is_array($node)) { // This node is a directory: recurse
                 $title = $nodeName;
-                $nodeResult['folder'] = true;
-                $nodeResult['children'] = $this->convertDirectoryStructureToResponseArray($node, $path . '/' . $nodeName);
+                $isFolder = true;
+                $children = $this->convertDirectoryStructureToResponseArray($node, ($path ? $path . '/' : '') . $nodeName);
             } else { // This node is a file
-                $title = $node;
-                $nodeResult['key'] = 12345; // Dummy value for now
-                //TODO: add 'key' with file ID
+                list($fileName, $fileId) = explode('_*_ID_*_', $node);
+                $title = $fileName;
             }
 
-            $nodeResult['title'] = $title;
             $nodeResult['fullpath'] = $path . '/' . $title;
+            $nodeResult['title'] = $title;
+            if ($isFolder) {
+                $nodeResult['folder'] = true;
+                $nodeResult['children'] = $children;
+            } else {
+                $nodeResult['key'] = $fileId;
+            }
 
             $responseArray[] = $nodeResult;
         }
