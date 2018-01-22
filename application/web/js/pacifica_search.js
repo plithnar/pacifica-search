@@ -61,7 +61,7 @@
                         });
                     }
 
-                    $$(typeContainer.find('.page_number')).text(pageNumber);
+                    $$(_getContainerForType(type).find('.page_number')).text(pageNumber);
                 }
             );
         }
