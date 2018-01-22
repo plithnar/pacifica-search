@@ -115,7 +115,8 @@ abstract class Repository
 
         // We don't do any filtering if the filter contains no values
         if ($filter->isEmpty()) {
-            return null;
+            $ownIds = $this->repositoryManager->getTransactionRepository()->getIdsOfTypeAssociatedWithAtLeastOneTransaction($this->getModelClass());
+            return $ownIds;
         }
 
         $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);

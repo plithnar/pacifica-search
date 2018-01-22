@@ -23,4 +23,11 @@ interface TransactionRepositoryInterface
      * @return array
      */
     public function getAssocArrayByFilter(Filter $filter) : array;
+
+    /**
+     * @deprecated Included only as a stop-gap until we update ES database to include only items that have relationships with at least one Transaction
+     * @param string $modelClass Pass e.g. InstitutionRepository::class
+     * @return int[]
+     */
+    public function getIdsOfTypeAssociatedWithAtLeastOneTransaction($modelClass);
 }
