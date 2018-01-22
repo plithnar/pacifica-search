@@ -8,7 +8,21 @@
     $(function () {
         $$('#search_filter')
             .on('change', 'input', function () {
-                _updateOptions();
+                $.ajax({
+                    url: '/filter',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(_getFilter().toObj())
+                }).then(function () {
+                    $.get('/filter/pages', function(result) {
+                        for(var type in result) {
+                            _getOptionContainerForType(type).html('');
+                            result[type].instances.forEach(function (instance) {
+                                _addInstanceToType(instance, type);
+                            });
+                        }
+                     });
+                });
             })
             .on('click', '.prev_page', function () {
                 _handlePageChangeClick(this, -1);
@@ -17,22 +31,6 @@
                 _handlePageChangeClick(this, 1);
             });
 
-        function _updateOptions() {
-            var filter = _getFilter();
-
-            $$('#files').find('p').detach();
-
-            $.ajax({
-                url: '/filter',
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(filter.toObj())
-            }).then(function () {
-                _enableAndDisableFilterOptions();
-                _updateFileList();
-            });
-        }
-
         function _handlePageChangeClick(element, howManyPages) {
             element = $(element);
             var type = _getTypeByElement(element);
@@ -40,64 +38,37 @@
             var curPage = parseInt(pageNumberContainer.text());
             var newPage = curPage + howManyPages;
 
-            console.log("Change " + type + " from " + curPage + " to " + (curPage + howManyPages));
+            _loadFilterPage(type, newPage);
+        }
+
+        function _loadFilterPage(type, pageNumber) {
             $.get(
-                '/filters/' + type + '/pages/' + newPage,
+                '/filters/' + type + '/pages/' + pageNumber,
                 function (results) {
-                    var optionContainer = element.closest('fieldset').find('.option_container');
-                    optionContainer.html('');
+                    _getOptionContainerForType(type).html('');
 
                     if (results.instances) {
                         results.instances.forEach(function (instance) {
-                            var inputId = type + '_' + instance.id;
-                            var input = $('<input type="checkbox">').attr('id', inputId).attr('data-id', instance.id);
-                            var label = $('<label>').attr('for', inputId).append(input).append(instance.name);
-
-                            optionContainer.append(label);
+                            _addInstanceToType(instance, type);
                         });
                     }
 
-                    pageNumberContainer.text(newPage);
+                    $$(typeContainer.find('.page_number')).text(pageNumber);
                 }
             );
         }
 
-        /**
-         * Retrieve valid filter IDs from the server and mark each filter option as enabled or disabled accordingly
-         */
-        function _enableAndDisableFilterOptions() {
-            $.get('/valid_filter_ids', function (results) {
-                ['instrument_type', 'instrument', 'institution', 'user', 'proposal'].forEach(function (type) {
-                    var idsToEnable = results[type];
-
-                    DomMgr.FacetedSearchFilter.getInputsByType(type).each(function () {
-                        var id = attr(this, 'data-id');
-                        var disable = idsToEnable && (idsToEnable.indexOf(parseInt(id)) === -1);
-
-                        if (disable) {
-                            $(this).closest('label').addClass('disabled');
-                            $(this).attr('disabled', true);
-                        } else {
-                            $(this).closest('label').removeClass('disabled');
-                            $(this).removeAttr('disabled');
-                        }
-                    });
-                });
-            });
+        function _getOptionContainerForType(type) {
+            var typeContainer = $$('fieldset[data-type="' + type + '"]');
+            return $$(typeContainer.find('.option_container'));
         }
 
-        /**
-         * Retrieve the list of files fitting the current filter and update the list shown to the user accordingly
-         */
-        function _updateFileList() {
-            $.get('/files', function (results) {
-                var fileTemplate = $$('#file_template').children();
-                results.forEach(function(result) {
-                    var fileEntry = fileTemplate.clone();
-                    $$(fileEntry.find('[data-is-file-name-container]')).html(result['name']);
-                    $$('#files').append(fileEntry);
-                });
-            });
+        function _addInstanceToType(instance, type) {
+            var inputId = type + '_' + instance.id;
+            var input = $('<input type="checkbox">').attr('id', inputId).attr('data-id', instance.id);
+            var label = $('<label>').attr('for', inputId).append(input).append(instance.name);
+
+            _getOptionContainerForType(type).append(label);
         }
 
         /**

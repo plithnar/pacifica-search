@@ -76,15 +76,4 @@ class MockRepositoryManager implements RepositoryManagerInterface
     {
         return $this->getMockRepository($class);
     }
-
-    private function getMockRepository($class)
-    {
-        if (!$this->repositories[$class]) {
-            $this->repositories[$class] = $this->testCase->getMockBuilder($class)
-                ->setConstructorArgs([ $this->searchService, $this ])
-                ->getMock();
-        }
-        return $this->repositories[$class];
-    }
-
 }

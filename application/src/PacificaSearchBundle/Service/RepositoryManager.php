@@ -112,23 +112,4 @@ class RepositoryManager implements RepositoryManagerInterface
 
         return $this->fileRepository;
     }
-
-    /**
-     * @param string
-     * @return Repository|TransactionRepositoryInterface
-     */
-    public function getRepositoryByClass($class)
-    {
-        switch ($class) {
-            case InstitutionRepository::class     : return $this->getInstitutionRepository();
-            case InstrumentRepository::class      : return $this->getInstrumentRepository();
-            case InstrumentTypeRepository::class  : return $this->getInstrumentTypeRepository();
-            case ProposalRepository::class        : return $this->getProposalRepository();
-            case UserRepository::class            : return $this->getUserRepository();
-            case TransactionRepository::class     : return $this->getTransactionRepository();
-            case FileRepository::class            : return $this->getFileRepository();
-        }
-
-        throw new \InvalidArgumentException("$class is not a recognized Repository class");
-    }
 }

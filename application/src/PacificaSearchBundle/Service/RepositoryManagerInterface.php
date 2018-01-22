@@ -43,10 +43,4 @@ interface RepositoryManagerInterface
      * @return Repository
      */
     public function getFileRepository() : Repository;
-
-    /**
-     * @param string
-     * @return Repository|TransactionRepository
-     */
-    public function getRepositoryByClass($class);
 }
