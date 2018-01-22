@@ -79,7 +79,13 @@ abstract class Repository
         $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
 
         $filteredIds = $this->getIdsThatMayBeAddedToFilter($filter);
-        if (!empty($filteredIds)) {
+        $idsToExclude = $filter->getIdsByType($this->getModelClass());
+
+        // We can only call byId() or excludeIds() - the two are mutually incompatible calls (TODO: maybe fix that)
+        if (empty($filteredIds)) {
+            $qb->excludeIds($idsToExclude);
+        } else {
+            $filteredIds = array_diff($filteredIds, $idsToExclude);
             $qb->byId($filteredIds);
         }
 
