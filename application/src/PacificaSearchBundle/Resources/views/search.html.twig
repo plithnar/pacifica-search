@@ -18,17 +18,16 @@
         {% for collection in filters %}
             <fieldset data-type="{{ collection.machineName }}">
                 <legend>{{ collection.typeDisplayName }}</legend>
-                <div class="current_filter_options">
+                <div class="current_filter_options" style="display:none;">
                     <!-- This element's contents are generated in JavaScript -->
                 </div>
-                <hr>
                 <div class="option_container">
                     {% for instance in collection.instances %}
                         {% set input_id = collection.machineName ~ "_" ~ instance.id %}
                     <label for="{{ input_id }}" title="{{ instance.displayName }}">
-                            <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
-                            {{ instance.displayName }}
-                        </label>
+                        <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
+                        {{ instance.displayName }}
+                    </label>
                     {% endfor %}
                 </div>
             <div class="page_control_block">

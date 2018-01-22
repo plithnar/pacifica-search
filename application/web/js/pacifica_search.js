@@ -12,7 +12,13 @@
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 selectedOption.detach();
-                _getCurrentFilterContainerForType(selectedOptionType).append(selectedOption);
+                var cft = _getCurrentFilterContainerForType(selectedOptionType)
+                cft.append(selectedOption);
+                if(cft.find('input').length > 0){
+                    cft.show();
+                }else{
+                    cft.hide();
+                }
 
                 $.ajax({
                     url: '/filter',
@@ -27,6 +33,7 @@
                                 _addInstanceToType(instance, type);
                             });
                         }
+                        _updateTransactionList()
                      });
                 });
             })
@@ -39,6 +46,7 @@
 
         function _handlePageChangeClick(element, howManyPages) {
             element = $(element);
+            debugger;
             var type = _getTypeByElement(element);
             var pageNumberContainer = $$(element.closest('fieldset').find('.page_number'));
             var curPage = parseInt(pageNumberContainer.text());
@@ -104,26 +112,34 @@
                 if(pageNumber == null){
                     pageNumber = currTransactionPageNumber;
                 }
-                $('.results_instructions').hide();
-                $('#results_filetree').fancytree({
-                    source: {
+                if(!$('#results_filetree').find('.ui-fancytree').length){
+                    $('#results_filetree').fancytree({
+                        source: {
+                            url: '/file_tree/pages/' + pageNumber,
+                            cache: false
+                        },
+                        lazyLoad: function(event, data){
+                            var node = data.node;
+                            data.result = {
+                                url: '/file_tree/transactions/' + node.key + '/files',
+                                data: {mode: 'children', parent: node.key},
+                                cache: false
+                            }
+                        },
+                        createNode: function(event, data){
+                            if($('#results_pager').is(':hidden')){
+                                $('#results_pager').show();
+                            }
+                            $('.results_instructions').hide();
+                        }
+                    });
+                }else{
+                    $('#results_filetree').fancytree('option', 'source', {
                         url: '/file_tree/pages/' + pageNumber,
                         cache: false
-                    },
-                    lazyLoad: function(event, data){
-                        var node = data.node;
-                        data.result = {
-                            url: '/file_tree/transactions/' + node.key + '/files',
-                            data: {mode: 'children', parent: node.key},
-                            cache: false
-                        }
-                    },
-                    createNode: function(event, data){
-                        if($('#results_pager').is(':hidden')){
-                            $('#results_pager').show();
-                        }
                     }
-                });
+                );
+                }
             // });
         }
 
