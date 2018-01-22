@@ -8,16 +8,17 @@
     $(function () {
         $$('#search_filter')
             .on('change', 'input', function () {
-                // Move the selected option into the "currently selected filters" container
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 selectedOption.detach();
-                var cft = _getCurrentFilterContainerForType(selectedOptionType)
-                cft.append(selectedOption);
-                if(cft.find('input').length > 0){
-                    cft.show();
-                }else{
-                    cft.hide();
+                if (this.checked) {
+                    var cft = _getCurrentFilterContainerForType(selectedOptionType)
+                    cft.append(selectedOption);
+                    if(cft.find('input').length > 0){
+                        cft.show();
+                    }else{
+                        cft.hide();
+                    }
                 }
 
                 $.ajax({
@@ -46,7 +47,6 @@
 
         function _handlePageChangeClick(element, howManyPages) {
             element = $(element);
-            debugger;
             var type = _getTypeByElement(element);
             var pageNumberContainer = $$(element.closest('fieldset').find('.page_number'));
             var curPage = parseInt(pageNumberContainer.text());

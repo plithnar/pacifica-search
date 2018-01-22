@@ -62,6 +62,48 @@ class TransactionRepository implements TransactionRepositoryInterface
         return $transactions;
     }
 
+    // TODO: Remove this when we remove getIdsOfTypeAssociatedWithAtLeastOneTransaction()
+    private $idsByModel;
+    /**
+     * @deprecated Included only as a stop-gap until we update ES database to include only items that have relationships with at least one Transaction
+     * @param string $modelClass Pass e.g. InstitutionRepository::class
+     * @return int[]
+     */
+    public function getIdsOfTypeAssociatedWithAtLeastOneTransaction($modelClass)
+    {
+        // TODO: This is an optimization problem. At the very least we need to turn this into a scan & scroll operation,
+        // but with a very large database we really should just ensure that there are no records not associated with at
+        // least one Transaction. Until I know whether the production database will actually have orphaned records, though,
+        // this is just going to be a brute force retrieval.
+        if (!$this->idsByModel) {
+            $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
+            $results = $this->searchService->getResults($qb, true);
+
+            foreach ($results as $result) {
+                $vals = $result['_source'];
+                $this->idsByModel[User::class][$vals['submitter']] = $vals['submitter'];
+                $this->idsByModel[Instrument::class][$vals['instrument']] = $vals['instrument'];
+                $this->idsByModel[Proposal::class][$vals['proposal']] = $vals['proposal'];
+            }
+
+            $instrumentTypeQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_GROUP)
+                ->whereIn('instrument_members', $this->idsByModel[Instrument::class]);
+            $this->idsByModel[InstrumentType::class] = $this->searchService->getIds($instrumentTypeQb);
+
+            $institutionQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_INSITUTION)
+                ->whereIn('users', $this->idsByModel[User::class]);
+            $this->idsByModel[Institution::class] = $this->searchService->getIds($institutionQb);
+
+            $this->idsByModel[File::class] = []; // Not relevant since all files have a transaction, this is just to circumvent the otherwise helpful error message below
+        }
+
+        if (!isset($this->idsByModel[$modelClass])) {
+            throw new \InvalidArgumentException("$modelClass is not a valid class for this method - it's either not a class that has a relationship to Transactions or it hasn't been implemented in this method yet");
+        }
+
+        return $this->idsByModel[$modelClass];
+    }
+
     private function getQueryBuilderByFilter(Filter $filter)
     {
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);

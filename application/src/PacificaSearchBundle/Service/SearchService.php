@@ -71,6 +71,27 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
+     * TODO: Make this more elegant so that a getResults() and a count() on the same QB don't run the query twice
+     * @param ElasticSearchQueryBuilder $queryBuilder
+     * @return int
+     */
+    public function count(ElasticSearchQueryBuilder $queryBuilder)
+    {
+        $client = $this->getClient();
+
+        $queryBuilder->fetchOnlyMetaData();
+        $request = $queryBuilder->toArray();
+
+        try {
+            $response = $client->search($request);
+        } catch (\Exception $e) {
+            throw new \RuntimeException("ES search request failed. Request was \n\n" . json_encode($request) . "\n\nException message:" . $e->getMessage());
+        }
+
+        return $response['hits']['total'];
+    }
+
+    /**
      * Retrieve only the IDs of the fields matched by a query
      * @param ElasticSearchQueryBuilder $queryBuilder
      * @return int[]
