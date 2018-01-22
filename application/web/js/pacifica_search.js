@@ -8,11 +8,13 @@
     $(function () {
         $$('#search_filter')
             .on('change', 'input', function () {
-                // Move the selected option into the "currently selected filters" container
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 selectedOption.detach();
-                _getCurrentFilterContainerForType(selectedOptionType).append(selectedOption);
+
+                if (this.checked) {
+                    _getCurrentFilterContainerForType(selectedOptionType).append(selectedOption);
+                }
 
                 $.ajax({
                     url: '/filter',
