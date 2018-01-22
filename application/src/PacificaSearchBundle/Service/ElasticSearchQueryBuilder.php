@@ -45,6 +45,13 @@ class ElasticSearchQueryBuilder
      */
     private $ids;
 
+    /**
+     * IDs that will be excluded from the results of this request
+     *
+     * @var int[]
+     */
+    private $idsToExclude;
+
     /** @var int */
     private $pageNumber;
 
@@ -132,6 +139,21 @@ class ElasticSearchQueryBuilder
     }
 
     /**
+     * @param int|int[] $ids
+     * @return ElasticSearchQueryBuilder
+     */
+    public function excludeIds($ids)
+    {
+        if (!is_array($ids)) {
+            $ids = [ $ids ];
+        }
+
+        $this->idsToExclude = array_values($ids); // array_values() required because IDs queries break on associative arrays
+
+        return $this;
+    }
+
+    /**
      * Makes the query a paginated query
      *
      * @param int $pageNumber
@@ -172,10 +194,11 @@ class ElasticSearchQueryBuilder
                 'values' => $this->ids
             ];
 
-            // TODO: The model I started developing with, where you could accumulate query types, just doesn't work.
-            // I either need to figure out how to actually make it possible for every type of query to work together,
-            // or rearchitect this whole thing to just generate different arrays for each query type. Leaving ugly
-            // for now in the interests of getting something working as quickly as possible.
+            return $array;
+        }
+
+        if ($this->idsToExclude) {
+            $array['body']['query']['bool']['must_not'][]['ids']['values'] = $this->idsToExclude;
             return $array;
         }
 

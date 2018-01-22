@@ -8,6 +8,12 @@
     $(function () {
         $$('#search_filter')
             .on('change', 'input', function () {
+                // Move the selected option into the "currently selected filters" container
+                var selectedOption = $(this).closest('label');
+                var selectedOptionType = _getTypeByElement(selectedOption);
+                selectedOption.detach();
+                _getCurrentFilterContainerForType(selectedOptionType).append(selectedOption);
+
                 $.ajax({
                     url: '/filter',
                     type: 'PUT',
@@ -58,9 +64,17 @@
             );
         }
 
+        // TODO: Move all of these methods into a DomManager class
         function _getOptionContainerForType(type) {
-            var typeContainer = $$('fieldset[data-type="' + type + '"]');
-            return $$(typeContainer.find('.option_container'));
+            return $$(_getContainerForType(type).find('.option_container'));
+        }
+
+        function _getCurrentFilterContainerForType(type) {
+            return $$(_getContainerForType(type).find('.current_filter_options'));
+        }
+
+        function _getContainerForType(type) {
+            return $$('fieldset[data-type="' + type + '"]');
         }
 
         function _addInstanceToType(instance, type) {

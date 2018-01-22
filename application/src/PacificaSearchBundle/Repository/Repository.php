@@ -30,37 +30,6 @@ abstract class Repository
     }
 
     /**
-     * Retrieve the IDs of all instances that could be added to the passed filter without resulting in an empty result.
-     * It is important to note that each repository must ignore filters of its own type. That is to say, if an
-     * Institution is selected, that should not prohibit the addition of further Institutions to the Filter - only
-     * adding Filter items of other types should impact the options of a given type.
-     *
-     * @param Filter $filter
-     * @return array|NULL NULL indicates that no filtering was performed because the filter was empty (possibly after
-     *   removing all of the Repository's own model class's items)
-     */
-    public function getIdsThatMayBeAddedToFilter(Filter $filter)
-    {
-        // Clone the filter before making any changes so that the caller's filter doesn't get changed
-        $filter = clone $filter;
-
-        // Remove filters of own type if applicable - you can't restrict Users by picking a User
-        if ($this->isFilterRepository()) {
-            $filter->setIdsByType($this->getModelClass(), []);
-        }
-
-        // We don't do any filtering if the filter contains no values
-        if ($filter->isEmpty()) {
-            return null;
-        }
-
-        $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
-        $ownIds = $this->getIdsByTransactionIds($transactionIds);
-
-        return $ownIds;
-    }
-
-    /**
      * Gets the name of the model class of the type that this repository is responsible for. Will attempt to find the
      * class by the convention that repository classes are named <ModelClass>Repository, override this method if that's
      * not the case.
@@ -110,12 +79,49 @@ abstract class Repository
         $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
 
         $filteredIds = $this->getIdsThatMayBeAddedToFilter($filter);
-        if (!empty($filteredIds)) {
+        $idsToExclude = $filter->getIdsByType($this->getModelClass());
+
+        // We can only call byId() or excludeIds() - the two are mutually incompatible calls (TODO: maybe fix that)
+        if (empty($filteredIds)) {
+            $qb->excludeIds($idsToExclude);
+        } else {
+            $filteredIds = array_diff($filteredIds, $idsToExclude);
             $qb->byId($filteredIds);
         }
 
         $response = $this->searchService->getResults($qb);
         return $this->resultsToTypeCollection($response);
+    }
+
+    /**
+     * Retrieve the IDs of all instances that could be added to the passed filter without resulting in an empty result.
+     * It is important to note that each repository must ignore filters of its own type. That is to say, if an
+     * Institution is selected, that should not prohibit the addition of further Institutions to the Filter - only
+     * adding Filter items of other types should impact the options of a given type.
+     *
+     * @param Filter $filter
+     * @return array|NULL NULL indicates that no filtering was performed because the filter was empty (possibly after
+     *   removing all of the Repository's own model class's items)
+     */
+    protected function getIdsThatMayBeAddedToFilter(Filter $filter)
+    {
+        // Clone the filter before making any changes so that the caller's filter doesn't get changed
+        $filter = clone $filter;
+
+        // Remove filters of own type if applicable - you can't restrict Users by picking a User
+        if ($this->isFilterRepository()) {
+            $filter->setIdsByType($this->getModelClass(), []);
+        }
+
+        // We don't do any filtering if the filter contains no values
+        if ($filter->isEmpty()) {
+            return null;
+        }
+
+        $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
+        $ownIds = $this->getIdsByTransactionIds($transactionIds);
+
+        return $ownIds;
     }
 
     /**

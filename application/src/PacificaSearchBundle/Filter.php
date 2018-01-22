@@ -20,31 +20,31 @@ class Filter
 {
     /**
      * IDs of instrument types that are included in this filter
-     * @var integer[]
+     * @var int[]
      */
     private $instrumentTypeIds = [];
 
     /**
      * IDs of instruments that are included in this filter
-     * @var integer[]
+     * @var int[]
      */
     private $instrumentIds = [];
 
     /**
      * IDs of institutions that are included in this filter
-     * @var integer[]
+     * @var int[]
      */
     private $institutionIds = [];
 
     /**
      * IDs of users that are included in this filter
-     * @var integer[]
+     * @var int[]
      */
     private $userIds = [];
 
     /**
      * IDs of proposals that are included in this filter
-     * @var integer[]
+     * @var int[]
      */
     private $proposalIds = [];
 
@@ -112,7 +112,7 @@ class Filter
     }
 
     /**
-     * @return integer[]
+     * @return int[]
      */
     public function getInstrumentTypeIds(): array
     {
@@ -120,7 +120,7 @@ class Filter
     }
 
     /**
-     * @param integer[] $instrumentTypeIds
+     * @param int[] $instrumentTypeIds
      * @return Filter
      */
     public function setInstrumentTypeIds(array $instrumentTypeIds): Filter
@@ -130,7 +130,7 @@ class Filter
     }
 
     /**
-     * @return integer[]
+     * @return int[]
      */
     public function getInstrumentIds(): array
     {
@@ -138,7 +138,7 @@ class Filter
     }
 
     /**
-     * @param integer[] $instrumentIds
+     * @param int[] $instrumentIds
      * @return Filter
      */
     public function setInstrumentIds(array $instrumentIds): Filter
@@ -148,7 +148,7 @@ class Filter
     }
 
     /**
-     * @return integer[]
+     * @return int[]
      */
     public function getInstitutionIds(): array
     {
@@ -156,7 +156,7 @@ class Filter
     }
 
     /**
-     * @param integer[] $institutionIds
+     * @param int[] $institutionIds
      * @return Filter
      */
     public function setInstitutionIds(array $institutionIds): Filter
@@ -166,7 +166,7 @@ class Filter
     }
 
     /**
-     * @return integer[]
+     * @return int[]
      */
     public function getUserIds(): array
     {
@@ -174,7 +174,7 @@ class Filter
     }
 
     /**
-     * @param integer[] $userIds
+     * @param int[] $userIds
      * @return Filter
      */
     public function setUserIds(array $userIds): Filter
@@ -184,7 +184,7 @@ class Filter
     }
 
     /**
-     * @return integer[]
+     * @return int[]
      */
     public function getProposalIds(): array
     {
@@ -192,7 +192,7 @@ class Filter
     }
 
     /**
-     * @param integer[] $proposalIds
+     * @param int[] $proposalIds
      * @return Filter
      */
     public function setProposalIds(array $proposalIds): Filter
@@ -203,8 +203,8 @@ class Filter
 
     /**
      * Use this method like $filter->setIdsByType(Instrument::class, [1, 2, 3])
-     * @param $class
-     * @param $value
+     * @param string $class
+     * @param int[] $value
      * @return $this
      */
     public function setIdsByType($class, $value)
@@ -217,6 +217,22 @@ class Filter
         $setter = $machineNamesToSetters[$class::getMachineName()];
         $this->$setter($value);
         return $this;
+    }
+
+    /**
+     * Use this method like $filter->getIdsByType(Instrument::class
+     * @param string $class
+     * @return int[]
+     */
+    public function getIdsByType($class)
+    {
+        if (!is_subclass_of($class, ElasticSearchType::class)) {
+            throw new \InvalidArgumentException("$class is not a subclass of ElasticSearchType, getByClass() cannot be called on other classes");
+        }
+
+        $machineNamesToSetters = self::machineNamesToMethods('get');
+        $getter = $machineNamesToSetters[$class::getMachineName()];
+        return $this->$getter();
     }
 
     /**
