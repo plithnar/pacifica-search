@@ -203,8 +203,8 @@ class Filter
 
     /**
      * Use this method like $filter->setIdsByType(Instrument::class, [1, 2, 3])
-     * @param $class
-     * @param $value
+     * @param string $class
+     * @param integer[] $value
      * @return $this
      */
     public function setIdsByType($class, $value)
@@ -217,6 +217,22 @@ class Filter
         $setter = $machineNamesToSetters[$class::getMachineName()];
         $this->$setter($value);
         return $this;
+    }
+
+    /**
+     * Use this method like $filter->getIdsByType(Instrument::class
+     * @param string $class
+     * @return integer[]
+     */
+    public function getIdsByType($class)
+    {
+        if (!is_subclass_of($class, ElasticSearchType::class)) {
+            throw new \InvalidArgumentException("$class is not a subclass of ElasticSearchType, getByClass() cannot be called on other classes");
+        }
+
+        $machineNamesToSetters = self::machineNamesToMethods('get');
+        $getter = $machineNamesToSetters[$class::getMachineName()];
+        return $this->$getter();
     }
 
     /**
