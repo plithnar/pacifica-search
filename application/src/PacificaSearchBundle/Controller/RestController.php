@@ -107,7 +107,8 @@ class RestController extends BaseRestController
         return $this->handleView(View::create($filterPages));
     }
 
-    private function getPageByType($type) {
+    private function getPageByType($type)
+    {
         $pagesByType = $this->getPagesByType();
         return $pagesByType[$type];
     }
@@ -126,7 +127,8 @@ class RestController extends BaseRestController
         }
         return $pagesByType;
     }
-    private function setPageByType($type, $page) {
+    private function setPageByType($type, $page)
+    {
         $pagesByType = $this->getPagesByType();
         $pagesByType[$type] = $page;
     }
