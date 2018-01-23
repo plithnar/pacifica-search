@@ -11,14 +11,14 @@
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 selectedOption.detach();
+                var cft = _getCurrentFilterContainerForType(selectedOptionType)
                 if (this.checked) {
-                    var cft = _getCurrentFilterContainerForType(selectedOptionType)
                     cft.append(selectedOption);
-                    if(cft.find('input').length > 0){
-                        cft.show();
-                    }else{
-                        cft.hide();
-                    }
+                }
+                if(cft.find('input').length > 0){
+                    cft.show();
+                }else{
+                    cft.hide();
                 }
 
                 $.ajax({
@@ -130,6 +130,7 @@
                             if($('#results_pager').is(':hidden')){
                                 $('#results_pager').show();
                             }
+                            $('#files .page_number').html(pageNumber);
                             $('.results_instructions').hide();
                         }
                     });
