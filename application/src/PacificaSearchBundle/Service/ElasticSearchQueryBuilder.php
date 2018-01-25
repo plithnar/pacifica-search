@@ -189,9 +189,8 @@ class ElasticSearchQueryBuilder
         }
 
         if ($this->ids) {
-            $array['body']['query']['ids'] = [
-                'type' => $this->type,
-                'values' => $this->ids
+            $array['body']['query']['terms'] = [
+                '_id' => $this->ids
             ];
 
             return $array;
