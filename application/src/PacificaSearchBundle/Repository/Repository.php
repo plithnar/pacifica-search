@@ -142,6 +142,7 @@ abstract class Repository
      * TODO: Figure out how to make the query here unique by the required field so that we don't have to process a
      * large number of redundant results.
      *
+     * @throws \Exception
      * @param array $transactionIds
      * @return int[]
      */
@@ -149,7 +150,19 @@ abstract class Repository
     {
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
         $results = $this->searchService->getResults($qb);
+
+        if (empty($results)) {
+            // This should be impossible, since we presumably are always passing transaction IDs that we already received via another query
+            throw new \Exception('No transactions were found with the following IDs: ' . implode(', ', $transactionIds));
+        }
+
         $ids = $this->getOwnIdsFromTransactionResults($results);
+
+        if (empty($ids)) {
+            // This shouldn't happen because no records should exist in the database without a relationship to at least one transaction
+            throw new \Exception('No records from the ' . static::class . ' repository could be found for the following transactions: ' . implode(', ', $transactionIds));
+        }
+
         $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
         return $ids;
     }
