@@ -2,7 +2,6 @@
 
 namespace PacificaSearchBundle\Controller;
 
-
 use PacificaSearchBundle\Model\Institution;
 use PacificaSearchBundle\Model\Instrument;
 use PacificaSearchBundle\Model\InstrumentType;

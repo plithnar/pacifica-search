@@ -2,7 +2,6 @@
 
 namespace PacificaSearchBundle\Controller;
 
-
 use FOS\RestBundle\Controller\FOSRestController;
 use PacificaSearchBundle\Repository\InstitutionRepository;
 use PacificaSearchBundle\Repository\InstrumentRepository;

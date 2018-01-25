@@ -20,7 +20,6 @@ class AppKernel extends Kernel
             new FOS\RestBundle\FOSRestBundle(),
             new PacificaSearchBundle\PacificaSearchBundle(),
         ];
-
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {
             $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();

@@ -2,7 +2,6 @@
 
 namespace PacificaSearchBundle\Service;
 
-
 use PacificaSearchBundle\Repository\Repository;
 use PacificaSearchBundle\Repository\TransactionRepository;
 use PacificaSearchBundle\Repository\TransactionRepositoryInterface;

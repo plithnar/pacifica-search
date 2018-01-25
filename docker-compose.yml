@@ -11,6 +11,7 @@ services:
         volumes:
             - ./docker/nginx/application.conf:/etc/nginx/conf.d/default.conf:ro
             - ./docker/nginx/fastcgi_params:/etc/nginx/fastcgi_params:ro
+            - ./docker/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
         ports:
             - 80:80
 
@@ -40,6 +41,8 @@ services:
             SITEDB_DBDRIVER: postgre
             XDEBUG_CONFIG: remote_host=docker.for.mac.localhost
             PHP_IDE_CONFIG: serverName=PacificaSearch
+        ports:
+            - 9999:9000
 
     search_sitedb:
         container_name: search_sitedb

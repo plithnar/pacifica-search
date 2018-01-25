@@ -213,7 +213,7 @@ class FileTreeController extends BaseRestController
     {
         $node = array_shift($nodes);
         if (strlen($node) === 0) { // Ignore nodes without a name
-            $this->addToDirectoryStructure( $directory, $nodes, $fileId);
+            $this->addToDirectoryStructure($directory, $nodes, $fileId);
         } elseif (count($nodes)) { // $node is a directory: recurse
             if (!array_key_exists($node, $directory)) {
                 $directory[$node] = [];

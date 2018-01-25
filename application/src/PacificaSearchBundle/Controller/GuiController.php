@@ -25,6 +25,8 @@ class GuiController
     /** @var EngineInterface */
     protected $renderingEngine;
 
+    private $page_data = [];
+
     public function __construct(
         InstitutionRepository $institutionRepository,
         InstrumentRepository $instrumentRepository,
@@ -44,6 +46,18 @@ class GuiController
 
         $this->transactionRepository = $transactionRepository;
         $this->renderingEngine = $renderingEngine;
+
+        $this->page_data['script_uris'] = array(
+            'js/lib/spinner/spin.min.js',
+            'js/lib/fancytree/dist/jquery.fancytree-all.js',
+            'js/lib/select2/dist/js/select2.js'
+        );
+        $this->page_data['css_uris'] = array(
+            'js/lib/fancytree/dist/skin-lion/ui.fancytree.min.css',
+            'js/lib/select2/dist/css/select2.css',
+            'css/file_directory_styling.css',
+            'css/combined.css'
+        );
     }
 
     /**
@@ -73,7 +87,8 @@ class GuiController
         $renderedContent = $this->renderingEngine->render(
             'PacificaSearchBundle::search.html.twig',
             [
-                'filters' => $filters
+                'filters' => $filters,
+                'page_data' => $this->page_data
             ]
         );
 
