@@ -13,7 +13,7 @@ class InstrumentTypeRepository extends Repository
      */
     public function getIdsByInstrumentIds(array $instrumentIds)
     {
-        $qb = $this->getQueryBuilder()->whereIn('instrument_id', $instrumentIds);
+        $qb = $this->getQueryBuilder()->whereIn('instrument_members', $instrumentIds);
 
         $ids = $this->searchService->getIds($qb);
 
