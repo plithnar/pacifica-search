@@ -11,32 +11,19 @@
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 selectedOption.detach();
-                var cft = _getCurrentFilterContainerForType(selectedOptionType)
+
+                var filterContainer = _getCurrentFilterContainerForType(selectedOptionType)
                 if (this.checked) {
-                    cft.append(selectedOption);
-                }
-                if(cft.find('input').length > 0){
-                    cft.show();
-                }else{
-                    cft.hide();
+                    filterContainer.append(selectedOption);
                 }
 
-                $.ajax({
-                    url: '/filter',
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify(_getFilter().toObj())
-                }).then(function () {
-                    $.get('/filter/pages', function(result) {
-                        for(var type in result) {
-                            _getOptionContainerForType(type).html('');
-                            result[type].instances.forEach(function (instance) {
-                                _addInstanceToType(instance, type);
-                            });
-                        }
-                        _updateTransactionList()
-                     });
-                });
+                if(filterContainer.find('input').length > 0) {
+                    filterContainer.show();
+                } else {
+                    filterContainer.hide();
+                }
+
+                _persistUpdatedFilter();
             })
             .on('click', '.prev_page', function () {
                 _handlePageChangeClick(this, -1);
@@ -44,6 +31,38 @@
             .on('click', '.next_page', function () {
                 _handlePageChangeClick(this, 1);
             });
+
+        /**
+         * Persists the currently selected filter values to the server, and updates the available filter options
+         * accordingly.
+         *
+         * _.debounce() turns this function into a debounced function - the user can make several changes to the filter
+         * in quick succession, and the AJAX call won't actually go out until they've stopped for a brief time.
+         *
+         * TODO: We might need to change this to also fire if the user attempts to select an option from a different
+         * filter type. The problem is, a user could select an instrument, then quickly select an Institution that
+         * doesn't fit the instrument. A solution could be to disable every other filter type when an option is selected,
+         * then re-enable them in the .then() call here, so you could quickly select several of the same type but would
+         * have to wait for the load cycle to complete before selecting filters of another type.
+         */
+        var _persistUpdatedFilter = _.debounce(function() {
+            $.ajax({
+                url: '/filter',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(_getFilter().toObj())
+            }).then(function () {
+                $.get('/filter/pages', function(result) {
+                    for(var type in result) {
+                        _getOptionContainerForType(type).html('');
+                        result[type].instances.forEach(function (instance) {
+                            _addInstanceToType(instance, type);
+                        });
+                    }
+                    _updateTransactionList()
+                });
+            });
+        }, 500);
 
         function _handlePageChangeClick(element, howManyPages) {
             element = $(element);
