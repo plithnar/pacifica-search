@@ -140,14 +140,19 @@ class FileTreeController extends BaseRestController
             $instrumentId = $transaction['_source']['instrument'];
             $transactionId = $transaction['_id'];
 
-            if (!array_key_exists($instrumentId, $response[$proposalId]['children'])) {
-                $instrumentName = $instrumentNames[$instrumentId];
-                $response[$proposalId]['children'][$instrumentId] = [
-                    'title' => "$instrumentName (Instrument ID: $instrumentId)",
-                    'key' => $instrumentId,
-                    'folder' => true,
-                    'children' => []
-                ];
+            // TODO: This outermost array_key_exists() check is necessary because we are artificially limiting the
+            // transactions we handle to 1000 - see Respository::getIdsByTransactionIds(). We need to remove that
+            // limitation, and once we have we can remove the check
+            if (array_key_exists($proposalId, $response)) {
+                if (!array_key_exists($instrumentId, $response[$proposalId]['children'])) {
+                    $instrumentName = $instrumentNames[$instrumentId];
+                    $response[$proposalId]['children'][$instrumentId] = [
+                        'title' => "$instrumentName (Instrument ID: $instrumentId)",
+                        'key' => $instrumentId,
+                        'folder' => true,
+                        'children' => []
+                    ];
+                }
             }
 
             $dateCreated = new \DateTime($transaction['_source']['created']);
