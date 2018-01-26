@@ -120,9 +120,7 @@ class FileTreeController extends BaseRestController
             ];
         }
 
-        $transactionFilter = new Filter();
-        $transactionFilter->setProposalIds($proposalIds);
-        $transactions = $this->transactionRepository->getAssocArrayByFilter($transactionFilter);
+        $transactions = $this->transactionRepository->getAssocArrayByFilter($filter);
         $instrumentIds = [];
         foreach ($transactions as $transaction) {
             $instrumentId = $transaction['_source']['instrument'];
