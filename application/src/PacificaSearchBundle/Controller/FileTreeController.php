@@ -101,8 +101,9 @@ class FileTreeController extends BaseRestController
         // TODO: Instead of storing the filter in the session, pass it as a request variable
         $filter = $this->getSession()->get('filter');
 
-        if (null === $filter) {
-            $filter = new Filter();
+        if (null === $filter || $filter->isEmpty()) {
+            // Without a filter we do not show a file tree - the result set would be too large to handle in any case
+            return $this->handleView(View::create([]));
         }
 
         // TODO: Obviously paginating the proposalIds at the query level would be better but there's not an obvious way
