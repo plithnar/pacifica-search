@@ -36,7 +36,7 @@ class UserRepository extends Repository
      */
     public function getIdsByInstitution(array $institutionIds)
     {
-        $qb = $this->getQueryBuilder()->whereIn('institutions.institution_id', $institutionIds);
+        $qb = $this->getQueryBuilder()->whereIn('institutions', $institutionIds);
         $results = $this->searchService->getIds($qb);
 
         return $results;
