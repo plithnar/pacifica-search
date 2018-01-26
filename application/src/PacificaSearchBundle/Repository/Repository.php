@@ -164,6 +164,13 @@ abstract class Repository
      */
     protected function getIdsByTransactionIds(array $transactionIds)
     {
+        // TODO: Don't do this any more! We are limiting the number of transaction IDs that we request to 1000 because
+        // the server limits out at 1024 clauses (we leave 24 in case other clauses are in the query)
+        $maxTransactionCount = 1000;
+        if (count($transactionIds) > $maxTransactionCount) {
+            $transactionIds = array_slice($transactionIds, 0, $maxTransactionCount);
+        }
+
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
         $results = $this->searchService->getResults($qb);
 
