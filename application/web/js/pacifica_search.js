@@ -13,20 +13,20 @@
                 var filterContainer = _getCurrentFilterContainerForType(selectedOptionType);
                 var isChecked = this.checked;
 
-                if (isChecked) {
+                // Move the option into the "selected options" container, unless it's already there (which can
+                // happen if you quickly click an option off then on again)
+                if (isChecked && !filterContainer.find(selectedOption).length) {
                     selectedOption.detach();
                     filterContainer.append(selectedOption.clone());
                     filterContainer.show();
                 }
 
                 _persistUpdatedFilter(function () {
-                    if (!isChecked) {
-                        selectedOption.detach();
+                    filterContainer.find('input').not(':checked').closest('label').detach();
 
-                        // Hide the filter container if it has no remaining elements
-                        if(filterContainer.find('input').length === 0) {
-                            filterContainer.hide();
-                        }
+                    // Hide the filter container if it has no remaining elements
+                    if(filterContainer.find('input').length === 0) {
+                        filterContainer.hide();
                     }
                 });
             })
