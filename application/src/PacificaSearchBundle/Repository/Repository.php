@@ -102,6 +102,13 @@ abstract class Repository
             $qb->excludeIds($idsToExclude);
         } else {
             $filteredIds = array_diff($filteredIds, $idsToExclude);
+
+            // If the result of removing $idsToExclude from the legal filter options is that
+            // no filter options remain, return an empty collection instead of running an ES query
+            if (empty($filteredIds)) {
+                return new ElasticSearchTypeCollection();
+            }
+
             $qb->byId($filteredIds);
         }
 
