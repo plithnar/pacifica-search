@@ -102,6 +102,13 @@ abstract class Repository
             $qb->excludeIds($idsToExclude);
         } else {
             $filteredIds = array_diff($filteredIds, $idsToExclude);
+
+            // If the result of removing $idsToExclude from the legal filter options is that
+            // no filter options remain, return an empty collection instead of running an ES query
+            if (empty($filteredIds)) {
+                return new ElasticSearchTypeCollection();
+            }
+
             $qb->byId($filteredIds);
         }
 
@@ -164,6 +171,13 @@ abstract class Repository
      */
     protected function getIdsByTransactionIds(array $transactionIds)
     {
+        // TODO: Don't do this any more! We are limiting the number of transaction IDs that we request to 1000 because
+        // the server limits out at 1024 clauses (we leave 24 in case other clauses are in the query)
+        $maxTransactionCount = 1000;
+        if (count($transactionIds) > $maxTransactionCount) {
+            $transactionIds = array_slice($transactionIds, 0, $maxTransactionCount);
+        }
+
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
         $results = $this->searchService->getResults($qb);
 

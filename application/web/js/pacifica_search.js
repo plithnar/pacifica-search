@@ -10,20 +10,25 @@
             .on('change', 'input', function () {
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
-                selectedOption.detach();
+                var filterContainer = _getCurrentFilterContainerForType(selectedOptionType);
+                var isChecked = this.checked;
 
-                var filterContainer = _getCurrentFilterContainerForType(selectedOptionType)
-                if (this.checked) {
-                    filterContainer.append(selectedOption);
-                }
-
-                if(filterContainer.find('input').length > 0) {
+                // Move the option into the "selected options" container, unless it's already there (which can
+                // happen if you quickly click an option off then on again)
+                if (isChecked && !filterContainer.find(selectedOption).length) {
+                    selectedOption.detach();
+                    filterContainer.append(selectedOption.clone());
                     filterContainer.show();
-                } else {
-                    filterContainer.hide();
                 }
                 if($('#search_filter').find('input[type="checkbox"]:checked').length > 0){
-                    _persistUpdatedFilter();
+                    _persistUpdatedFilter(function () {
+                        filterContainer.find('input').not(':checked').closest('label').detach();
+
+                        // Hide the filter container if it has no remaining elements
+                        if(filterContainer.find('input').length === 0) {
+                            filterContainer.hide();
+                        }
+                    });
                 }else{
                     $('#results_filetree').hide()
                     $('.results_instructions').show();
@@ -48,9 +53,11 @@
          * doesn't fit the instrument. A solution could be to disable every other filter type when an option is selected,
          * then re-enable them in the .then() call here, so you could quickly select several of the same type but would
          * have to wait for the load cycle to complete before selecting filters of another type.
+         *
+         * @param {function} callback Invoked after the AJAX call returns. This is implemented as a callback rather than
+         *   the standard of returning a Promise because debounced functions can't return anything.
          */
-        var _persistUpdatedFilter = _.debounce(function() {
-            console.log('Deeeeebounce!');
+        var _persistUpdatedFilter = _.debounce(function(callback) {
             $('#results_filetree').show()
             $.ajax({
                 url: '/filter',
@@ -58,7 +65,7 @@
                 contentType: 'application/json',
                 data: JSON.stringify(_getFilter().toObj())
             }).then(function () {
-                $.get('/filter/pages', function(result) {
+                return $.get('/filter/pages', function(result) {
                     for(var type in result) {
                         _getOptionContainerForType(type).html('');
                         result[type].instances.forEach(function (instance) {
@@ -67,7 +74,7 @@
                     }
                     _updateTransactionList()
                 });
-            });
+            }).then(callback);
         }, 2000);
 
         function _handlePageChangeClick(element, howManyPages) {
