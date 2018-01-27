@@ -158,7 +158,7 @@ class FileTreeController extends BaseRestController
             $dateCreated = new \DateTime($transaction['_source']['created']);
             $dateFormatted = $dateCreated->format('Y-m-d');
             $response[$proposalId]['children'][$instrumentId]['children'][] = [
-                'title' => "Files uploaded $dateFormatted (Transaction $transactionId)",
+                'title' => "Files uploaded $dateFormatted (<a href='https://status.local/view/$transactionId'>Transaction $transactionId</a>)",
                 'key' => $transactionId,
                 'folder' => true,
                 'lazy' => true

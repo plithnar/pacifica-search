@@ -20,15 +20,18 @@
                     filterContainer.append(selectedOption.clone());
                     filterContainer.show();
                 }
-                if($('#search_filter').find('input[type="checkbox"]:checked').length > 0){
-                    _persistUpdatedFilter(function () {
-                        filterContainer.find('input').not(':checked').closest('label').detach();
+                _persistUpdatedFilter(function () {
+                    filterContainer.find('input').not(':checked').closest('label').detach();
 
-                        // Hide the filter container if it has no remaining elements
-                        if(filterContainer.find('input').length === 0) {
-                            filterContainer.hide();
-                        }
-                    });
+                    // Hide the filter container if it has no remaining elements
+                    if(filterContainer.find('input').length === 0) {
+                        filterContainer.hide();
+                    }
+                });
+
+                if($('#search_filter').find('input[type="checkbox"]:checked').length > 0){
+                    // $('#results_filetree').show()
+                    $('.results_instructions').hide();
                 }else{
                     $('#results_filetree').hide()
                     $('.results_instructions').show();
@@ -57,8 +60,9 @@
          * @param {function} callback Invoked after the AJAX call returns. This is implemented as a callback rather than
          *   the standard of returning a Promise because debounced functions can't return anything.
          */
+
         var _persistUpdatedFilter = _.debounce(function(callback) {
-            $('#results_filetree').show()
+            $('.loading_blocker').show().addClass('active');
             $.ajax({
                 url: '/filter',
                 type: 'PUT',
@@ -71,8 +75,19 @@
                         result[type].instances.forEach(function (instance) {
                             _addInstanceToType(instance, type);
                         });
+                        // var page_control = $$(_getContainerForType(type)).find('.page_control_block');
+                        // if(result[type].instances.length > 10){
+                        //     page_control.show()
+                        // }else{
+                        //     page_control.hide();
+                        // }
                     }
                     _updateTransactionList()
+                    $('.loading_blocker').removeClass('active', function(el){
+                         $(this).hide();
+                         $('#results_filetree').show()
+                    });
+
                 });
             }).then(callback);
         }, 2000);
@@ -92,7 +107,6 @@
                 '/filters/' + type + '/pages/' + pageNumber,
                 function (results) {
                     _getOptionContainerForType(type).html('');
-
                     if (results.instances) {
                         results.instances.forEach(function (instance) {
                             _addInstanceToType(instance, type);
@@ -140,40 +154,39 @@
         }
 
         function _updateTransactionList(pageNumber) {
-            // $.get('/transactions', function (results) {
-                if(pageNumber == null){
-                    pageNumber = currTransactionPageNumber;
-                }
-                if(!$('#results_filetree').find('.ui-fancytree').length){
-                    $('#results_filetree').fancytree({
-                        source: {
-                            url: '/file_tree/pages/' + pageNumber,
+            if(pageNumber == null){
+                pageNumber = currTransactionPageNumber;
+            }
+            if(!$('#results_filetree').find('.ui-fancytree').length){
+                $('#results_filetree').fancytree({
+                    source: {
+                        url: '/file_tree/pages/' + pageNumber,
+                        cache: false
+                    },
+                    lazyLoad: function(event, data){
+                        var node = data.node;
+                        data.result = {
+                            url: '/file_tree/transactions/' + node.key + '/files',
+                            data: {mode: 'children', parent: node.key},
                             cache: false
-                        },
-                        lazyLoad: function(event, data){
-                            var node = data.node;
-                            data.result = {
-                                url: '/file_tree/transactions/' + node.key + '/files',
-                                data: {mode: 'children', parent: node.key},
-                                cache: false
-                            }
-                        },
-                        createNode: function(event, data){
-                            if($('#results_pager').is(':hidden')){
-                                $('#results_pager').show();
-                            }
-                            $('#files .page_number').html(pageNumber);
-                            $('.results_instructions').hide();
                         }
-                    });
-                }else{
-                    $('#results_filetree').fancytree('option', 'source', {
+                    },
+                    createNode: function(event, data){
+                        if($('#results_pager').is(':hidden')){
+                            $('#results_pager').show();
+                        }
+                        $('#files .page_number').html(pageNumber);
+                        $('.results_instructions').hide();
+                        $('#results_filetree').show()
+                    }
+                });
+            }else{
+                $('#results_filetree').fancytree('option', 'source', {
                         url: '/file_tree/pages/' + pageNumber,
                         cache: false
                     }
                 );
-                }
-            // });
+            }
         }
 
         var getNextTransactionPage = function(){
@@ -228,7 +241,6 @@
                 var selectedFilterIds = DomMgr.FacetedSearchFilter.getInputsByType(type, true).map(function () {
                     return attr(this, 'data-id');
                 }).get();
-
                 filter.set(type, selectedFilterIds);
             });
 
