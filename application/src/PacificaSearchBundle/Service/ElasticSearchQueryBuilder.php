@@ -11,7 +11,7 @@ class ElasticSearchQueryBuilder
      */
     const TYPE_GROUP = 'Groups';
     const TYPE_INSTRUMENT = 'Instruments';
-    const TYPE_INSITUTION = 'Institutions';
+    const TYPE_INSTITUTION = 'Institutions';
     const TYPE_USER = 'Users';
     const TYPE_PROPOSAL = 'Proposals';
     const TYPE_TRANSACTION = 'Transactions';
@@ -212,7 +212,7 @@ class ElasticSearchQueryBuilder
     {
         $validTypes = [
             self::TYPE_GROUP,
-            self::TYPE_INSITUTION,
+            self::TYPE_INSTITUTION,
             self::TYPE_INSTRUMENT,
             self::TYPE_PROPOSAL,
             self::TYPE_USER,

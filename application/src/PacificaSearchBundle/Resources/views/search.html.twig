@@ -4,15 +4,16 @@
 {% block title %}search{% endblock %}
 {% block stylesheets %}
     {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/loading_animation.css') }}" />
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/namespace.js') }}"></script>
     <script src="{{ asset('js/utilities.js') }}"></script>
     <script src="{{ asset('js/dom_manager.js') }}"></script>
+    <script src="{{ asset('js/lib/underscore/underscore-min.js') }}"></script>
     <script src="{{ asset('js/filter.js') }}"></script>
     <script src="{{ asset('js/pacifica_search.js') }}"></script>
-    <script src="{{ asset('js/lib/underscore-min.js') }}"></script>
 {% endblock %}
 {% block body %}
     <section id="search_filter" class="search_results_block">

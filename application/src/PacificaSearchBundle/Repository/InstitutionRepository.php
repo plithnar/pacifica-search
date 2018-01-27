@@ -35,6 +35,6 @@ class InstitutionRepository extends Repository
      */
     protected function getType()
     {
-        return ElasticSearchQueryBuilder::TYPE_INSITUTION;
+        return ElasticSearchQueryBuilder::TYPE_INSTITUTION;
     }
 }

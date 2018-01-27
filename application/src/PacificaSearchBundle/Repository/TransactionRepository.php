@@ -90,7 +90,7 @@ class TransactionRepository implements TransactionRepositoryInterface
                 ->whereIn('instrument_members', $this->idsByModel[Instrument::class]);
             $this->idsByModel[InstrumentType::class] = $this->searchService->getIds($instrumentTypeQb);
 
-            $institutionQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_INSITUTION)
+            $institutionQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_INSTITUTION)
                 ->whereIn('users', $this->idsByModel[User::class]);
             $this->idsByModel[Institution::class] = $this->searchService->getIds($institutionQb);
 

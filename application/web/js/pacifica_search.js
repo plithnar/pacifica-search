@@ -22,8 +22,12 @@
                 } else {
                     filterContainer.hide();
                 }
-
-                _persistUpdatedFilter();
+                if($('#search_filter').find('input[type="checkbox"]:checked').length > 0){
+                    _persistUpdatedFilter();
+                }else{
+                    $('#results_filetree').hide()
+                    $('.results_instructions').show();
+                }
             })
             .on('click', '.prev_page', function () {
                 _handlePageChangeClick(this, -1);
@@ -46,6 +50,8 @@
          * have to wait for the load cycle to complete before selecting filters of another type.
          */
         var _persistUpdatedFilter = _.debounce(function() {
+            console.log('Deeeeebounce!');
+            $('#results_filetree').show()
             $.ajax({
                 url: '/filter',
                 type: 'PUT',
@@ -62,7 +68,7 @@
                     _updateTransactionList()
                 });
             });
-        }, 500);
+        }, 2000);
 
         function _handlePageChangeClick(element, howManyPages) {
             element = $(element);
