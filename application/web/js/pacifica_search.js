@@ -11,6 +11,7 @@
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 var filterContainer = _getCurrentFilterContainerForType(selectedOptionType);
+                var optionContainer = _getOptionContainerForType(selectedOptionType);
                 var isChecked = this.checked;
 
                 // Move the option into the "selected options" container, unless it's already there (which can
@@ -18,15 +19,13 @@
                 if (isChecked && !filterContainer.find(selectedOption).length) {
                     selectedOption.detach();
                     filterContainer.append(selectedOption.clone());
-                    filterContainer.show();
                 }
+
+                _updateBorderBetweenContainers(selectedOptionType);
+
                 _persistUpdatedFilter(function () {
                     filterContainer.find('input').not(':checked').closest('label').detach();
-
-                    // Hide the filter container if it has no remaining elements
-                    if(filterContainer.find('input').length === 0) {
-                        filterContainer.hide();
-                    }
+                    _updateBorderBetweenContainers(selectedOptionType);
                 });
 
                 if($('#search_filter').find('input[type="checkbox"]:checked').length > 0){
@@ -129,6 +128,23 @@
 
         function _getContainerForType(type) {
             return $$('fieldset[data-type="' + type + '"]');
+        }
+
+        /**
+         * Makes the border separating the upper and lower sections of a filter (the selected and unselected options,
+         * respectively) visible or hidden depending on whether both sections contain elements.
+         * @param {string} type
+         */
+        function _updateBorderBetweenContainers(type) {
+            var filterContainer = _getCurrentFilterContainerForType(type);
+            var optionContainer = _getOptionContainerForType(type);
+
+            // Hide the border separating the selected from the unselected items if either is empty
+            if(filterContainer.find('input').length === 0 || optionContainer.find('input').length === 0) {
+                filterContainer.css('border-bottom', 'none');
+            } else {
+                filterContainer.css('border-bottom', '2px solid #888');
+            }
         }
 
         function _addInstanceToType(instance, type) {
