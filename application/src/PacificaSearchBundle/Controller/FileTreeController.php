@@ -111,6 +111,11 @@ class FileTreeController extends BaseRestController
         $proposalIds = $this->proposalRepository->getFilteredIds($filter);
         $proposalIds = array_slice($proposalIds, ($pageNumber-1) * self::PAGE_SIZE, self::PAGE_SIZE);
 
+        // If there are no proposals on the requested page, return an empty set
+        if (empty($proposalIds)) {
+            return $this->handleView(View::create([]));
+        }
+
         $response = [];
         foreach ($proposalIds as $proposalId) {
             $response[$proposalId] = [
