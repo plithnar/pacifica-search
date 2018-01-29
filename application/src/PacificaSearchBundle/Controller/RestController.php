@@ -73,6 +73,9 @@ class RestController extends BaseRestController
         /** @var Filter $filter */
         // TODO: Instead of storing the filter in the session, pass it as a request variable
         $filter = $this->getSession()->get('filter');
+        if (null === $filter) {
+            $filter = new Filter();
+        }
 
         $filterableRepositories = $this->getFilterableRepositories();
         if (!array_key_exists($type, $filterableRepositories)) {
