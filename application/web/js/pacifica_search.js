@@ -11,14 +11,18 @@
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 var filterContainer = _getCurrentFilterContainerForType(selectedOptionType);
+                var optionsContainer = _getOptionContainerForType(selectedOptionType);
                 var isChecked = this.checked;
 
                 // Move the option into the "selected options" container, unless it's already there (which can
                 // happen if you quickly click an option off then on again)
                 if (isChecked && !filterContainer.find(selectedOption).length) {
+                    selectedOption.addClass('bold_label')
                     selectedOption.detach();
                     filterContainer.append(selectedOption.clone());
                     filterContainer.show();
+                }else{
+                    selectedOption.removeClass('bold_label');
                 }
                 _persistUpdatedFilter(function () {
                     filterContainer.find('input').not(':checked').closest('label').detach();
@@ -26,6 +30,15 @@
                     // Hide the filter container if it has no remaining elements
                     if(filterContainer.find('input').length === 0) {
                         filterContainer.hide();
+                    }else{
+                        filterContainer.show();
+                        filterContainer.addClass('bottom_border');
+                    }
+                    if(optionsContainer.find('input').length === 0) {
+                        optionsContainer.hide();
+                        filterContainer.removeClass('bottom_border');
+                    }else{
+                        optionsContainer.show();
                     }
                 });
 

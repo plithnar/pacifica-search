@@ -79,11 +79,18 @@ body {
 }
 
 .current_filter_options {
-    border-bottom: 2px solid #888;
     margin: auto -5px;
     padding: 0 5px 0 5px;
     padding-bottom: 5px;
     margin-bottom: 10px;
+}
+
+.bottom_border {
+    border-bottom: 2px solid #888;
+}
+
+label.bold_label {
+    font-weight: bold;
 }
 
 #files {
