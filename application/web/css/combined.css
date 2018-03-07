@@ -88,7 +88,7 @@ label.bold_label {
 
 #files {
     position: absolute;
-    top: 38px;
+    top: 48px;
     left: 220px;
     width: 720px;
 }
@@ -182,6 +182,11 @@ label.bold_label {
     font-weight: 600;
     font-size: 1.1em;
     width:auto;
+}
+
+.search_results_block fieldset input[type="text"] {
+    border: 2px solid #bbb;
+    border-radius: 3px;
 }
 
 .themed {
@@ -756,4 +761,9 @@ div.form_container td {
     padding: 5px;
     vertical-align: middle;
     text-align: center;
+}
+
+fieldset.text_search_box {
+    padding: 1em !important;
+    padding-right: 0;
 }
