@@ -88,11 +88,27 @@ class GuiController
             'PacificaSearchBundle::search.html.twig',
             [
                 'filters' => $filters,
-                'page_data' => $this->page_data
+                'page_data' => $this->page_data,
+                'version_information' => $this->getVersionInformation()
             ]
         );
 
         return new Response($renderedContent);
+    }
+
+    /**
+     * Returns information about the current version, such as the latest Git hash and
+     * commit date. Be careful about what information is included here - the value
+     * is publicly visible.
+     *
+     * @return string
+     */
+    protected function getVersionInformation()
+    {
+        $hash = trim(exec('git log --pretty="%H" -n1 HEAD'));
+        $commitDate = trim(exec('git log -n1 --pretty=%ci HEAD'));
+
+        return $commitDate . ' - ' . $hash;
     }
 
     /**
