@@ -11,7 +11,6 @@
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 var filterContainer = _getCurrentFilterContainerForType(selectedOptionType);
-                var optionContainer = _getOptionContainerForType(selectedOptionType);
                 var isChecked = this.checked;
 
                 // Move the option into the "selected options" container, unless it's already there (which can
