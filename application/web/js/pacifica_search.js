@@ -72,12 +72,6 @@
                         result[type].instances.forEach(function (instance) {
                             _addInstanceToType(instance, type);
                         });
-                        // var page_control = $$(_getContainerForType(type)).find('.page_control_block');
-                        // if(result[type].instances.length > 10){
-                        //     page_control.show()
-                        // }else{
-                        //     page_control.hide();
-                        // }
                     }
                     _updateTransactionList()
                     $('.loading_blocker').removeClass('active', function(el){
@@ -153,22 +147,8 @@
             _getOptionContainerForType(type).append(label);
         }
 
-        /**
-         * Retrieve the list of files fitting the current filter and update the list shown to the user accordingly
-         */
-        function _updateFileList() {
-            $.get('/files', function (results) {
-                var fileTemplate = $$('#file_template').children();
-                results.forEach(function(result) {
-                    var fileEntry = fileTemplate.clone();
-                    $$(fileEntry.find('[data-is-file-name-container]')).html(result['name']);
-                    $$('#files').append(fileEntry);
-                });
-            });
-        }
-
         function _updateTransactionList(pageNumber) {
-            if(pageNumber == null){
+            if(pageNumber === null){
                 pageNumber = currTransactionPageNumber;
             }
             if(!$('#results_filetree').find('.ui-fancytree').length){
@@ -203,17 +183,6 @@
             }
         }
 
-        var getNextTransactionPage = function(){
-            var prevPageNum = currentTransactionPageNumber - 1;
-            prevPageNum = prevPageNum < 1 ? 1 : prevPageNum;
-            return prevPageNum;
-        };
-
-        var getPrevTransactionPage = function(){
-            return currentTransactionPageNumber + 1;
-        };
-
-
         $('#files .paging_button').off('click').on('click', function(event){
             var el = $(event.target);
             var new_page_num = currTransactionPageNumber
@@ -224,26 +193,6 @@
             }
             _updateTransactionList(new_page_num);
         });
-
-//         $("#tree").fancytree({
-//   // Initial node data that sets 'lazy' flag on some leaf nodes
-//   source: [
-//     {title: "Child 1", key: "1", lazy: true},
-//     {title: "Folder 2", key: "2", folder: true, lazy: true}
-//   ],
-//   // Called when a lazy node is expanded for the first time:
-//   lazyLoad: function(event, data){
-//       var node = data.node;
-//       // Load child nodes via Ajax GET /getTreeData?mode=children&parent=1234
-//       data.result = {
-//         url: "/getTreeData",
-//         data: {mode: "children", parent: node.key},
-//         cache: false
-//       };
-//   },
-//   [...]
-// });
-
 
         /**
          * @returns {PacificaSearch.Filter}
