@@ -11,11 +11,10 @@
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = _getTypeByElement(selectedOption);
                 var filterContainer = _getCurrentFilterContainerForType(selectedOptionType);
-                var isChecked = this.checked;
 
                 // Move the option into the "selected options" container, unless it's already there (which can
                 // happen if you quickly click an option off then on again)
-                if (isChecked && !filterContainer.find(selectedOption).length) {
+                if (this.checked && !filterContainer.find(selectedOption).length) {
                     selectedOption.detach();
                     filterContainer.append(selectedOption.clone());
                 }
