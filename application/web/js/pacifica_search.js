@@ -27,7 +27,6 @@
                 });
 
                 if($('#search_filter').find('input[type="checkbox"]:checked').length > 0){
-                    // $('#results_filetree').show()
                     $('.results_instructions').hide();
                 }else{
                     $('#results_filetree').hide()
