@@ -1,7 +1,7 @@
 (function ($, $$, undefined) {
     "use strict";
     if (undefined !== PacificaSearch.DomManager) {
-        throw new Error("PacificaSearch.Utilities is already defined, did you include this file twice?");
+        throw new Error("PacificaSearch.DomManager is already defined, did you include this file twice?");
     }
 
     /**
