@@ -61,4 +61,12 @@ trait FilterAwareController
             User::getMachineName()           => $this->userRepository
         ];
     }
+
+    /**
+     * @return string[]
+     */
+    protected function getFilterableTypes() : array
+    {
+        return array_keys($this->getFilterableRepositories());
+    }
 }

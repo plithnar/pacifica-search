@@ -117,6 +117,23 @@ abstract class Repository
     }
 
     /**
+     * Retrieves a page of model objects that fit the passed query string
+     *
+     * @param string $searchQuery
+     * @param int $pageNumber 1-based page number
+     * @return ElasticSearchTypeCollection
+     */
+    public function getPageByTextSearch($searchQuery, $pageNumber) : ElasticSearchTypeCollection
+    {
+        $qb = $this->getQueryBuilder()
+            ->paginate($pageNumber, self::DEFAULT_PAGE_SIZE)
+            ->byText($searchQuery);
+
+        $response = $this->searchService->getResults($qb);
+        return $this->resultsToTypeCollection($response);
+    }
+
+    /**
      * Retrieve the IDs of all instances that could be added to the passed filter without resulting in an empty result.
      * It is important to note that each repository must ignore filters of its own type. That is to say, if an
      * Institution is selected, that should not prohibit the addition of further Institutions to the Filter - only

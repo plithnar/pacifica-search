@@ -16,6 +16,7 @@ class ElasticSearchQueryBuilder
     const TYPE_PROPOSAL = 'Proposals';
     const TYPE_TRANSACTION = 'Transactions';
     const TYPE_FILE = 'Files';
+    const TYPE_ANY = null;
 
     /**
      * Defines values of fields that must be present in a record for it to be returned
@@ -51,6 +52,13 @@ class ElasticSearchQueryBuilder
      * @var int[]
      */
     private $idsToExclude;
+
+    /**
+     * A text-based query string - results will be filtered to include records with any value that matches the string
+     *
+     * @var string
+     */
+    private $text;
 
     /** @var int */
     private $pageNumber;
@@ -139,6 +147,17 @@ class ElasticSearchQueryBuilder
     }
 
     /**
+     * @param string $text
+     * @return $this
+     */
+    public function byText($text)
+    {
+        $this->text = $text;
+
+        return $this;
+    }
+
+    /**
      * @param int|int[] $ids
      * @return ElasticSearchQueryBuilder
      */
@@ -158,11 +177,14 @@ class ElasticSearchQueryBuilder
      *
      * @param int $pageNumber
      * @param int $pageSize
+     * @return ElasticSearchQueryBuilder
      */
     public function paginate($pageNumber, $pageSize)
     {
         $this->pageNumber = $pageNumber;
         $this->pageSize = $pageSize;
+
+        return $this;
     }
 
     /**
@@ -181,8 +203,16 @@ class ElasticSearchQueryBuilder
             'index' => $this->index,
             'size' =>  $this->pageSize,
             'from' => ($this->pageNumber-1) * $this->pageSize, // The -1 is necessary because pageSize is 1-based
-            'type' => $this->type
         ];
+
+        // https://www.elastic.co/guide/en/elasticsearch/guide/current/multi-index-multi-type.html
+        // ElasticSearch supports comma-separated lists of Types, which we use to make sure no Types other than those
+        // we care about are included in our result
+        if ($this->type === self::TYPE_ANY) {
+            $array['type'] = implode(',', $this->getTypes());
+        } else {
+            $array['type'] = $this->type;
+        }
 
         if ($this->metadataOnly) {
             $array['body']['_source'] = false;
@@ -205,12 +235,25 @@ class ElasticSearchQueryBuilder
             $array['body']['query']['bool']['filter'][] = ['terms' => [$fieldName => $fieldValues]];
         }
 
+        if ($this->text) {
+            $array['body']['query']['bool']['must']['query_string']['default_field'] = '_all';
+            $array['body']['query']['bool']['must']['query_string']['query'] = $this->text;
+        }
+
         return $array;
     }
 
     private function assertValidType($type)
     {
-        $validTypes = [
+        // TYPE_ANY is checked separately because it's really not a type but rather represents all valid types
+        if ($type !== self::TYPE_ANY && !in_array($type, $this->getTypes())) {
+            throw new \Exception("Type '$type' is not a valid value. Allowed values are '" . implode(',', $this->getTypes()) . "'");
+        }
+    }
+
+    private function getTypes()
+    {
+        return [
             self::TYPE_GROUP,
             self::TYPE_INSTITUTION,
             self::TYPE_INSTRUMENT,
@@ -219,9 +262,5 @@ class ElasticSearchQueryBuilder
             self::TYPE_TRANSACTION,
             self::TYPE_FILE
         ];
-
-        if (!in_array($type, $validTypes)) {
-            throw new \Exception("Type '$type' is not a valid value. Allowed values are '" . implode(',', $validTypes) . "'");
-        }
     }
 }
