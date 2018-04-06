@@ -2,28 +2,19 @@
 
 namespace PacificaSearchBundle\Controller;
 
+// Annotations - IDE marks "unused" but they are not
+use FOS\RestBundle\Controller\Annotations\Get;
+
 use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
-use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
 use PacificaSearchBundle\Model\Institution;
 use PacificaSearchBundle\Model\Instrument;
 use PacificaSearchBundle\Model\InstrumentType;
 use PacificaSearchBundle\Model\Proposal;
 use PacificaSearchBundle\Model\User;
-use PacificaSearchBundle\Repository\FileRepository;
 use PacificaSearchBundle\Repository\Repository;
-use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-// Annotations - IDE marks "unused" but they are not
-use FOS\RestBundle\Controller\Annotations\Get;
-use PacificaSearchBundle\Repository\InstitutionRepository;
-use PacificaSearchBundle\Repository\InstrumentRepository;
-use PacificaSearchBundle\Repository\InstrumentTypeRepository;
-use PacificaSearchBundle\Repository\ProposalRepository;
-use PacificaSearchBundle\Repository\TransactionRepositoryInterface;
-use PacificaSearchBundle\Repository\UserRepository;
 
 /**
  * @codeCoverageIgnore - Because this controller relies on functionality provided by the FOSRestController there is
@@ -31,6 +22,30 @@ use PacificaSearchBundle\Repository\UserRepository;
  */
 class RestController extends BaseRestController
 {
+    /**
+     * Retrieves a page for each filter type based a text search
+     *
+     * @throws \Exception
+     * @param Request $request
+     * @return Response
+     */
+    public function getText_searchAction(Request $request)
+    {
+        $searchQuery = $request->query->get('search_query');
+        if (null === $searchQuery) {
+            throw new \Exception("Missing mandatory query parameter 'search_query'");
+        }
+
+        $filterPages = [];
+        foreach ($this->getFilterableRepositories() as $type => $repository) {
+            $filterPages[$type] = $repository->getPageByTextSearch(
+                $searchQuery,
+                $this->getPageByType($type)
+            );
+        }
+        return $this->handleView(View::create($filterPages));
+    }
+
     /**
      * Sets the current filter
      *

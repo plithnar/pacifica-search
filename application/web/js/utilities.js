@@ -51,21 +51,14 @@
         },
 
         /**
-         * Returns a new Array containing all elements that are in both a and b
-         * @param {Array} a
-         * @param {Array} b
-         */
-        arrayIntersection: function (a, b) {
-            return a.filter(function(n) {
-                return b.indexOf(n) !== -1;
-            });
-        },
-
-        /**
          * Returns a Promise that resolves when all of the passed Promises have resolved.
-         * @param {promise[]} promises
+         * @param {promise|promise[]} promises
          */
         allResolved: function (promises) {
+            if (!Array.isArray(promises)) {
+                promises = [ promises ];
+            }
+
             var deferred = $.Deferred();
             var numUnresolved = promises.length;
 
@@ -83,6 +76,25 @@
             });
 
             return deferred.promise();
+        },
+
+        /**
+         * Renders a page-blocking loading animation that is removed when the passed promise(s) resolve(s)
+         * @param {promise|promise[]} promises
+         * @returns promise Promise resolves when the loading animation is no longer visible
+         */
+        showLoadingAnimationUntilResolved : function (promises) {
+            var loadingAnimation = PacificaSearch.DomManager.getLoadingAnimation();
+
+            // The "active" class triggers a transition, which is why we combine showing and adding a class instead of
+            // just using "show()"
+            loadingAnimation.show().addClass('active');
+
+            return this.allResolved(promises).then(function () {
+                loadingAnimation.removeClass('active', function () {
+                    loadingAnimation.hide();
+                });
+            });
         }
     };
 
