@@ -41,9 +41,10 @@ services:
             SITEDB_DB_NAME: search
             SITEDB_DBDRIVER: postgre
             XDEBUG_CONFIG: remote_host=docker.for.mac.localhost
+            GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
             PHP_IDE_CONFIG: serverName=PacificaSearch
         ports:
-            - 9999:9000
+            - 9000:9000
 
     search_sitedb:
         container_name: search_sitedb
