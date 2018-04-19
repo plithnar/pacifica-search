@@ -16,12 +16,12 @@ RUN yes | pecl install xdebug \
     && echo "xdebug.default_enable=0" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_host=docker.for.mac.host.internal" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_connect_back=0" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_port=9000" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_handler=dbgp" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_mode=req" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.profiler_enable=0" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.idekey=xdebug.atom" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_autostart=true" >> /usr/local/etc/php/conf.d/xdebug.ini
+    && echo "xdebug.remote_log=/tmp/xdebug.log" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 # Permission fix
 RUN usermod -u 1000 www-data
