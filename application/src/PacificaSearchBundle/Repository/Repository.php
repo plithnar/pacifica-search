@@ -195,23 +195,23 @@ abstract class Repository
             $transactionIds = array_slice($transactionIds, 0, $maxTransactionCount);
         }
 
-        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
-        $results = $this->searchService->getResults($qb);
+        $transactionQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
+        $transactionResults = $this->searchService->getResults($transactionQb);
 
-        if (empty($results)) {
+        if (empty($transactionResults)) {
             // This should be impossible, since we presumably are always passing transaction IDs that we already received via another query
             throw new \Exception('No transactions were found with the following IDs: ' . implode(', ', $transactionIds));
         }
 
-        $ids = $this->getOwnIdsFromTransactionResults($results);
+        $ownIds = $this->getOwnIdsFromTransactionResults($transactionResults);
 
-        if (empty($ids)) {
+        if (empty($ownIds)) {
             // This shouldn't happen because no records should exist in the database without a relationship to at least one transaction
             throw new \Exception('No records from the ' . static::class . ' repository could be found for the following transactions: ' . implode(', ', $transactionIds));
         }
 
-        $ids = array_values(array_unique($ids)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
-        return $ids;
+        $ownIds = array_values(array_unique($ownIds)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
+        return $ownIds;
     }
 
     /**
