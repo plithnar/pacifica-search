@@ -27,6 +27,7 @@ class InstitutionRepository extends Repository
     {
         $qb = $this->getQueryBuilder()->whereIn('users', $userIds);
         $ids = $this->searchService->getIds($qb);
+        $ids = array_unique($ids);
         return $ids;
     }
 

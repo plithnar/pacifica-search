@@ -17,6 +17,7 @@ class FileRepository extends Repository
         $transactionIds = array_map(function ($result) {
             return (int) $result['_id'];
         }, $transactionResults);
+        $transactionIds = array_unique($transactionIds);
 
         $qb = $this->getQueryBuilder()->whereIn('transaction_id', $transactionIds);
         $fileIds = $this->searchService->getIds($qb);

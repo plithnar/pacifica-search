@@ -50,6 +50,7 @@ class UserRepository extends Repository
         $ids = array_map(function ($result) {
             return $result['_source']['submitter'];
         }, $transactionResults);
+        $ids = array_unique($ids);
         return $ids;
     }
 }
