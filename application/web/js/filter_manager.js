@@ -128,7 +128,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify(PacificaSearch.FilterManager.getFilter().toObj())
                 }).then(function () {
-                    $.get('/filter/pages', function (result) {
+                    return $.get('/filter/pages', function (result) {
                         PacificaSearch.FilterManager.injectFilterResultIntoSidebar(result);
                         callback();
                     });
