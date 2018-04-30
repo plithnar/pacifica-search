@@ -31,7 +31,7 @@
                             url: '/file_tree/transactions/' + node.key + '/files',
                             data: {mode: 'children', parent: node.key},
                             cache: false
-                        }
+                        };
                     },
                     createNode: function(event, data){
                         if($('#results_pager').is(':hidden')){
