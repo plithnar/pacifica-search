@@ -24,10 +24,7 @@
             }
             if(!$('#results_filetree').find('.ui-fancytree').length){
                 $('#results_filetree').fancytree({
-                    source: {
-                        url: '/file_tree/pages/' + pageNumber,
-                        cache: false
-                    },
+                    source: _getSourceObj(pageNumber),
                     lazyLoad: function(event, data){
                         var node = data.node;
                         data.result = {
@@ -46,11 +43,7 @@
                     }
                 });
             }else{
-                $('#results_filetree').fancytree('option', 'source', {
-                        url: '/file_tree/pages/' + pageNumber,
-                        cache: false
-                    }
-                );
+                $('#results_filetree').fancytree('option', 'source', _getSourceObj(pageNumber));
             }
         }
 
@@ -66,4 +59,14 @@
         }
         PacificaSearch.FileTreeManager.updateTransactionList(newPageNumber);
     });
+
+    function _getSourceObj(pageNumber) {
+        return {
+            url: '/file_tree/pages/' + pageNumber,
+            type: 'POST',
+            cache: false,
+            data: JSON.stringify(PacificaSearch.FilterManager.getFilter().toObj()),
+            contentType: 'application/json'
+        };
+    }
 })(jQuery, PacificaSearch.Utilities.assertElementExists);

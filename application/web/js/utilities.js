@@ -95,6 +95,42 @@
                     loadingAnimation.hide();
                 });
             });
+        },
+
+        /**
+         * Works similarly to $.post(), but sets the content type of the outgoing request to application/json and
+         * expects JSON to be returned
+         *
+         * @param {string} url The URL to which the POST will be sent
+         * @param {string|Object} data This data will be sent as the body of the request
+         * @param {function=} success Callback executed after a successful call
+         * @returns {promise}
+         */
+        postJson : function (url, data, success) {
+            if (null === data || undefined === data) {
+                throw new Error('Missing property data');
+            }
+
+            if (typeof data === 'string') {
+                // Validate that the string is valid JSON - JSON.parse() will generate a SyntaxError if the string
+                // is not proper JSON
+                JSON.parse(data);
+            }
+
+            if (typeof data === 'object') {
+                data = JSON.stringify(data);
+            } else {
+                throw new Error('data is expected to be a string or an object');
+            }
+
+            return $.ajax({
+                url: url,
+                type: 'POST',
+                data: data,
+                contentType: 'application/json',
+                dataType: 'json',
+                success: success
+            });
         }
     };
 

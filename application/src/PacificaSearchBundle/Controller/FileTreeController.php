@@ -13,6 +13,7 @@ use PacificaSearchBundle\Repository\InstrumentTypeRepository;
 use PacificaSearchBundle\Repository\ProposalRepository;
 use PacificaSearchBundle\Repository\TransactionRepositoryInterface;
 use PacificaSearchBundle\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class FileTreeController
@@ -89,19 +90,17 @@ class FileTreeController extends BaseRestController
      *
      *
      * @param int $pageNumber
+     * @param Request $request
      * @return Response
      */
-    public function getPageAction($pageNumber) : Response
+    public function postPageAction($pageNumber, Request $request) : Response
     {
         if ($pageNumber < 1 || intval($pageNumber) != $pageNumber) {
             return $this->handleView(View::create([]));
         }
 
-        /** @var Filter $filter */
-        // TODO: Instead of storing the filter in the session, pass it as a request variable
-        $filter = $this->getSession()->get('filter');
-
-        if (null === $filter || $filter->isEmpty()) {
+        $filter = Filter::fromRequest($request);
+        if ($filter->isEmpty()) {
             // Without a filter we do not show a file tree - the result set would be too large to handle in any case
             return $this->handleView(View::create([]));
         }
@@ -201,7 +200,7 @@ class FileTreeController extends BaseRestController
      * @param int $transactionId
      * @return Response
      */
-    public function getTransactionFilesAction($transactionId) : Response
+    public function postTransactionFilesAction($transactionId) : Response
     {
         if ($transactionId < 1 || intval($transactionId) != $transactionId) {
             return $this->handleView(View::create([]));

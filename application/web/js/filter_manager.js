@@ -42,9 +42,11 @@
          */
         loadFilterPage : function (type, pageNumber) {
             var self = this;
+            var filterObj = this.getFilter().toObj();
 
-            $.get(
-                '/filters/' + type + '/pages/' + pageNumber,
+            PacificaSearch.Utilities.postJson(
+                '/filters/' +type + '/pages/' + pageNumber,
+                filterObj,
                 function (results) {
                     DomManager.FacetedSearchFilter.getOptionContainerForType(type).html('');
                     if (results.instances) {
@@ -105,34 +107,26 @@
         },
 
         /**
-         * Persists the currently selected filter values to the server, and updates the available filter options
-         * accordingly.
+         * Updates the options available in the faceted search filter based on what other values are already selected
          *
          * _.debounce() turns this function into a debounced function - the user can make several changes to the filter
          * in quick succession, and the AJAX call won't actually go out until they've stopped for a brief time.
          *
-         * TODO: We might need to change this to also fire if the user attempts to select an option from a different
-         * filter type. The problem is, a user could select an instrument, then quickly select an Institution that
-         * doesn't fit the instrument. A solution could be to disable every other filter type when an option is selected,
-         * then re-enable them in the .then() call here, so you could quickly select several of the same type but would
-         * have to wait for the load cycle to complete before selecting filters of another type.
-         *
          * @param {function} callback Invoked after the AJAX call returns. This is implemented as a callback rather than
          *   the standard of returning a Promise because debounced functions can't return anything.
          */
-        persistCurrentFilter : _.debounce(function(callback) {
+        updateAvailableFilterOptions : _.debounce(function(callback) {
+            var filterObj = this.getFilter().toObj();
+
             PacificaSearch.Utilities.showLoadingAnimationUntilResolved(
-                $.ajax({
-                    url: '/filter',
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify(PacificaSearch.FilterManager.getFilter().toObj())
-                }).then(function () {
-                    return $.get('/filter/pages', function (result) {
+                PacificaSearch.Utilities.postJson(
+                    '/filters/pages',
+                    filterObj,
+                    function (result) {
                         PacificaSearch.FilterManager.injectFilterResultIntoSidebar(result);
                         callback();
-                    });
-                })
+                    }
+                )
             )
         }, 2000),
 

@@ -207,7 +207,7 @@ abstract class Repository
 
         if (empty($ownIds)) {
             // This shouldn't happen because no records should exist in the database without a relationship to at least one transaction
-            throw new \Exception('No records from the ' . static::class . ' repository could be found for the following transactions: ' . implode(', ', $transactionIds));
+//            throw new \Exception('No records from the ' . static::class . ' repository could be found for the following transactions: ' . implode(', ', $transactionIds));
         }
 
         $ownIds = array_values(array_unique($ownIds)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices

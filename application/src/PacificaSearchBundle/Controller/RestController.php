@@ -47,49 +47,18 @@ class RestController extends BaseRestController
     }
 
     /**
-     * Sets the current filter
-     *
-     * The filter is made up of collections of IDs, formatted like:
-     * {
-     *   "instrument_types" : ["12", "22", "23"],
-     *   "instruments" : ["1", "3"],
-     *   "institutions" : [],
-     *   "users" : ["5"],
-     *   "proposals" : []
-     * }
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function putFilterAction(Request $request)
-    {
-        $filterValues = json_decode($request->getContent(), true);
-
-        $filter = Filter::fromArray($filterValues);
-        $this->getSession()->set('filter', $filter);
-
-        return $this->handleView(View::create([ 'result' => 'Ok']));
-    }
-
-    /**
      * Retrieves a page of allowable filter items based on which items are already selected in the other filter types
      *
      * @throws \Exception
      * @param string $type
      * @param int $pageNumber
+     * @param Request $request
      * @return Response
      */
-    public function getFilterPageAction($type, $pageNumber) : Response
+    public function postFilterPageAction($type, $pageNumber, Request $request) : Response
     {
         if ($pageNumber < 1 || intval($pageNumber) != $pageNumber) {
             return $this->handleView(View::create([]));
-        }
-
-        /** @var Filter $filter */
-        // TODO: Instead of storing the filter in the session, pass it as a request variable
-        $filter = $this->getSession()->get('filter');
-        if (null === $filter) {
-            $filter = new Filter();
         }
 
         $filterableRepositories = $this->getFilterableRepositories();
@@ -100,6 +69,7 @@ class RestController extends BaseRestController
         $this->setPageByType($type, $pageNumber);
 
         $repository = $filterableRepositories[$type];
+        $filter = Filter::fromRequest($request);
         $filteredPageContents = $repository->getFilteredPage($filter, $pageNumber);
 
         return $this->handleView(View::create($filteredPageContents));
@@ -107,13 +77,12 @@ class RestController extends BaseRestController
 
     /**
      * Retrieves a page for each filter type based on the current contents of the filter
+     * @param Request $request
      * @return Response
      */
-    public function getFilterPagesAction() : Response
+    public function postFilterPagesAction(Request $request) : Response
     {
-        /** @var Filter $filter */
-        // TODO: Instead of storing the filter in the session, pass it as a request variable
-        $filter = $this->getSession()->get('filter');
+        $filter = Filter::fromRequest($request);
 
         $filterPages = [];
         foreach ($this->getFilterableRepositories() as $type => $repository) {

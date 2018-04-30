@@ -3,12 +3,12 @@
 namespace PacificaSearchBundle;
 
 use PacificaSearchBundle\Model\ElasticSearchType;
-use PacificaSearchBundle\Model\File;
 use PacificaSearchBundle\Model\Institution;
 use PacificaSearchBundle\Model\Instrument;
 use PacificaSearchBundle\Model\InstrumentType;
 use PacificaSearchBundle\Model\Proposal;
 use PacificaSearchBundle\Model\User;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class Filter
@@ -57,9 +57,9 @@ class Filter
      *     'instrument' => [ 34150, 24151 ],
      *     ...
      * ]
-     * @return static
+     * @return Filter
      */
-    public static function fromArray(array $filterValues)
+    public static function fromArray(array $filterValues) : Filter
     {
         $machineNamesToSetters = self::machineNamesToMethods('set');
 
@@ -79,6 +79,28 @@ class Filter
         foreach ($machineNamesToSetters as $machineName => $setter) {
             $filter->$setter($filterValues[$machineName]);
         }
+        return $filter;
+    }
+
+    /**
+     * Pass a request whose body contains the JSON representation of a Filter instance, and this factory method
+     * will return an equivalent instance of Filter
+     *
+     * @param Request $request
+     * @return Filter
+     */
+    public static function fromRequest(Request $request) : Filter
+    {
+        $content = $request->getContent();
+        if (strlen($content) === 0) {
+            throw new \InvalidArgumentException('Request was empty. Expected a JSON-encoded representation of the Filter class.');
+        }
+
+        $filterValues = json_decode($content, true);
+        if (null === $filterValues) {
+            throw new \InvalidArgumentException('Request could not be parsed. Expected a JSON-encoded representation of the Filter class.');
+        }
+        $filter = Filter::fromArray($filterValues);
         return $filter;
     }
 

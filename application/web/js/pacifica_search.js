@@ -20,7 +20,7 @@
 
                 FilterManager.updateBorderBetweenContainers(selectedOptionType);
 
-                FilterManager.persistCurrentFilter(function () {
+                FilterManager.updateAvailableFilterOptions(function () {
                     filterContainer.find('input').not(':checked').closest('label').detach();
                     FilterManager.updateBorderBetweenContainers(selectedOptionType);
                 });
@@ -28,7 +28,7 @@
                 if($('#search_filter').find('input[type="checkbox"]:checked').length > 0){
                     $('.results_instructions').hide();
                 }else{
-                    $('#results_filetree').hide()
+                    $('#results_filetree').hide();
                     $('.results_instructions').show();
                 }
             })
