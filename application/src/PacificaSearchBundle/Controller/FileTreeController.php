@@ -200,7 +200,7 @@ class FileTreeController extends BaseRestController
      * @param int $transactionId
      * @return Response
      */
-    public function postTransactionFilesAction($transactionId) : Response
+    public function getTransactionFilesAction($transactionId) : Response
     {
         if ($transactionId < 1 || intval($transactionId) != $transactionId) {
             return $this->handleView(View::create([]));
