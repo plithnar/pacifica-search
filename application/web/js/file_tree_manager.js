@@ -26,10 +26,10 @@
                 $('#results_filetree').fancytree({
                     source: _getSourceObj(pageNumber),
                     lazyLoad: function(event, data){
-                        var node = data.node;
+                        var transactionId = data.node.key;
                         data.result = {
-                            url: '/file_tree/transactions/' + node.key + '/files',
-                            data: {mode: 'children', parent: node.key},
+                            url: '/file_tree/transactions/' + transactionId + '/files',
+                            data: {mode: 'children', parent: transactionId},
                             cache: false
                         };
                     },
