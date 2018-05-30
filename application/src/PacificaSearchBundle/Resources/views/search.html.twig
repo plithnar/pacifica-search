@@ -18,35 +18,22 @@
     <script src="{{ asset('js/filter_manager.js') }}"></script>
     <script src="{{ asset('js/text_search.js') }}"></script>
     <script src="{{ asset('js/pacifica_search.js') }}"></script>
-    <script>
-        $(function () {
-            if (console && console.log) {
-                console.log('Pacifica Search version {{ version_information }}');
-            }
-        });
-    </script>
 {% endblock %}
 {% block body %}
     <section id="search_filter" class="search_results_block">
-        {% for collection in filters %}
-            <fieldset data-type="{{ collection.machineName }}">
-                <legend>{{ collection.typeDisplayName }}</legend>
+        {% for machine_name, type_display_name in filter_types %}
+            <fieldset data-type="{{ machine_name }}">
+                <legend>{{ type_display_name }}</legend>
                 <div class="current_filter_options">
                     <!-- This element's contents are generated in JavaScript -->
                 </div>
                 <div class="option_container">
-                    {% for instance in collection.instances %}
-                        {% set input_id = collection.machineName ~ "_" ~ instance.id %}
-                        <label for="{{ input_id }}" title="{{ instance.displayName }}">
-                            <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
-                            {{ instance.displayName }}
-                        </label>
-                    {% endfor %}
+                    <!-- This element's contents are generated in JavaScript -->
                 </div>
                 <div class="page_control_block">
                     <div class="next_prev_control">
                         <a href="javascript:void(0);" class="paging_button prev_page">prev</a>
-                    <span class="page_number">1</span>
+                        <span class="page_number">1</span>
                         <a href="javascript:void(0);" class="paging_button next_page">next</a>
                     </div>
                 </div>
