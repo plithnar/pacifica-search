@@ -2,9 +2,6 @@
 
 namespace PacificaSearchBundle\Controller;
 
-// Annotations - IDE marks "unused" but they are not
-use FOS\RestBundle\Controller\Annotations\Get;
-
 use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\Institution;

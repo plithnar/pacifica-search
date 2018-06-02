@@ -139,9 +139,9 @@ abstract class Repository
      * Institution is selected, that should not prohibit the addition of further Institutions to the Filter - only
      * adding Filter items of other types should impact the options of a given type.
      *
+     * @throws \Exception
      * @param Filter $filter
-     * @return array|NULL NULL indicates that no filtering was performed because the filter was empty (possibly after
-     *   removing all of the Repository's own model class's items)
+     * @return array
      */
     protected function getIdsThatMayBeAddedToFilter(Filter $filter)
     {
@@ -151,12 +151,6 @@ abstract class Repository
         // Remove filters of own type if applicable - you can't restrict Users by picking a User
         if ($this->isFilterRepository()) {
             $filter->setIdsByType($this->getModelClass(), []);
-        }
-
-        // We don't do any filtering if the filter contains no values
-        if ($filter->isEmpty()) {
-            $ownIds = $this->repositoryManager->getTransactionRepository()->getIdsOfTypeAssociatedWithAtLeastOneTransaction($this->getModelClass());
-            return $ownIds;
         }
 
         $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
