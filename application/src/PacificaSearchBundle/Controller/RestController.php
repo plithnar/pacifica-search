@@ -33,12 +33,11 @@ class RestController extends BaseRestController
             throw new \Exception("Missing mandatory query parameter 'search_query'");
         }
 
+        $transactionIds = $this->transactionRepository->getIdsByTextSearch($searchQuery);
+
         $filterPages = [];
         foreach ($this->getFilterableRepositories() as $type => $repository) {
-            $filterPages[$type] = $repository->getPageByTextSearch(
-                $searchQuery,
-                $this->getPageByType($type)
-            );
+            $filterPages[$type] = $repository->getPageByTransactionIds($transactionIds, 1);
         }
         return $this->handleView(View::create($filterPages));
     }
