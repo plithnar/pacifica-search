@@ -9,14 +9,24 @@ class ElasticSearchQueryBuilder
      * are represented by this application's model classes. The reason is that, for example, an InstrumentType is
      * actually a subset of the records from type Group in Elasticsearch.
      */
-    const TYPE_GROUP = 'Groups';
-    const TYPE_INSTRUMENT = 'Instruments';
-    const TYPE_INSTITUTION = 'Institutions';
-    const TYPE_USER = 'Users';
-    const TYPE_PROPOSAL = 'Proposals';
-    const TYPE_TRANSACTION = 'Transactions';
-    const TYPE_FILE = 'Files';
+    const TYPE_GROUP = 'groups';
+    const TYPE_INSTRUMENT = 'instruments';
+    const TYPE_INSTITUTION = 'institutions';
+    const TYPE_USER = 'users';
+    const TYPE_PROPOSAL = 'proposals';
+    const TYPE_TRANSACTION = 'transactions';
+    const TYPE_FILE = 'files';
     const TYPE_ANY = null;
+
+    private const VALID_TYPES = [
+        self::TYPE_GROUP,
+        self::TYPE_INSTRUMENT,
+        self::TYPE_INSTITUTION,
+        self::TYPE_USER,
+        self::TYPE_PROPOSAL,
+        self::TYPE_TRANSACTION,
+        self::TYPE_FILE
+    ];
 
     /**
      * Defines values of fields that must be present in a record for it to be returned
@@ -75,7 +85,12 @@ class ElasticSearchQueryBuilder
      */
     private $metadataOnly = false;
 
-    public function __construct($index, $type)
+    /**
+     * @param string $index
+     * @param string $type
+     * @throws \Exception
+     */
+    public function __construct(string $index, string $type)
     {
         $this->assertValidType($type);
 
@@ -91,7 +106,7 @@ class ElasticSearchQueryBuilder
     /**
      * @return string
      */
-    public function getType()
+    public function getType() : string
     {
         return $this->type;
     }
@@ -103,7 +118,7 @@ class ElasticSearchQueryBuilder
      * @param string|string[] $value
      * @return ElasticSearchQueryBuilder
      */
-    public function whereEq($fieldName, $value)
+    public function whereEq($fieldName, $value) : ElasticSearchQueryBuilder
     {
         if ($fieldName === 'id') {
             return $this->byId($value);
@@ -126,7 +141,7 @@ class ElasticSearchQueryBuilder
      * @param $values
      * @return ElasticSearchQueryBuilder
      */
-    public function whereIn($fieldName, $values)
+    public function whereIn($fieldName, $values) : ElasticSearchQueryBuilder
     {
         return $this->whereEq($fieldName, $values);
     }
@@ -135,7 +150,7 @@ class ElasticSearchQueryBuilder
      * @param int|int[] $ids
      * @return ElasticSearchQueryBuilder
      */
-    public function byId($ids)
+    public function byId($ids) : ElasticSearchQueryBuilder
     {
         if (!is_array($ids)) {
             $ids = [ $ids ];
@@ -150,7 +165,7 @@ class ElasticSearchQueryBuilder
      * @param string $text
      * @return $this
      */
-    public function byText($text)
+    public function byText($text) : ElasticSearchQueryBuilder
     {
         $this->text = $text;
 
@@ -161,7 +176,7 @@ class ElasticSearchQueryBuilder
      * @param int|int[] $ids
      * @return ElasticSearchQueryBuilder
      */
-    public function excludeIds($ids)
+    public function excludeIds($ids) : ElasticSearchQueryBuilder
     {
         if (!is_array($ids)) {
             $ids = [ $ids ];
@@ -179,7 +194,7 @@ class ElasticSearchQueryBuilder
      * @param int $pageSize
      * @return ElasticSearchQueryBuilder
      */
-    public function paginate($pageNumber, $pageSize)
+    public function paginate($pageNumber, $pageSize) : ElasticSearchQueryBuilder
     {
         $this->pageNumber = $pageNumber;
         $this->pageSize = $pageSize;
@@ -191,13 +206,13 @@ class ElasticSearchQueryBuilder
      * Restricts the query so that it will only retrieve the IDs of the matching fields
      * @return ElasticSearchQueryBuilder
      */
-    public function fetchOnlyMetaData()
+    public function fetchOnlyMetaData() : ElasticSearchQueryBuilder
     {
         $this->metadataOnly = true;
         return $this;
     }
 
-    public function toArray()
+    public function toArray() : array
     {
         $array = [
             'index' => $this->index,
@@ -209,7 +224,7 @@ class ElasticSearchQueryBuilder
         // ElasticSearch supports comma-separated lists of Types, which we use to make sure no Types other than those
         // we care about are included in our result
         if ($this->type === self::TYPE_ANY) {
-            $array['type'] = implode(',', $this->getTypes());
+            $array['type'] = implode(',', self::VALID_TYPES);
         } else {
             $array['type'] = $this->type;
         }
@@ -243,24 +258,15 @@ class ElasticSearchQueryBuilder
         return $array;
     }
 
-    private function assertValidType($type)
+    /**
+     * @param string $type
+     * @throws \Exception
+     */
+    private function assertValidType(string $type)
     {
         // TYPE_ANY is checked separately because it's really not a type but rather represents all valid types
-        if ($type !== self::TYPE_ANY && !in_array($type, $this->getTypes())) {
-            throw new \Exception("Type '$type' is not a valid value. Allowed values are '" . implode(',', $this->getTypes()) . "'");
+        if ($type !== self::TYPE_ANY && !in_array($type, self::VALID_TYPES)) {
+            throw new \Exception("Type '$type' is not a valid value. Allowed values are '" . implode(',', self::VALID_TYPES) . "'");
         }
-    }
-
-    private function getTypes()
-    {
-        return [
-            self::TYPE_GROUP,
-            self::TYPE_INSTITUTION,
-            self::TYPE_INSTRUMENT,
-            self::TYPE_PROPOSAL,
-            self::TYPE_USER,
-            self::TYPE_TRANSACTION,
-            self::TYPE_FILE
-        ];
     }
 }
