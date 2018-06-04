@@ -85,6 +85,7 @@ abstract class Repository
     /**
      * Retrieves a page of model objects that fit the passed filter.
      *
+     * @throws \Exception
      * @param Filter $filter
      * @param int $pageNumber 1-based page number
      * @return ElasticSearchTypeCollection
@@ -114,6 +115,25 @@ abstract class Repository
 
         $response = $this->searchService->getResults($qb);
         return $this->resultsToTypeCollection($response);
+    }
+
+    /**
+     * Retrieves a page of model objects that are related to the passed set of transactions.
+     *
+     * @param array $transactionIds
+     * @param int $pageNumber
+     * @return ElasticSearchTypeCollection
+     */
+    public function getPageByTransactionIds(array $transactionIds, $pageNumber)
+    {
+        $qb = $this->getQueryBuilder();
+        $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
+
+        //TODO: Make this dependent on $transactionIds. At the time I write this the transaction's embedded model objects
+        // are missing their ids, and the model objects' transaction_ids fields are not populated, so it's not possible
+        // to make this mapping work.
+        $results = $this->searchService->getResults($qb);
+        return $this->resultsToTypeCollection($results);
     }
 
     /**
@@ -255,6 +275,6 @@ abstract class Repository
      */
     protected static function getNameFromSearchResult(array $result)
     {
-        return $result['_source']['name'];
+        return $result['_source']['display_name'];
     }
 }
