@@ -3,13 +3,6 @@
 namespace PacificaSearchBundle\Repository;
 
 use PacificaSearchBundle\Filter;
-use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
-use PacificaSearchBundle\Model\File;
-use PacificaSearchBundle\Model\Institution;
-use PacificaSearchBundle\Model\Instrument;
-use PacificaSearchBundle\Model\InstrumentType;
-use PacificaSearchBundle\Model\Proposal;
-use PacificaSearchBundle\Model\User;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 use PacificaSearchBundle\Service\RepositoryManagerInterface;
 use PacificaSearchBundle\Service\SearchServiceInterface;
@@ -62,7 +55,29 @@ class TransactionRepository implements TransactionRepositoryInterface
         return $transactions;
     }
 
-    private function getQueryBuilderByFilter(Filter $filter)
+    /**
+     * Retrieves the IDs of all transactions matching a text search. Because Transactions contain the searchable texts
+     * of all related Persons, Proposals, etc, this gives us the set of all Transactions with a relationship to any
+     * searchable type that matches the search.
+     *
+     * @param string $searchString
+     * @return int[]
+     */
+    public function getIdsByTextSearch(string $searchString) : array
+    {
+        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)
+            ->byText($searchString)
+            ->fetchOnlyMetaData();
+
+        $results = $this->searchService->getResults($qb);
+        $transactionIds = array_map(function ($result) {
+            return $result['_id'];
+        }, $results);
+
+        return $transactionIds;
+    }
+
+    private function getQueryBuilderByFilter(Filter $filter) : ElasticSearchQueryBuilder
     {
         $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
 

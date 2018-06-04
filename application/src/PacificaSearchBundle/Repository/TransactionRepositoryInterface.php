@@ -22,4 +22,14 @@ interface TransactionRepositoryInterface
      * @return array
      */
     public function getAssocArrayByFilter(Filter $filter) : array;
+
+    /**
+     * Retrieves the IDs of all transactions matching a text search. Because Transactions contain the searchable texts
+     * of all related Persons, Proposals, etc, this gives us the set of all Transactions with a relationship to any
+     * searchable type that matches the search.
+     *
+     * @param string $searchString
+     * @return int[]
+     */
+    public function getIdsByTextSearch(string $searchString) : array;
 }
