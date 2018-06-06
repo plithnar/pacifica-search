@@ -16,7 +16,7 @@
          * @returns {jQuery}
          */
         getTextSearchInput : function () {
-            return $$('#text-search');
+            return $$('#text_search');
         },
 
         /**
@@ -27,10 +27,28 @@
             return $$('.loading_blocker');
         },
 
+        getTransactionCountContainer : function () {
+            return $$('#transaction_count');
+        },
+
         /**
          * Retrieval methods associated with the faceted search filter
          */
         FacetedSearchFilter : {
+
+            /**
+             * Make the faceted search sidebar visible
+             */
+            show : function () {
+                this._getContainer().show();
+            },
+
+            /**
+             * Hide the faceted search sidebar
+             */
+            hide : function () {
+                this._getContainer().hide();
+            },
 
             /**
              * Retrieves the inputs used to toggle filter options on and off for a given filter type
@@ -52,7 +70,7 @@
              */
             getAllTypes : function() {
                 var types = [];
-                $$('fieldset[data-type]').each(function () {
+                $('fieldset[data-type]:visible').each(function () {
                     types.push($(this).attr('data-type'));
                 });
                 return types;
@@ -94,6 +112,10 @@
             getTypeByElement : function (element) {
                 var fieldset = $$($(element).closest('fieldset'));
                 return PacificaSearch.Utilities.assertAttributeExists(fieldset, 'data-type');
+            },
+
+            _getContainer : function () {
+                return $$('#search_filter');
             }
         }
     };

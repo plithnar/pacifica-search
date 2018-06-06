@@ -2,6 +2,11 @@
 
 namespace PacificaSearchBundle\Service;
 
+use PacificaSearchBundle\Model\Institution;
+use PacificaSearchBundle\Model\Instrument;
+use PacificaSearchBundle\Model\InstrumentType;
+use PacificaSearchBundle\Model\Proposal;
+use PacificaSearchBundle\Model\User;
 use PacificaSearchBundle\Repository\FileRepository;
 use PacificaSearchBundle\Repository\InstitutionRepository;
 use PacificaSearchBundle\Repository\InstrumentRepository;
@@ -11,7 +16,6 @@ use PacificaSearchBundle\Repository\Repository;
 use PacificaSearchBundle\Repository\TransactionRepository;
 use PacificaSearchBundle\Repository\TransactionRepositoryInterface;
 use PacificaSearchBundle\Repository\UserRepository;
-use phpDocumentor\Reflection\Types\Mixed_;
 
 /**
  * Class RepositoryManager
@@ -111,5 +115,20 @@ class RepositoryManager implements RepositoryManagerInterface
         }
 
         return $this->fileRepository;
+    }
+
+    /**
+     * Gets the set of all repositories that can be filtered on in a faceted search
+     * @return array
+     */
+    public function getFilterableRepositories() : array
+    {
+        return [
+            Institution::getMachineName()    => $this->getInstitutionRepository(),
+            Instrument::getMachineName()     => $this->getInstrumentRepository(),
+            InstrumentType::getMachineName() => $this->getInstrumentTypeRepository(),
+            Proposal::getMachineName()       => $this->getProposalRepository(),
+            User::getMachineName()           => $this->getUserRepository()
+        ];
     }
 }

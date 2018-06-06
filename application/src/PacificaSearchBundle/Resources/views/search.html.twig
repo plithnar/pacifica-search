@@ -9,20 +9,28 @@
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('js/lib/underscore/underscore-min.js') }}"></script>
     <script src="{{ asset('js/namespace.js') }}"></script>
     <script src="{{ asset('js/utilities.js') }}"></script>
     <script src="{{ asset('js/dom_manager.js') }}"></script>
     <script src="{{ asset('js/file_tree_manager.js') }}"></script>
     <script src="{{ asset('js/filter.js') }}"></script>
     <script src="{{ asset('js/filter_manager.js') }}"></script>
-    <script src="{{ asset('js/text_search.js') }}"></script>
     <script src="{{ asset('js/pacifica_search.js') }}"></script>
 {% endblock %}
 {% block body %}
-    <section id="search_filter" class="search_results_block">
+    <section id="text_search_section">
+        <fieldset class="text_search_box">
+            <form onsubmit="PacificaSearch.FilterManager.updateAvailableFilterOptions(); return false;" class="buttons">
+                <input title="Text Search" id="text_search"/>
+                <button id="text_search_btn">Search</button>
+            </form>
+        </fieldset>
+        <span id="transaction_count"><!-- This element's contents are generated in JavaScript --></span>
+    </section>
+
+    <section id="search_filter" class="search_results_block" style="display:none">
         {% for machine_name, type_display_name in filter_types %}
-            <fieldset data-type="{{ machine_name }}">
+            <fieldset data-type="{{ machine_name }}" style="display:hidden">
                 <legend>{{ type_display_name }}</legend>
                 <div class="current_filter_options">
                     <!-- This element's contents are generated in JavaScript -->
@@ -41,13 +49,7 @@
         {% endfor %}
     </section>
 
-    <section id="files" class="search_results_block file_results themed" style="float:left;">
-        <fieldset class="text_search_box">
-            <form onsubmit="PacificaSearch.TextSearch.performTextSearch(); return false;" class="buttons" style="margin-bottom:-10px;">
-                <input id="text-search" style="width:90%;font-size:1.1em;font-weight:bold"/>
-                <button style="margin-top:3px;">Search</button>
-            </form>
-        </fieldset>
+    <section id="files" class="search_results_block file_results themed" style="display:none">
         <fieldset>
             <legend>Files</legend>
             <div class="results_instructions">

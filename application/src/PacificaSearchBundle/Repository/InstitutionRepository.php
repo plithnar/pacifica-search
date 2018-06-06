@@ -9,7 +9,7 @@ class InstitutionRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getOwnIdsFromTransactionResults(array $transactionResults)
+    protected function getOwnIdsFromTransactionResults(array $transactionResults) : array
     {
         $userRepo = $this->repositoryManager->getUserRepository();
 
@@ -34,7 +34,7 @@ class InstitutionRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getType()
+    protected function getType() : string
     {
         return ElasticSearchQueryBuilder::TYPE_INSTITUTION;
     }

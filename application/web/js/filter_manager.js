@@ -5,7 +5,6 @@
     }
 
     var DomManager = PacificaSearch.DomManager;
-    var FileTreeManager = PacificaSearch.FileTreeManager;
     var Filter = PacificaSearch.Filter;
     var Utilities = PacificaSearch.Utilities;
 
@@ -31,6 +30,8 @@
                 filter.set(type, selectedFilterIds);
             });
 
+            filter.setText(PacificaSearch.DomManager.getTextSearchInput().val());
+
             return filter;
         },
 
@@ -48,6 +49,8 @@
                 '/filters/' +type + '/pages/' + pageNumber,
                 filterObj,
                 function (results) {
+                    debugger;
+
                     DomManager.FacetedSearchFilter.getOptionContainerForType(type).html('');
                     if (results.instances) {
                         results.instances.forEach(function (instance) {
@@ -69,7 +72,7 @@
         addInstanceToType : function (instance, type) {
             var inputId = type + '_' + instance.id;
             var input = $('<input type="checkbox">').attr('id', inputId).attr('data-id', instance.id);
-            var label = $('<label>').attr('for', inputId).append(input).append(instance.name);
+            var label = $('<label>').attr('for', inputId).append(input).append(instance.name + " (" + instance.transaction_count + ")");
 
             DomManager.FacetedSearchFilter.getOptionContainerForType(type).append(label);
         },
@@ -109,13 +112,12 @@
         /**
          * Updates the options available in the faceted search filter based on what other values are already selected
          *
-         * _.debounce() turns this function into a debounced function - the user can make several changes to the filter
-         * in quick succession, and the AJAX call won't actually go out until they've stopped for a brief time.
-         *
          * @param {function} callback Invoked after the AJAX call returns. This is implemented as a callback rather than
          *   the standard of returning a Promise because debounced functions can't return anything.
+         *
+         *   TODO: If we really keep this function non-debounced, refactor it to return a Promise
          */
-        updateAvailableFilterOptions : _.debounce(function(callback) {
+        updateAvailableFilterOptions : function(callback) {
             var filterObj = this.getFilter().toObj();
 
             PacificaSearch.Utilities.showLoadingAnimationUntilResolved(
@@ -123,23 +125,35 @@
                     '/filters/pages',
                     filterObj,
                     function (result) {
-                        PacificaSearch.FilterManager.injectFilterResultIntoSidebar(result);
-                        callback();
+                        DomManager.FacetedSearchFilter.show();
+                        DomManager.getTransactionCountContainer().html("Search matched <strong>" + result.transaction_count + "</strong> transactions. Select options below to further refine your results.");
+                        PacificaSearch.FilterManager.injectFilterResultIntoSidebar(result.filter_pages);
+
+                        if (undefined !== callback) {
+                            callback();
+                        }
                     }
                 )
             )
-        }, 2000),
+        },
 
         injectFilterResultIntoSidebar : function (result) {
             var self = this;
             Object.getOwnPropertyNames(result).forEach(function (type) {
                 DomManager.FacetedSearchFilter.getOptionContainerForType(type).html('');
-                result[type].instances.forEach(function (instance) {
-                    self.addInstanceToType(instance, type);
-                });
+
+                // For results that are empty or only have a single result (which makes filtering on that result
+                // meaningless) we don't inject the contents or make the filter section visible
+                var typeContainer = DomManager.FacetedSearchFilter.getContainerForType(type);
+                if (result[type].instances.length > 1) {
+                    result[type].instances.forEach(function (instance) {
+                        self.addInstanceToType(instance, type);
+                    });
+                    typeContainer.show();
+                } else {
+                    typeContainer.hide();
+                }
             });
-            FileTreeManager.updateTransactionList();
-            $('#results_filetree').show();
         }
 
     };

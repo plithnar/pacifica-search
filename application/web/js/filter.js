@@ -6,9 +6,10 @@
      */
     PacificaSearch.Filter = function () {
         this._filter = {
-            /**
-             * @value {Number[]}
-             */
+            /** @value {string} */
+            text : null,
+
+            /** @value {Number[]} */
             instrument_type : [],
 
             /** @value {Number[]} */
@@ -28,7 +29,7 @@
     /**
      * A validation wrapper that confirms the requested property is defined before setting its value
      *
-     * @param {string} property Must be one of this class's *Ids properties
+     * @param {string} property Must be one of this class's properties
      * @param {number[]} ids
      */
     PacificaSearch.Filter.prototype.set = function (property, ids) {
@@ -36,6 +37,13 @@
             throw new Error("'" + property + "' is not a valid filter field");
         }
         this._filter[property] = ids;
+    };
+
+    /**
+     * @param {string} text
+     */
+    PacificaSearch.Filter.prototype.setText = function (text) {
+        this._filter.text = text;
     };
 
     /**

@@ -19,6 +19,13 @@ use Symfony\Component\HttpFoundation\Request;
 class Filter
 {
     /**
+     * A free text that the user can enter to filter transactions
+     *
+     * @var string
+     */
+    private $text;
+
+    /**
      * IDs of instrument types that are included in this filter
      * @var int[]
      */
@@ -79,6 +86,7 @@ class Filter
         foreach ($machineNamesToSetters as $machineName => $setter) {
             $filter->$setter($filterValues[$machineName]);
         }
+        $filter->setText($filterValues['text']);
         return $filter;
     }
 
@@ -131,6 +139,24 @@ class Filter
         }
 
         return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getText() : string
+    {
+        return $this->text === null ? '' : $this->text;
+    }
+
+    /**
+     * @param string $text
+     * @return Filter
+     */
+    public function setText(?string $text) : Filter
+    {
+        $this->text = $text;
+        return $this;
     }
 
     /**
@@ -242,7 +268,7 @@ class Filter
     }
 
     /**
-     * Use this method like $filter->getIdsByType(Instrument::class
+     * Use this method like $filter->getIdsByType(Instrument::class)
      * @param string $class
      * @return int[]
      */
@@ -273,7 +299,8 @@ class Filter
             Instrument::getMachineName()     => "${prefix}InstrumentIds",
             Institution::getMachineName()    => "${prefix}InstitutionIds",
             User::getMachineName()           => "${prefix}UserIds",
-            Proposal::getMachineName()       => "${prefix}ProposalIds"
+            Proposal::getMachineName()       => "${prefix}ProposalIds",
+            'text'                           => "${prefix}Text"
         ];
         return $machineNamesToMethods;
     }

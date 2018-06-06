@@ -3,6 +3,11 @@
 namespace PacificaSearchBundle\Repository;
 
 use PacificaSearchBundle\Filter;
+use PacificaSearchBundle\Model\Institution;
+use PacificaSearchBundle\Model\Instrument;
+use PacificaSearchBundle\Model\InstrumentType;
+use PacificaSearchBundle\Model\Proposal;
+use PacificaSearchBundle\Model\User;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 use PacificaSearchBundle\Service\RepositoryManagerInterface;
 use PacificaSearchBundle\Service\SearchServiceInterface;
@@ -32,30 +37,6 @@ class TransactionRepository implements TransactionRepositoryInterface
     }
 
     /**
-     * Retrieves the IDs of Transactions that are associated with at least one record of each type in the passed filter.
-     * That is to say, if the filter has InstrumentTypes 1, 2, 3, and Institutions 5, 6, and 7, then this will retrieve
-     * the IDs of all Transactions associated with ( (Instrument Type 1 OR 2 OR 3) AND (Institution 5 OR 6 OR 7) )
-     * @param Filter $filter
-     * @return int[]
-     */
-    public function getIdsByFilter(Filter $filter) : array
-    {
-        $qb = $this->getQueryBuilderByFilter($filter);
-        $transactionIds = $this->searchService->getIds($qb);
-        return $transactionIds;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAssocArrayByFilter(Filter $filter) : array
-    {
-        $qb = $this->getQueryBuilderByFilter($filter);
-        $transactions = $this->searchService->getResults($qb);
-        return $transactions;
-    }
-
-    /**
      * Retrieves the IDs of all transactions matching a text search. Because Transactions contain the searchable texts
      * of all related Persons, Proposals, etc, this gives us the set of all Transactions with a relationship to any
      * searchable type that matches the search.
@@ -71,78 +52,35 @@ class TransactionRepository implements TransactionRepositoryInterface
 
         $results = $this->searchService->getResults($qb);
         $transactionIds = array_map(function ($result) {
-            return $result['_id'];
+            // The object IDs in the transaction object are formatted like transaction_<ID> but no other type uses
+            // that format, so convert to standard integer IDs before returning
+            return (int)explode('_', $result['_id'])[1];
         }, $results);
 
         return $transactionIds;
     }
 
-    private function getQueryBuilderByFilter(Filter $filter) : ElasticSearchQueryBuilder
-    {
-        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
-
-        $this->addWhereClauseForProposals($qb, $filter->getProposalIds());
-        $this->addWhereClauseForInstruments($qb, $filter->getInstrumentIds(), $filter->getInstrumentTypeIds());
-        $this->addWhereClauseForUsers($qb, $filter->getUserIds(), $filter->getInstitutionIds());
-
-        return $qb;
-    }
-
     /**
-     * Add a WHERE clause to a query builder so that it filters on a set of proposals
-     * @param ElasticSearchQueryBuilder $qb
-     * @param array $proposalIds
+     * @throws \Exception
+     * @inheritdoc
      */
-    private function addWhereClauseForProposals(ElasticSearchQueryBuilder $qb, array $proposalIds)
+    public function getIdsByFilterItem(Filter $filter) : array
     {
-        if (count($proposalIds)) {
-            $qb->whereEq('proposal', $proposalIds);
+        $results = [];
+
+        $filterText = $filter->getText();
+        if (strlen($filterText)) {
+            $results['text'] = $this->getIdsByTextSearch($filterText);
         }
-    }
 
-    /**
-     * Add a WHERE clause to a query builder so that it filters on a set of instruments, based either on an explicit
-     * list of instrument IDs or, failing that, on a list of instrument types
-     * @param ElasticSearchQueryBuilder $qb
-     * @param array $instrumentIds
-     * @param array $instrumentTypeIds
-     */
-    private function addWhereClauseForInstruments(ElasticSearchQueryBuilder $qb, array $instrumentIds, array $instrumentTypeIds)
-    {
-        // Instruments/Instrument Types
-        // If both Instruments and Instrument Types are included in the filter, we disregard the Instrument Types, since
-        // Instrument Types are essentially just groups of Instruments, and the result of combining them is always either
-        // the same as just filtering by Instruments, or an empty set (if only instruments not belonging to any type in
-        // the filter are passed).
-        if (!count($instrumentIds)) {
-            if (count($instrumentTypeIds)) {
-                $instrumentIds = $this->repositoryManager->getInstrumentRepository()->getIdsByType($instrumentTypeIds);
+        $repositories = $this->repositoryManager->getFilterableRepositories();
+        foreach ($repositories as $typeMachineName => $repository) {
+            $idsByType = $filter->getIdsByType($repository->getModelClass());
+            if (count($idsByType) > 0) {
+                $results[$typeMachineName] = $repository->getTransactionIdsByOwnIds($idsByType);
             }
         }
-        if (count($instrumentIds)) {
-            $qb->whereEq('instrument', $instrumentIds);
-        }
-    }
 
-    /**
-     * Add a WHERE clause to a query builder so that it filters on a set of users, based either on an explicit list of
-     * user IDs or, failing that, on a list of institutions
-     * @param ElasticSearchQueryBuilder $qb
-     * @param array $userIds
-     * @param array $institutionIds
-     */
-    private function addWhereClauseForUsers(ElasticSearchQueryBuilder $qb, array $userIds, array $institutionIds)
-    {
-        // Users/Institutions
-        // Similar to Instruments and Instrument Types (see addWhereClauseForInstruments()), If both institutions and
-        // users are included in the filter, then we disregard the institutions.
-        if (!count($userIds)) {
-            if (count($institutionIds)) {
-                $userIds = $this->repositoryManager->getUserRepository()->getIdsByInstitution($institutionIds);
-            }
-        }
-        if (count($userIds)) {
-            $qb->whereEq('submitter', $userIds);
-        }
+        return $results;
     }
 }

@@ -24,9 +24,6 @@ body {
     border-radius: 4px;
 }
 
-/*.glyphicon-calendar {
-    background-image: url("/project_resources/images/glyphicons-46-calendar.png");
-}*/
 .daterangepicker th, .daterangepicker td {
     border-radius: 0;
 }
@@ -39,7 +36,6 @@ body {
 .option_container label.disabled {
     color: lightgrey;
 }
-
 
 .page_control_block {
     position: relative;
@@ -161,7 +157,6 @@ label.bold_label {
 .search_results_block label {
     color: #606060;
     font-size: 0.95em;
-    width: 185px;
     display: block;
     white-space: nowrap;
     overflow: hidden;
@@ -173,7 +168,6 @@ label.bold_label {
     padding: 0.25em;
     background-color: #efefef;
     margin-bottom: 1em;
-    width: 185px;
 }
 
 .search_results_block fieldset legend {
@@ -181,7 +175,6 @@ label.bold_label {
     color: #656565;
     font-weight: 600;
     font-size: 1.1em;
-    width:auto;
 }
 
 .search_results_block fieldset input[type="text"] {
@@ -766,4 +759,17 @@ div.form_container td {
 fieldset.text_search_box {
     padding: 1em !important;
     padding-right: 0;
+}
+
+#text_search {
+    font-size: 1.5em;
+    width: 90%;
+}
+
+#text_search_btn {
+    font-size: 1.4em;
+}
+
+#transaction_count {
+    margin-left: 17px;
 }

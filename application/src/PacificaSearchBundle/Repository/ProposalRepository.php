@@ -10,7 +10,7 @@ class ProposalRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function getOwnIdsFromTransactionResults(array $transactionResults)
+    public function getOwnIdsFromTransactionResults(array $transactionResults) : array
     {
         $ids = array_map(function ($result) {
             return (int) $result['_source']['proposal'];
@@ -22,7 +22,7 @@ class ProposalRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getType()
+    protected function getType() : string
     {
         return ElasticSearchQueryBuilder::TYPE_PROPOSAL;
     }
@@ -30,7 +30,7 @@ class ProposalRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected static function getNameFromSearchResult(array $result)
+    protected static function getNameFromSearchResult(array $result) : string
     {
         return "Proposal #" . $result['_id'];
     }

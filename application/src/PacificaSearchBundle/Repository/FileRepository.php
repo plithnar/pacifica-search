@@ -12,7 +12,7 @@ class FileRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getOwnIdsFromTransactionResults(array $transactionResults)
+    protected function getOwnIdsFromTransactionResults(array $transactionResults) : array
     {
         $transactionIds = array_map(function ($result) {
             return (int) $result['_id'];
@@ -28,7 +28,7 @@ class FileRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getType()
+    protected function getType() : string
     {
         return ElasticSearchQueryBuilder::TYPE_FILE;
     }
@@ -38,7 +38,7 @@ class FileRepository extends Repository
      *
      * @inheritdoc
      */
-    protected function isFilterRepository()
+    protected function isFilterRepository() : bool
     {
         return false;
     }
@@ -46,7 +46,7 @@ class FileRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected static function getNameFromSearchResult(array $result)
+    protected static function getNameFromSearchResult(array $result) : string
     {
         return $result['_source']['subdir'] . '/' . $result['_source']['name'];
     }
@@ -54,10 +54,11 @@ class FileRepository extends Repository
     /**
      * Retrieves the Files associated with a Transaction
      *
+     * @throws \Exception
      * @param $transactionId
      * @return ElasticSearchTypeCollection
      */
-    public function getByTransactionId($transactionId)
+    public function getByTransactionId($transactionId) : ElasticSearchTypeCollection
     {
         $qb = $this->getQueryBuilder()->whereEq('transaction_id', $transactionId);
         $fileArrays = $this->searchService->getResults($qb);

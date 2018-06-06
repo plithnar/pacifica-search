@@ -9,30 +9,20 @@ namespace PacificaSearchBundle\Model;
  */
 abstract class ElasticSearchType
 {
-
-    /** @var int */
+    /** @var string */
     protected $id;
 
-    /**
-     * @param int $id
-     */
-    public function __construct($id)
+    public function __construct(string $id)
     {
         $this->id = $id;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId() : string
     {
         return $this->id;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray() : array
     {
         return [
             'id' => $this->getId(),
@@ -44,17 +34,17 @@ abstract class ElasticSearchType
      * Returns a string that can represent the Type instance in the GUI
      * @return string
      */
-    abstract public function getDisplayName();
+    abstract public function getDisplayName() : string;
 
     /**
      * Returns the string that represents the Type in the REST API
      * @return string
      */
-    abstract public static function getMachineName();
+    abstract public static function getMachineName() : string;
 
     /**
      * Returns the string that represents the Type in the GUI
      * @return string
      */
-    abstract public static function getTypeDisplayName();
+    abstract public static function getTypeDisplayName() : string;
 }

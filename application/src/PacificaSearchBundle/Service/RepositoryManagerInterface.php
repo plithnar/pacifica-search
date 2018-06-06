@@ -42,4 +42,10 @@ interface RepositoryManagerInterface
      * @return Repository
      */
     public function getFileRepository() : Repository;
+
+    /**
+     * Gets the set of all repositories that can be filtered on in a faceted search
+     * @return Repository[]
+     */
+    public function getFilterableRepositories() : array;
 }

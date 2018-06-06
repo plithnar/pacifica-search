@@ -49,8 +49,10 @@ abstract class Repository
      * Gets the name of the model class of the type that this repository is responsible for. Will attempt to find the
      * class by the convention that repository classes are named <ModelClass>Repository, override this method if that's
      * not the case.
+     *
+     * @throws \Exception
      */
-    public function getModelClass()
+    public function getModelClass() : string
     {
         // Remove the "Repository" suffix from the repo's class name
         $modelClassName = preg_replace('/Repository$/', '', static::class);
@@ -69,15 +71,12 @@ abstract class Repository
     }
 
     /**
-     * @param int|int[] $ids
+     * @throws \Exception
+     * @param int[] $ids
      * @return ElasticSearchTypeCollection
      */
-    public function getById($ids)
+    public function getById(array $ids) : ElasticSearchTypeCollection
     {
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
-
         $response = $this->searchService->getResults($this->getQueryBuilder()->whereIn('id', $ids));
         return $this->resultsToTypeCollection($response);
     }
@@ -90,12 +89,15 @@ abstract class Repository
      * @param int $pageNumber 1-based page number
      * @return ElasticSearchTypeCollection
      */
-    public function getFilteredPage(Filter $filter, $pageNumber)
+    public function getFilteredPage(Filter $filter, $pageNumber) : ElasticSearchTypeCollection
     {
         $qb = $this->getQueryBuilder();
         $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
 
         $filteredIds = $this->getIdsThatMayBeAddedToFilter($filter);
+
+        // We exclude any IDs from the result that are already in the filter, because otherwise the returned
+        // page would include items the user has already selected and added to the filter.
         $idsToExclude = $filter->getIdsByType($this->getModelClass());
 
         // We can only call byId() or excludeIds() - the two are mutually incompatible calls (TODO: maybe fix that)
@@ -120,18 +122,18 @@ abstract class Repository
     /**
      * Retrieves a page of model objects that are related to the passed set of transactions.
      *
+     * @throws \Exception
      * @param array $transactionIds
      * @param int $pageNumber
      * @return ElasticSearchTypeCollection
      */
-    public function getPageByTransactionIds(array $transactionIds, $pageNumber)
+    public function getPageByTransactionIds(array $transactionIds, int $pageNumber) : ElasticSearchTypeCollection
     {
         $qb = $this->getQueryBuilder();
         $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
+        $qb->whereIn('transaction_ids', $transactionIds);
+        $qb->filterReturned('transaction_ids', $transactionIds);
 
-        //TODO: Make this dependent on $transactionIds. At the time I write this the transaction's embedded model objects
-        // are missing their ids, and the model objects' transaction_ids fields are not populated, so it's not possible
-        // to make this mapping work.
         $results = $this->searchService->getResults($qb);
         return $this->resultsToTypeCollection($results);
     }
@@ -139,6 +141,7 @@ abstract class Repository
     /**
      * Retrieves a page of model objects that fit the passed query string
      *
+     * @throws \Exception
      * @param string $searchQuery
      * @param int $pageNumber 1-based page number
      * @return ElasticSearchTypeCollection
@@ -163,7 +166,7 @@ abstract class Repository
      * @param Filter $filter
      * @return array
      */
-    protected function getIdsThatMayBeAddedToFilter(Filter $filter)
+    protected function getIdsThatMayBeAddedToFilter(Filter $filter) : array
     {
         // Clone the filter before making any changes so that the caller's filter doesn't get changed
         $filter = clone $filter;
@@ -185,7 +188,7 @@ abstract class Repository
      *
      * @return bool
      */
-    protected function isFilterRepository()
+    protected function isFilterRepository() : bool
     {
         return true;
     }
@@ -229,18 +232,51 @@ abstract class Repository
     }
 
     /**
+     * Given a set of IDs of the repository's own type, retrieves the IDs of all transactions associated with all of
+     * the records with those IDs.
+     *
+     * @param int[] $ownIds
+     * @return int[]
+     */
+    public function getTransactionIdsByOwnIds(array $ownIds) : array
+    {
+        // TODO: We should be able to craft a query such that it returns the unique set of transaction IDs instead of doing that work in PHP
+        $qb = $this->getQueryBuilder()->whereIn('id', $ownIds);
+        $results = $this->searchService->getResults($qb);
+
+        $transactionIds = [];
+        foreach ($results as $result) {
+            // This array_replace() allows us to guarantee uniqueness using the val => val trick without having to call
+            // array_unique on a growing array for each loop
+            $newTransactionIds = $result['_source']['transaction_ids'];
+            $transactionIds = array_replace($transactionIds, array_combine($newTransactionIds, $newTransactionIds));
+        }
+
+        return array_values($transactionIds); // array_values() so that
+    }
+
+    /**
      * @param array $transactionResults An array returned by SearchService when given a query for TYPE_TRANSACTION
      * @return int[] Array containing all IDs of this Repository's type that correspond to the returned transaction
      * records
      */
-    abstract protected function getOwnIdsFromTransactionResults(array $transactionResults);
+    abstract protected function getOwnIdsFromTransactionResults(array $transactionResults) : array;
 
-    protected function resultsToTypeCollection(array $results)
+    /**
+     * @throws \Exception
+     * @param array $results
+     * @return ElasticSearchTypeCollection
+     */
+    protected function resultsToTypeCollection(array $results) : ElasticSearchTypeCollection
     {
         $instances = new ElasticSearchTypeCollection();
         foreach ($results as $curHit) {
             $modelClass = $this->getModelClass();
-            $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
+            $instance = new $modelClass(
+                $curHit['_id'],
+                static::getNameFromSearchResult($curHit),
+                count($curHit['_source']['transaction_ids'])
+            );
             $instances->add($instance);
         }
 
@@ -254,16 +290,15 @@ abstract class Repository
      *
      * @return \PacificaSearchBundle\Service\ElasticSearchQueryBuilder
      */
-    protected function getQueryBuilder()
+    protected function getQueryBuilder() : ElasticSearchQueryBuilder
     {
         return $this->searchService->getQueryBuilder($this->getType());
     }
 
     /**
      * Gets the type (one of the ElasticSearchQueryBuilder::TYPE_* constants) that this repository is responsible for
-     * @return string
      */
-    abstract protected function getType();
+    abstract protected function getType() : string;
 
     /**
      * Given a single result (an entry from the "hits" field of an Elastic Search results object), returns a string
@@ -273,7 +308,7 @@ abstract class Repository
      * @param array $result
      * @return string
      */
-    protected static function getNameFromSearchResult(array $result)
+    protected static function getNameFromSearchResult(array $result) : string
     {
         return $result['_source']['display_name'];
     }

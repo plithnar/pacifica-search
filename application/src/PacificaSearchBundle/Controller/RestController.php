@@ -39,7 +39,6 @@ class RestController extends BaseRestController
         foreach ($this->getFilterableRepositories() as $type => $repository) {
             $filterPages[$type] = $repository->getPageByTransactionIds($transactionIds, 1);
         }
-        return $this->handleView(View::create($filterPages));
     }
 
     /**
@@ -73,29 +72,43 @@ class RestController extends BaseRestController
 
     /**
      * Retrieves a page for each filter type based on the current contents of the filter
+     * @throws \Exception
      * @param Request $request
      * @return Response
      */
     public function postFilterPagesAction(Request $request) : Response
     {
         $filter = Filter::fromRequest($request);
+        $transactionIdsByFilterItem = $this->transactionRepository->getIdsByFilterItem($filter);
 
         $filterPages = [];
         foreach ($this->getFilterableRepositories() as $type => $repository) {
-            $filterPages[$type] = $repository->getFilteredPage(
-                $filter,
-                $this->getPageByType($type)
+            $transIds = $transactionIdsByFilterItem;
+            unset($transIds[$type]);
+            $transIds = array_values($transIds);
+
+            $filteredTransactionIds = array_of_arrays_intersect($transIds);
+
+            $filterPages[$type] = $repository->getPageByTransactionIds(
+                $filteredTransactionIds,
+                $this->getPageNumberByType($type)
             );
         }
-        return $this->handleView(View::create($filterPages));
+
+        $allTransactionIds = array_of_arrays_union($transactionIdsByFilterItem);
+
+        return $this->handleView(View::create([
+            'transaction_count' => count($allTransactionIds),
+            'filter_pages' => $filterPages
+        ]));
     }
 
-    private function getPageByType($type)
+    private function getPageNumberByType($type)
     {
-        $pagesByType = $this->getPagesByType();
+        $pagesByType = $this->getPageNumbersByType();
         return $pagesByType[$type];
     }
-    private function getPagesByType()
+    private function getPageNumbersByType()
     {
         $pagesByType = $this->getSession()->get('pages_by_type');
         if (null === $pagesByType) {
@@ -112,7 +125,7 @@ class RestController extends BaseRestController
     }
     private function setPageByType($type, $page)
     {
-        $pagesByType = $this->getPagesByType();
+        $pagesByType = $this->getPageNumbersByType();
         $pagesByType[$type] = $page;
     }
 

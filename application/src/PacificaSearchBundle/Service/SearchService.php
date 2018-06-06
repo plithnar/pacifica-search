@@ -53,7 +53,16 @@ class SearchService implements SearchServiceInterface
             throw new \RuntimeException("ES search request failed. Request was \n\n" . json_encode($request) . "\n\nException message:" . $e->getMessage());
         }
 
-        return $response['hits']['hits'];
+        $results = $response['hits']['hits'];
+
+        $returnFilter = $queryBuilder->getReturnFilter();
+        foreach ($returnFilter as $fieldName => $valuesToKeep) {
+            foreach ($results as &$result) {
+                $result['_source'][$fieldName] = array_intersect($result['_source'][$fieldName], $valuesToKeep);
+            }
+        }
+
+        return $results;
     }
 
     /**

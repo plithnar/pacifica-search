@@ -36,6 +36,13 @@ class ElasticSearchQueryBuilder
     private $fields = [];
 
     /**
+     * Allows the values to be returned for a particular field to be filtered
+     *
+     * @var array
+     */
+    private $returnFilter = [];
+
+    /**
      * The Elasticsearch index that will be queried
      *
      * @var string
@@ -144,6 +151,27 @@ class ElasticSearchQueryBuilder
     public function whereIn($fieldName, $values) : ElasticSearchQueryBuilder
     {
         return $this->whereEq($fieldName, $values);
+    }
+
+    /**
+     * For fields that return arrays of values, return only the requested values
+     *
+     * Note: Currently this is implemented by actually returning all the values but filtering them out in the
+     * SearchService. It looks like a script field might be required to actually filter values before returning them.
+     *
+     * @param string $fieldName
+     * @param array $values
+     * @return ElasticSearchQueryBuilder
+     */
+    public function filterReturned(string $fieldName, array $values) : ElasticSearchQueryBuilder
+    {
+        $this->returnFilter[$fieldName] = $values;
+        return $this;
+    }
+
+    public function getReturnFilter() : array
+    {
+        return $this->returnFilter;
     }
 
     /**

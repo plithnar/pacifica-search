@@ -9,7 +9,7 @@ class UserRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getType()
+    protected function getType() : string
     {
         return ElasticSearchQueryBuilder::TYPE_USER;
     }
@@ -19,7 +19,7 @@ class UserRepository extends Repository
      * @param int[] $institutionIds
      * @return int[]
      */
-    public function getIdsByInstitution(array $institutionIds)
+    public function getIdsByInstitution(array $institutionIds) : array
     {
         $qb = $this->getQueryBuilder()->whereIn('institutions', $institutionIds);
         $results = $this->searchService->getIds($qb);
@@ -30,7 +30,7 @@ class UserRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function getOwnIdsFromTransactionResults(array $transactionResults)
+    public function getOwnIdsFromTransactionResults(array $transactionResults) : array
     {
         $ids = array_map(function ($result) {
             return $result['_source']['submitter'];
