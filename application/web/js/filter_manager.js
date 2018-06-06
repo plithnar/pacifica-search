@@ -49,8 +49,6 @@
                 '/filters/' +type + '/pages/' + pageNumber,
                 filterObj,
                 function (results) {
-                    debugger;
-
                     DomManager.FacetedSearchFilter.getOptionContainerForType(type).html('');
                     if (results.instances) {
                         results.instances.forEach(function (instance) {
