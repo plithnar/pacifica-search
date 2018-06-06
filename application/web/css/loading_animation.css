@@ -132,9 +132,16 @@
 }
 
 .loading_message {
-    position: absolute;
-    left: 50em;
-    top: 20em;
+	/* Center the loading message vertically */
+	top: 50%;
+	position: relative;
+	margin-top: -75px;
+
+	/* Center the loading message horizontally */
+	margin-left: auto;
+	margin-right: auto;
+
+	width: 20em;
     padding: 3em 3em 3em 2em;
     border: 4px solid #555;
     border-radius: 20px;
