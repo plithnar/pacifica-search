@@ -3,11 +3,6 @@
 namespace PacificaSearchBundle\Repository;
 
 use PacificaSearchBundle\Filter;
-use PacificaSearchBundle\Model\Institution;
-use PacificaSearchBundle\Model\Instrument;
-use PacificaSearchBundle\Model\InstrumentType;
-use PacificaSearchBundle\Model\Proposal;
-use PacificaSearchBundle\Model\User;
 use PacificaSearchBundle\Service\ElasticSearchQueryBuilder;
 use PacificaSearchBundle\Service\RepositoryManagerInterface;
 use PacificaSearchBundle\Service\SearchServiceInterface;
@@ -64,7 +59,7 @@ class TransactionRepository implements TransactionRepositoryInterface
      * @throws \Exception
      * @inheritdoc
      */
-    public function getIdsByFilterItem(Filter $filter) : array
+    public function getIdsByFilter(Filter $filter) : array
     {
         $results = [];
 

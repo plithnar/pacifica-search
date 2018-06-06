@@ -24,12 +24,15 @@
  */
 function array_of_arrays_intersect(array $arrayOfArrays) : array
 {
+    // Ensure arrays are indexed rather than associative
+    $arrayOfArrays = array_map('array_values', $arrayOfArrays);
+
     if (count($arrayOfArrays) === 0) {
         return [];
     } elseif (count($arrayOfArrays) > 1) {
         return call_user_func_array('array_intersect',$arrayOfArrays);
     } else {
-        return $arrayOfArrays[0];
+        return reset($arrayOfArrays);
     }
 }
 

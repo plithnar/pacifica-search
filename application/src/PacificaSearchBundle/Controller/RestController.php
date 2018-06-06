@@ -20,28 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 class RestController extends BaseRestController
 {
     /**
-     * Retrieves a page for each filter type based a text search
-     *
-     * @throws \Exception
-     * @param Request $request
-     * @return Response
-     */
-    public function getText_searchAction(Request $request)
-    {
-        $searchQuery = $request->query->get('search_query');
-        if (null === $searchQuery) {
-            throw new \Exception("Missing mandatory query parameter 'search_query'");
-        }
-
-        $transactionIds = $this->transactionRepository->getIdsByTextSearch($searchQuery);
-
-        $filterPages = [];
-        foreach ($this->getFilterableRepositories() as $type => $repository) {
-            $filterPages[$type] = $repository->getPageByTransactionIds($transactionIds, 1);
-        }
-    }
-
-    /**
      * Retrieves a page of allowable filter items based on which items are already selected in the other filter types
      *
      * @throws \Exception
@@ -79,7 +57,7 @@ class RestController extends BaseRestController
     public function postFilterPagesAction(Request $request) : Response
     {
         $filter = Filter::fromRequest($request);
-        $transactionIdsByFilterItem = $this->transactionRepository->getIdsByFilterItem($filter);
+        $transactionIdsByFilterItem = $this->transactionRepository->getIdsByFilter($filter);
 
         $filterPages = [];
         foreach ($this->getFilterableRepositories() as $type => $repository) {
@@ -95,14 +73,16 @@ class RestController extends BaseRestController
             );
         }
 
-        $allTransactionIds = array_of_arrays_union($transactionIdsByFilterItem);
+        $allTransactionIds = array_of_arrays_intersect($transactionIdsByFilterItem);
 
         return $this->handleView(View::create([
             'transaction_count' => count($allTransactionIds),
-            'filter_pages' => $filterPages
+            'filter_pages' => $filterPages,
+            'transaction_ids' => $allTransactionIds
         ]));
     }
 
+    // TODO: All of this page number functionality needs to be removed, since it's session-dependent.
     private function getPageNumberByType($type)
     {
         $pagesByType = $this->getPageNumbersByType();
