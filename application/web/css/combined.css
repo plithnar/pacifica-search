@@ -37,43 +37,6 @@ body {
     color: lightgrey;
 }
 
-.page_control_block {
-    position: relative;
-}
-.next_prev_control {
-    text-align: center;
-    color: #555;
-    font-size: 1.0em;
-    margin: 6px -3px -4px -4px;
-    background-color: #ddd;
-    border-top: 2px #aaa solid;
-}
-
-.next_prev_control a.paging_button {
-    text-transform: uppercase;
-    font-size: 0.8em;
-    color: #efefef;
-    text-decoration: none;
-    position: absolute;
-    background-color: #aaa;
-    padding: 0 10px;
-}
-
-.next_prev_control .prev_page {
-    left: -5px;
-    border-radius: 0 2px 2px 2px;
-}
-
-.next_prev_control .next_page {
-    right: -5px;
-    border-radius: 2px 0 2px 2px;
-}
-
-.next_prev_control a.paging_button:hover {
-    color: #efefef;
-    text-decoration: underline;
-}
-
 .bottom_border {
     border-bottom: 2px solid #888;
 }
@@ -93,28 +56,6 @@ label.bold_label {
     width: 98%;
     padding: 1em;
     padding-bottom: 4px
-}
-
-#files .page_control_block {
-    width: 25%;
-    margin: auto auto 0px auto;
-}
-
-#files .next_prev_control {
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    border-left: 2px #aaa solid;
-    border-right: 2px #aaa solid;
-}
-
-#files .next_prev_control .prev_page {
-    margin-left: 2px;
-    border-bottom-left-radius: 0;
-}
-
-#files .next_prev_control .next_page {
-    margin-right: 2px;
-    border-bottom-right-radius: 0;
 }
 
 .results_instructions {

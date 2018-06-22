@@ -17,20 +17,33 @@ class ElasticSearchTypeCollection implements \Countable
     private $instances = [];
 
     /**
-     * @param ElasticSearchType[] $instances
+     * It is common for an ElasticSearchTypeCollection to contain only a subset (usually a page) of the results of a
+     * search. In that case the creator of an instance of ElasticSearchTypeCollection has the option of setting this
+     * property to indicate the total number of hits, including any that weren't included in the collection.
+     *
+     * @var int
      */
-    public function __construct(array $instances = [])
+    private $totalHits;
+
+    /**
+     * @param ElasticSearchType[] $instances
+     * @param int|null $totalHits If this instance only represents a subset (the intended use case being pagination) of
+     *        a larger set, pass this to indicate the size of the full set.
+     */
+    public function __construct(array $instances = [], int $totalHits = null)
     {
         foreach ($instances as $instance) {
             $this->add($instance);
         }
+
+        $this->totalHits = $totalHits;
     }
 
     /**
      * @param ElasticSearchType $item
      * @return ElasticSearchTypeCollection
      */
-    public function add(ElasticSearchType $item)
+    public function add(ElasticSearchType $item) : ElasticSearchTypeCollection
     {
         // Enforce that all items in a collection have to be of the same class
         if (!empty($this->instances) && !($item instanceof $this->instances[0])) {
@@ -45,7 +58,7 @@ class ElasticSearchTypeCollection implements \Countable
     /**
      * @return ElasticSearchType[]
      */
-    public function getInstances()
+    public function getInstances() : array
     {
         return $this->instances;
     }
@@ -54,7 +67,7 @@ class ElasticSearchTypeCollection implements \Countable
      * Reorders the wrapped instances to be alphabetical by display name
      * @return ElasticSearchTypeCollection
      */
-    public function sortByDisplayName()
+    public function sortByDisplayName() : ElasticSearchTypeCollection
     {
         usort($this->instances, function ($a, $b) {
             /** @var $a ElasticSearchType */
@@ -69,7 +82,7 @@ class ElasticSearchTypeCollection implements \Countable
      * Returns the string that represents the contained Type in the GUI
      * @return string|NULL NULL if no items have been added
      */
-    public function getTypeDisplayName()
+    public function getTypeDisplayName() : ?string
     {
         if (empty($this->instances)) {
             return null;
@@ -82,7 +95,7 @@ class ElasticSearchTypeCollection implements \Countable
      * Returns the string that represents the contained Type in the REST API
      * @return string|NULL NULL if no items have been added
      */
-    public function getMachineName()
+    public function getMachineName() : ?string
     {
         if (empty($this->instances)) {
             return null;
@@ -91,7 +104,7 @@ class ElasticSearchTypeCollection implements \Countable
         return $this->instances[0]::getMachineName();
     }
 
-    public function count()
+    public function count() : int
     {
         return count($this->instances);
     }

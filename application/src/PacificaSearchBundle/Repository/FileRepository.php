@@ -62,7 +62,7 @@ class FileRepository extends Repository
     {
         $qb = $this->getQueryBuilder()->whereEq('transaction_id', $transactionId);
         $fileArrays = $this->searchService->getResults($qb);
-        $files = $this->resultsToTypeCollection($fileArrays);
+        $files = $this->searchResultsToTypeCollection($fileArrays);
         return $files;
     }
 }

@@ -30,20 +30,18 @@
 
     <section id="search_filter" class="search_results_block" style="display:none">
         {% for machine_name, type_display_name in filter_types %}
-            <fieldset data-type="{{ machine_name }}" style="display:hidden">
+            <fieldset data-type="{{ machine_name }}" style="display:none">
                 <legend>{{ type_display_name }}</legend>
-                <div class="current_filter_options">
+                <div class="currently_selected_options">
                     <!-- This element's contents are generated in JavaScript -->
                 </div>
                 <div class="option_container">
                     <!-- This element's contents are generated in JavaScript -->
                 </div>
-                <div class="page_control_block">
-                    <div class="next_prev_control">
-                        <a href="javascript:void(0);" class="paging_button prev_page">prev</a>
-                        <span class="page_number">1</span>
-                        <a href="javascript:void(0);" class="paging_button next_page">next</a>
-                    </div>
+                <div class="load_more_records_container">
+                    Showing
+                    <span class="current_record_count"></span>/<span class="total_record_count"></span>
+                    total records. (<a href="javascript:void(0)" onclick="PacificaSearch.FilterManager.loadMoreRecords('{{ machine_name }}')" class="load_more_records_link" data-page="1">more</a>)
                 </div>
             </fieldset>
         {% endfor %}
@@ -56,15 +54,7 @@
                 Select some categories from the column to the left to load results
             </div>
             <div id="results_filetree"></div>
-            <div id="results_pager" class="page_control_block" style="display: none;">
-                <div class="next_prev_control">
-                    <a href="javascript:void(0);" class="paging_button prev_page">prev</a>
-                    <span class="page_number">1</span>
-                    <a href="javascript:void(0);" class="paging_button next_page">next</a>
-                </div>
-            </div>
         </fieldset>
-        <!-- This element's remaining contents are generated in JavaScript -->
     </section>
     <div id="file_template" style="display:none">
         <p>

@@ -45,7 +45,7 @@ class TransactionRepository implements TransactionRepositoryInterface
             ->byText($searchString)
             ->fetchOnlyMetaData();
 
-        $results = $this->searchService->getResults($qb);
+        ['hits' => $results] = $this->searchService->getResults($qb);
         $transactionIds = array_map(function ($result) {
             // The object IDs in the transaction object are formatted like transaction_<ID> but no other type uses
             // that format, so convert to standard integer IDs before returning
@@ -59,7 +59,7 @@ class TransactionRepository implements TransactionRepositoryInterface
      * @throws \Exception
      * @inheritdoc
      */
-    public function getIdsByFilter(Filter $filter) : array
+    public function getIdsByFilter(Filter $filter, bool $flatten = false) : array
     {
         $results = [];
 
@@ -74,6 +74,14 @@ class TransactionRepository implements TransactionRepositoryInterface
             if (count($idsByType) > 0) {
                 $results[$typeMachineName] = $repository->getTransactionIdsByOwnIds($idsByType);
             }
+        }
+
+        if ($flatten) {
+            $resultsFlattened = [];
+            foreach ($results as $result) {
+                $resultsFlattened = array_merge($result, $resultsFlattened);
+            }
+            $results = array_unique($resultsFlattened);
         }
 
         return $results;

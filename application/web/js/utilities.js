@@ -36,6 +36,22 @@
 
             return attrValue;
         },
+        /**
+         * Generate an error if the passed value is not an integer
+         * @param val Note any number of arguments can be passed, all will be validated
+         */
+        assertInteger : function (val) {
+            // Allow any number of arguments to be passed
+            if (arguments.length > 1) {
+                for (var i = 0; i < arguments.length; i++) {
+                    this.assertInteger(arguments[i]);
+                }
+            } else {
+                if (parseInt(val) != val) {
+                    throw new Error(val + ' is not an integer.');
+                }
+            }
+        },
 
         /**
          * Replace all instances of <find> with <replace> in <string>

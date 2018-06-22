@@ -36,32 +36,6 @@
         },
 
         /**
-         * Loads a single page of results into the sidebar for a single type
-         *
-         * @param {string} type
-         * @param {Number} pageNumber
-         */
-        loadFilterPage : function (type, pageNumber) {
-            var self = this;
-            var filterObj = this.getFilter().toObj();
-
-            PacificaSearch.Utilities.postJson(
-                '/filters/' +type + '/pages/' + pageNumber,
-                filterObj,
-                function (results) {
-                    DomManager.FacetedSearchFilter.getOptionContainerForType(type).html('');
-                    if (results.instances) {
-                        results.instances.forEach(function (instance) {
-                            self.addInstanceToType(instance, type);
-                        });
-                    }
-
-                    $$(DomManager.FacetedSearchFilter.getContainerForType(type).find('.page_number')).text(pageNumber);
-                }
-            );
-        },
-
-        /**
          * Adds a single option to the filter sidebar
          * @param {object} instance The object is in the same form as the results returned by the
          * filters/{type}/pages/{page} REST resource
@@ -73,21 +47,6 @@
             var label = $('<label>').attr('for', inputId).append(input).append(instance.name + " (" + instance.transaction_count + ")");
 
             DomManager.FacetedSearchFilter.getOptionContainerForType(type).append(label);
-        },
-
-        /**
-         * This method is meant to be called whenever the "change page" elements of the filter types are clicked
-         * @param {Element} element The DOM element that was clicked
-         * @param {Number} howManyPages How many pages to add or (for a negative number) subtract from the current page
-         */
-        handlePageChangeClick : function (element, howManyPages) {
-            element = $(element);
-            var type = DomManager.FacetedSearchFilter.getTypeByElement(element);
-            var pageNumberContainer = $$(element.closest('fieldset').find('.page_number'));
-            var curPage = parseInt(pageNumberContainer.text());
-            var newPage = curPage + howManyPages;
-
-            this.loadFilterPage(type, newPage);
         },
 
         /**
@@ -112,8 +71,6 @@
          *
          * @param {function} callback Invoked after the AJAX call returns. This is implemented as a callback rather than
          *   the standard of returning a Promise because debounced functions can't return anything.
-         *
-         *   TODO: If we really keep this function non-debounced, refactor it to return a Promise
          */
         updateAvailableFilterOptions : function(callback) {
             var filterObj = this.getFilter().toObj();
@@ -125,34 +82,95 @@
                     function (result) {
                         DomManager.FacetedSearchFilter.show();
                         DomManager.getTransactionCountContainer().html("Search matched <strong>" + result.transaction_count + "</strong> transactions. Select options below to further refine your results.");
-                        PacificaSearch.FilterManager.injectFilterResultIntoSidebar(result.filter_pages);
+                        PacificaSearch.FilterManager.injectFilterResultIntoFacetedSearchContainers(result.filter_pages);
 
                         if (undefined !== callback) {
                             callback();
                         }
                     }
                 )
-            )
+            );
         },
 
-        injectFilterResultIntoSidebar : function (result) {
+        injectFilterResultIntoFacetedSearchContainers : function (result) {
             var self = this;
             Object.getOwnPropertyNames(result).forEach(function (type) {
-                DomManager.FacetedSearchFilter.getOptionContainerForType(type).html('');
-
                 // For results that are empty or only have a single result (which makes filtering on that result
                 // meaningless) we don't inject the contents or make the filter section visible
                 var typeContainer = DomManager.FacetedSearchFilter.getContainerForType(type);
-                if (result[type].instances.length > 1) {
-                    result[type].instances.forEach(function (instance) {
+
+                // If only a single filter item or no items are available for selection, and the filter has no selected
+                // values, then there's no reason to show it.
+                var areOptionsSelected = DomManager.FacetedSearchFilter.getCurrentFilterContainerForType(type).find(':checked').length > 0;
+                if (result[type].total_hits <= 1 && !areOptionsSelected) {
+                    typeContainer.hide();
+                } else {
+                    typeContainer.show();
+
+                    // Remove all of the options currently being shown
+                    DomManager.FacetedSearchFilter.getOptionContainerForType(type).empty();
+
+                    var instances = result[type].instances;
+                    instances.forEach(function (instance) {
                         self.addInstanceToType(instance, type);
                     });
-                    typeContainer.show();
-                } else {
-                    typeContainer.hide();
+                    self.updateMoreRecordsContainer(type, instances.length, result[type].total_hits);
                 }
             });
-        }
+        },
 
+        /**
+         * Show or hide the "load more records" section that is rendered at the bottom of the search container for facet
+         * types that only partially loaded due to having more records than our page size. Also update the numbers shown
+         * in that section.
+         *
+         * @param {string} type
+         * @param {int} currentRecordCount
+         * @param {int} totalRecordCount
+         */
+        updateMoreRecordsContainer : function (type, currentRecordCount, totalRecordCount) {
+            Utilities.assertInteger(currentRecordCount, totalRecordCount);
+
+            DomManager.FacetedSearchFilter.MoreRecords.getCurrentRecordCountElement(type).text(currentRecordCount);
+            DomManager.FacetedSearchFilter.MoreRecords.getTotalRecordCountElement(type).text(totalRecordCount);
+
+            var moreRecordsContainer = DomManager.FacetedSearchFilter.MoreRecords.getContainer(type);
+            if (totalRecordCount > currentRecordCount) {
+                moreRecordsContainer.show();
+            } else {
+                moreRecordsContainer.hide();
+            }
+        },
+
+        /**
+         * Load another page of results
+         * @param {string} type
+         */
+        loadMoreRecords : function (type) {
+            var self = this;
+            var link = DomManager.FacetedSearchFilter.MoreRecords.getLink(type);
+            var currentPage = Utilities.assertAttributeExists(link, 'data-page');
+            var newPage = parseInt(currentPage) + 1;
+            var filterObj = this.getFilter().toObj();
+
+            PacificaSearch.Utilities.showLoadingAnimationUntilResolved(
+                PacificaSearch.Utilities.postJson(
+                    '/filters/' + type + '/pages/' + newPage,
+                    filterObj,
+                    function (result) {
+                        result.instances.forEach(function (instance) {
+                            self.addInstanceToType(instance, type);
+                        });
+                        self.updateMoreRecordsContainer(
+                            type,
+                            parseInt(DomManager.FacetedSearchFilter.MoreRecords.getCurrentRecordCountElement(type).text()) + result.instances.length,
+                            result.total_hits
+                        );
+
+                        link.attr('data-page', newPage);
+                    }
+                )
+            );
+        }
     };
 })(jQuery, PacificaSearch.Utilities.assertElementExists);

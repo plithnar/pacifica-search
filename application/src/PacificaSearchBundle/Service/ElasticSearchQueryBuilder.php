@@ -262,16 +262,18 @@ class ElasticSearchQueryBuilder
         }
 
         if ($this->ids) {
-            $array['body']['query']['terms'] = [
-                '_id' => $this->ids
-            ];
+            // TODO: Once IDs are integers again, we can remove this.
+            if ($this->type === self::TYPE_ANY) {
+                throw new \Exception("Because of the type strings currently prepended to IDs, it's not possible to support ID queries for queries of TYPE_ANY");
+            }
 
-            return $array;
+            $ids = array_map(function ($id) { return $this->type . '_' . $id; }, $this->ids);
+
+            $array['body']['query']['terms'] = [ '_id' => $ids ];
         }
 
         if ($this->idsToExclude) {
             $array['body']['query']['bool']['must_not'][]['ids']['values'] = $this->idsToExclude;
-            return $array;
         }
 
         foreach ($this->fields as $fieldName => $fieldValues) {

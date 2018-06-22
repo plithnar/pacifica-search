@@ -5,7 +5,7 @@
     var DomMgr = PacificaSearch.DomManager;
 
     $(function () {
-        $$('#search_filter')
+        $$('#search_filter  ')
             .on('change', 'input', function () {
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = DomMgr.FacetedSearchFilter.getTypeByElement(selectedOption);
@@ -31,12 +31,6 @@
                     $('#results_filetree').hide();
                     $('.results_instructions').show();
                 }
-            })
-            .on('click', '.prev_page', function () {
-                FilterManager.handlePageChangeClick(this, -1);
-            })
-            .on('click', '.next_page', function () {
-                FilterManager.handlePageChangeClick(this, 1);
             });
     });
 })(jQuery, PacificaSearch.Utilities.assertElementExists);

@@ -77,6 +77,14 @@
             },
 
             /**
+             * Gets the set of all DOM elements that are containers for the various type-specific filters
+             * @returns {jQuery}
+             */
+            getOptionContainersForAllTypes : function () {
+                return $$('fieldset[data-type]');
+            },
+
+            /**
              * Gets the DOM element containing the available filter options for a type
              * @param {string} type
              * @returns {jQuery}
@@ -91,7 +99,8 @@
              * @returns {jQuery}
              */
             getCurrentFilterContainerForType : function (type) {
-                return $$(this.getContainerForType(type).find('.current_filter_options'));
+                var container = this.getContainerForType(type);
+                return $$(container.find('.currently_selected_options'));
             },
 
             /**
@@ -116,6 +125,47 @@
 
             _getContainer : function () {
                 return $$('#search_filter');
+            },
+
+            /**
+             * Methods for the "load more records" subsection of the faceted search filter
+             */
+            MoreRecords : {
+                /**
+                 * Gets the DOM element that contains the "load more..." link for a faceted search type
+                 * @param {string} type
+                 * @returns {jQuery}
+                 */
+                getContainer : function (type) {
+                    return $$(PacificaSearch.DomManager.FacetedSearchFilter.getContainerForType(type).find('.load_more_records_container'));
+                },
+
+                /**
+                 * Gets the span containing the number of records currently loaded
+                 * @param {string} type
+                 * @returns {jQuery}
+                 */
+                getCurrentRecordCountElement : function (type) {
+                    return $$(this.getContainer(type).find('.current_record_count'));
+                },
+
+                /**
+                 * Gets the span containing the total number of records available
+                 * @param {string} type
+                 * @returns {jQuery}
+                 */
+                getTotalRecordCountElement : function (type) {
+                    return $$(this.getContainer(type).find('.total_record_count'));
+                },
+
+                /**
+                 * Gets the <a> element that loads another page of records when clicked
+                 * @param {string} type
+                 * @returns {jQuery}
+                 */
+                getLink : function (type) {
+                    return $$(this.getContainer(type).find('.load_more_records_link'));
+                }
             }
         }
     };

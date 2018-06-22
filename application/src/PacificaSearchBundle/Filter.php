@@ -116,7 +116,7 @@ class Filter
      * Inverse of fromArray(), returned array format is documented there.
      * @return array
      */
-    public function toArray()
+    public function toArray() : array
     {
         $machineNamesToGetters = self::machineNamesToMethods('get');
 
@@ -130,7 +130,7 @@ class Filter
     /**
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty() : bool
     {
         foreach ($this->toArray() as $vals) {
             if (!empty($vals)) {
@@ -225,7 +225,7 @@ class Filter
      * @param int[] $userIds
      * @return Filter
      */
-    public function setUserIds(array $userIds): Filter
+    public function setUserIds(array $userIds) : Filter
     {
         $this->userIds = $userIds;
         return $this;
@@ -243,7 +243,7 @@ class Filter
      * @param int[] $proposalIds
      * @return Filter
      */
-    public function setProposalIds(array $proposalIds): Filter
+    public function setProposalIds(array $proposalIds) : Filter
     {
         $this->proposalIds = $proposalIds;
         return $this;
@@ -252,10 +252,10 @@ class Filter
     /**
      * Use this method like $filter->setIdsByType(Instrument::class, [1, 2, 3])
      * @param string $class
-     * @param int[] $value
+     * @param int[] $ids
      * @return $this
      */
-    public function setIdsByType($class, $value)
+    public function setIdsByType(string $class, array $ids) : Filter
     {
         if (!is_subclass_of($class, ElasticSearchType::class)) {
             throw new \InvalidArgumentException("$class is not a subclass of ElasticSearchType, setByClass() cannot be called on other classes");
@@ -263,7 +263,7 @@ class Filter
 
         $machineNamesToSetters = self::machineNamesToMethods('set');
         $setter = $machineNamesToSetters[$class::getMachineName()];
-        $this->$setter($value);
+        $this->$setter($ids);
         return $this;
     }
 
@@ -272,7 +272,7 @@ class Filter
      * @param string $class
      * @return int[]
      */
-    public function getIdsByType($class)
+    public function getIdsByType(string $class) : array
     {
         if (!is_subclass_of($class, ElasticSearchType::class)) {
             throw new \InvalidArgumentException("$class is not a subclass of ElasticSearchType, getByClass() cannot be called on other classes");
@@ -288,7 +288,7 @@ class Filter
      * @param $prefix
      * @return array
      */
-    private static function machineNamesToMethods($prefix)
+    private static function machineNamesToMethods(string $prefix) : array
     {
         if (!in_array($prefix, [ 'set', 'get' ])) {
             throw new \InvalidArgumentException("Unexpected prefix '$prefix'");

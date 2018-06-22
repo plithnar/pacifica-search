@@ -19,6 +19,7 @@ interface TransactionRepositoryInterface
 
     /**
      * @param Filter $filter
+     * @param bool $flatten Pass TRUE to get a flattened array of IDs instead of by type
      * @return array in the form:
      * [
      *   'text' => [<int>, ...],
@@ -28,5 +29,5 @@ interface TransactionRepositoryInterface
      * Where each array of <int> is the set of all Transaction IDs that are related to items selected in that facet.
      * If a facet has no items selected (i.e. no filtering), then that key is not present
      */
-    public function getIdsByFilter(Filter $filter) : array;
+    public function getIdsByFilter(Filter $filter, bool $flatten = false) : array;
 }

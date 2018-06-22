@@ -39,8 +39,6 @@ class RestController extends BaseRestController
             throw new \Exception("'$type' is not a valid type. Valid options are: " . implode(', ', array_keys($filterableRepositories)));
         }
 
-        $this->setPageByType($type, $pageNumber);
-
         $repository = $filterableRepositories[$type];
         $filter = Filter::fromRequest($request);
         $filteredPageContents = $repository->getFilteredPage($filter, $pageNumber);
@@ -49,7 +47,7 @@ class RestController extends BaseRestController
     }
 
     /**
-     * Retrieves a page for each filter type based on the current contents of the filter
+     * Retrieves a page for each searchable type based on the contents of the filter
      * @throws \Exception
      * @param Request $request
      * @return Response
@@ -61,51 +59,31 @@ class RestController extends BaseRestController
 
         $filterPages = [];
         foreach ($this->getFilterableRepositories() as $type => $repository) {
+            // Make a copy of the set of transactions but remove each type's own filter results - the contents of any
+            // given filter type are not constrained by what's already been chosen in that filter type, only by the
+            // selection of other filter types. For example, if you pick a user, you can still pick any other user, not
+            // only other users that share transactions with the original user.
             $transIds = $transactionIdsByFilterItem;
             unset($transIds[$type]);
-            $transIds = array_values($transIds);
-
             $filteredTransactionIds = array_of_arrays_intersect($transIds);
 
             $filterPages[$type] = $repository->getPageByTransactionIds(
                 $filteredTransactionIds,
-                $this->getPageNumberByType($type)
+                1,
+
+                 // Exclude results that are already selected in the filter - we don't want selected options to be offered to the user again
+                $filter->getIdsByType($repository->getModelClass())
             );
         }
 
+        // Get a set of all transactions that fit the filter so that we can provide the UI with a count of transactions
+        // that pass the current filter.
         $allTransactionIds = array_of_arrays_intersect($transactionIdsByFilterItem);
 
         return $this->handleView(View::create([
             'transaction_count' => count($allTransactionIds),
             'filter_pages' => $filterPages
         ]));
-    }
-
-    // TODO: All of this page number functionality needs to be removed, since it's session-dependent.
-    private function getPageNumberByType($type)
-    {
-        $pagesByType = $this->getPageNumbersByType();
-        return $pagesByType[$type];
-    }
-    private function getPageNumbersByType()
-    {
-        $pagesByType = $this->getSession()->get('pages_by_type');
-        if (null === $pagesByType) {
-            $pagesByType = [
-                Institution::getMachineName() => 1,
-                Instrument::getMachineName() => 1,
-                InstrumentType::getMachineName() => 1,
-                Proposal::getMachineName() => 1,
-                User::getMachineName() => 1
-            ];
-            $this->getSession()->set('pages_by_type', $pagesByType);
-        }
-        return $pagesByType;
-    }
-    private function setPageByType($type, $page)
-    {
-        $pagesByType = $this->getPageNumbersByType();
-        $pagesByType[$type] = $page;
     }
 
     /**

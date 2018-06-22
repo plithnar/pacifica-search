@@ -13,7 +13,12 @@ interface SearchServiceInterface
 
     /**
      * @param ElasticSearchQueryBuilder $queryBuilder
-     * @return array The results of the search
+     * @return array The results of the search in the form:
+     * [
+     *   'hits' => array of ES records, each itself represented by an array
+     *   'total_hits' => <int> The number of total records matching the search. May differ from the size of 'hits' if
+     *                   a requests 'size' property was less than the total number of search matches.
+     * ]
      */
     public function getResults(ElasticSearchQueryBuilder $queryBuilder);
 

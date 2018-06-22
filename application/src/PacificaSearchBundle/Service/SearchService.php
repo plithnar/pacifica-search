@@ -39,9 +39,7 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
-     * @throws \RuntimeException
-     * @param ElasticSearchQueryBuilder $queryBuilder
-     * @return array The results of the search
+     * @inheritdoc
      */
     public function getResults(ElasticSearchQueryBuilder $queryBuilder) : array
     {
@@ -53,16 +51,24 @@ class SearchService implements SearchServiceInterface
             throw new \RuntimeException("ES search request failed. Request was \n\n" . json_encode($request) . "\n\nException message:" . $e->getMessage());
         }
 
-        $results = $response['hits']['hits'];
+        $hits = $response['hits']['hits'];
+        $totalHits = $response['hits']['total'];
 
-        $returnFilter = $queryBuilder->getReturnFilter();
-        foreach ($returnFilter as $fieldName => $valuesToKeep) {
-            foreach ($results as &$result) {
-                $result['_source'][$fieldName] = array_intersect($result['_source'][$fieldName], $valuesToKeep);
+        // If a "return filter" is set, only return the values requested.
+        // TODO: Obviously we should update our code so that we can filter on values in the request instead of in script
+        if ($totalHits > 0) {
+            $returnFilter = $queryBuilder->getReturnFilter();
+            foreach ($returnFilter as $fieldName => $valuesToKeep) {
+                foreach ($hits as &$result) {
+                    $result['_source'][$fieldName] = array_intersect($result['_source'][$fieldName], $valuesToKeep);
+                }
             }
         }
 
-        return $results;
+        return [
+            'hits' => $hits,
+            'total_hits' => $totalHits
+        ];
     }
 
     /**
