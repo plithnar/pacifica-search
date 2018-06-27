@@ -9,19 +9,18 @@ class InstrumentRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function getOwnIdsFromTransactionResults(array $transactionResults)
+    public function getOwnIdsFromTransactionResults(array $transactionResults) : array
     {
         $ids = array_map(function ($result) {
-            return $result['_source']['instrument'];
+            return $result['_source']['instruments'];
         }, $transactionResults);
-        // TODO: Figure out how to make the original request unique instead of doing this here
         return array_values(array_unique($ids));
     }
 
     /**
      * @inheritdoc
      */
-    protected function getType()
+    protected function getType() : string
     {
         return ElasticSearchQueryBuilder::TYPE_INSTRUMENT;
     }
@@ -31,20 +30,11 @@ class InstrumentRepository extends Repository
      * @param int[] $instrumentTypeIds
      * @return int[]
      */
-    public function getIdsByType(array $instrumentTypeIds)
+    public function getIdsByType(array $instrumentTypeIds) : array
     {
         $qb = $this->getQueryBuilder()->whereIn('groups.group_id', $instrumentTypeIds);
         $results = $this->searchService->getIds($qb);
 
         return $results;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected static function getNameFromSearchResult(array $result)
-    {
-        // We use the short name for instruments because the standard name field is much too long for the GUI
-        return $result['_source']['name_short'];
     }
 }

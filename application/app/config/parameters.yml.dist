@@ -19,7 +19,7 @@ parameters:
     secret: ThisTokenIsNotSoSecretChangeIt
 
     # Values below are for the Pacifica Search project
-    elasticsearch_host: 'IP_ADDRESS:9200' # Set to "devserver" for a development environment
+    elasticsearch_host: 'IP_ADDRESS:9200'
     elasticsearch_index: 'pacifica'
 
     # In a local development environment, you can replace the lines above with these settings to connect to the

@@ -9,73 +9,52 @@
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('js/lib/underscore/underscore-min.js') }}"></script>
     <script src="{{ asset('js/namespace.js') }}"></script>
     <script src="{{ asset('js/utilities.js') }}"></script>
     <script src="{{ asset('js/dom_manager.js') }}"></script>
     <script src="{{ asset('js/file_tree_manager.js') }}"></script>
     <script src="{{ asset('js/filter.js') }}"></script>
     <script src="{{ asset('js/filter_manager.js') }}"></script>
-    <script src="{{ asset('js/text_search.js') }}"></script>
     <script src="{{ asset('js/pacifica_search.js') }}"></script>
-    <script>
-        $(function () {
-            if (console && console.log) {
-                console.log('Pacifica Search version {{ version_information }}');
-            }
-        });
-    </script>
 {% endblock %}
 {% block body %}
-    <section id="search_filter" class="search_results_block">
-        {% for collection in filters %}
-            <fieldset data-type="{{ collection.machineName }}">
-                <legend>{{ collection.typeDisplayName }}</legend>
-                <div class="current_filter_options">
+    <section id="text_search_section">
+        <fieldset class="text_search_box">
+            <form onsubmit="PacificaSearch.FilterManager.updateAvailableFilterOptions(); return false;" class="buttons">
+                <input title="Text Search" id="text_search"/>
+                <button id="text_search_btn">Search</button>
+            </form>
+        </fieldset>
+        <span id="transaction_count"><!-- This element's contents are generated in JavaScript --></span>
+    </section>
+
+    <section id="search_filter" class="search_results_block" style="display:none">
+        {% for machine_name, type_display_name in filter_types %}
+            <fieldset data-type="{{ machine_name }}" style="display:none">
+                <legend>{{ type_display_name }}</legend>
+                <div class="currently_selected_options">
                     <!-- This element's contents are generated in JavaScript -->
                 </div>
                 <div class="option_container">
-                    {% for instance in collection.instances %}
-                        {% set input_id = collection.machineName ~ "_" ~ instance.id %}
-                        <label for="{{ input_id }}" title="{{ instance.displayName }}">
-                            <input type="checkbox" id="{{ input_id }}" data-id="{{ instance.id }}">
-                            {{ instance.displayName }}
-                        </label>
-                    {% endfor %}
+                    <!-- This element's contents are generated in JavaScript -->
                 </div>
-                <div class="page_control_block">
-                    <div class="next_prev_control">
-                        <a href="javascript:void(0);" class="paging_button prev_page">prev</a>
-                    <span class="page_number">1</span>
-                        <a href="javascript:void(0);" class="paging_button next_page">next</a>
-                    </div>
+                <div class="load_more_records_container">
+                    Showing
+                    <span class="current_record_count"></span>/<span class="total_record_count"></span>
+                    total records. (<a href="javascript:void(0)" onclick="PacificaSearch.FilterManager.loadMoreRecords('{{ machine_name }}')" class="load_more_records_link" data-page="1">more</a>)
                 </div>
             </fieldset>
         {% endfor %}
     </section>
 
-    <section id="files" class="search_results_block file_results themed" style="float:left;">
-        <fieldset class="text_search_box">
-            <form onsubmit="PacificaSearch.TextSearch.performTextSearch(); return false;" class="buttons" style="margin-bottom:-10px;">
-                <input id="text-search" style="width:90%;font-size:1.1em;font-weight:bold"/>
-                <button style="margin-top:3px;">Search</button>
-            </form>
-        </fieldset>
+    <section id="files" class="search_results_block file_results themed" style="display:none">
         <fieldset>
             <legend>Files</legend>
             <div class="results_instructions">
                 Select some categories from the column to the left to load results
             </div>
             <div id="results_filetree"></div>
-            <div id="results_pager" class="page_control_block" style="display: none;">
-                <div class="next_prev_control">
-                    <a href="javascript:void(0);" class="paging_button prev_page">prev</a>
-                    <span class="page_number">1</span>
-                    <a href="javascript:void(0);" class="paging_button next_page">next</a>
-                </div>
-            </div>
         </fieldset>
-        <!-- This element's remaining contents are generated in JavaScript -->
     </section>
     <div id="file_template" style="display:none">
         <p>

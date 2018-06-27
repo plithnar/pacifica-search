@@ -14,20 +14,30 @@ abstract class ConventionalElasticSearchType extends ElasticSearchType
     protected $name;
 
     /**
-     * InstrumentType constructor.
-     * @param int $id
-     * @param string $name
+     * The number of transactions associated with this object
+     *
+     * @var int
      */
-    public function __construct($id, $name)
+    protected $transactionCount;
+
+    /**
+     * InstrumentType constructor.
+     *
+     * @param string $id
+     * @param string $name
+     * @param int $transactionCount
+     */
+    public function __construct(string $id, string $name, int $transactionCount)
     {
         $this->name = $name;
+        $this->transactionCount = $transactionCount;
         parent::__construct($id);
     }
 
     /**
      * @inheritdoc
      */
-    public function getDisplayName()
+    public function getDisplayName() : string
     {
         return $this->name;
     }
@@ -35,7 +45,7 @@ abstract class ConventionalElasticSearchType extends ElasticSearchType
     /**
      * @inheritdoc
      */
-    public static function getTypeDisplayName()
+    public static function getTypeDisplayName() : string
     {
         // The display name, by convention, is "Class Name" for class ClassName
         return preg_replace('/(?<!^)[A-Z]/', ' $0', static::getClassNameWithoutNamespace());
@@ -44,7 +54,7 @@ abstract class ConventionalElasticSearchType extends ElasticSearchType
     /**
      * @inheritdoc
      */
-    public static function getMachineName()
+    public static function getMachineName() : string
     {
         // The machine name, by convention, is "class_name" for class "ClassName"
         $withUnderscores = preg_replace('/(?<!^)[A-Z]/', '_$0', static::getClassNameWithoutNamespace());
@@ -54,7 +64,7 @@ abstract class ConventionalElasticSearchType extends ElasticSearchType
     /**
      * @return string
      */
-    private static function getClassNameWithoutNamespace()
+    private static function getClassNameWithoutNamespace() : string
     {
         if ($pos = strrpos(static::class, '\\')) {
             return substr(static::class, $pos + 1);

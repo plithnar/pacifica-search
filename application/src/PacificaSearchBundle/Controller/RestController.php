@@ -2,9 +2,6 @@
 
 namespace PacificaSearchBundle\Controller;
 
-// Annotations - IDE marks "unused" but they are not
-use FOS\RestBundle\Controller\Annotations\Get;
-
 use FOS\RestBundle\View\View;
 use PacificaSearchBundle\Filter;
 use PacificaSearchBundle\Model\Institution;
@@ -22,30 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class RestController extends BaseRestController
 {
-    /**
-     * Retrieves a page for each filter type based a text search
-     *
-     * @throws \Exception
-     * @param Request $request
-     * @return Response
-     */
-    public function getText_searchAction(Request $request)
-    {
-        $searchQuery = $request->query->get('search_query');
-        if (null === $searchQuery) {
-            throw new \Exception("Missing mandatory query parameter 'search_query'");
-        }
-
-        $filterPages = [];
-        foreach ($this->getFilterableRepositories() as $type => $repository) {
-            $filterPages[$type] = $repository->getPageByTextSearch(
-                $searchQuery,
-                $this->getPageByType($type)
-            );
-        }
-        return $this->handleView(View::create($filterPages));
-    }
-
     /**
      * Retrieves a page of allowable filter items based on which items are already selected in the other filter types
      *
@@ -66,8 +39,6 @@ class RestController extends BaseRestController
             throw new \Exception("'$type' is not a valid type. Valid options are: " . implode(', ', array_keys($filterableRepositories)));
         }
 
-        $this->setPageByType($type, $pageNumber);
-
         $repository = $filterableRepositories[$type];
         $filter = Filter::fromRequest($request);
         $filteredPageContents = $repository->getFilteredPage($filter, $pageNumber);
@@ -76,48 +47,43 @@ class RestController extends BaseRestController
     }
 
     /**
-     * Retrieves a page for each filter type based on the current contents of the filter
+     * Retrieves a page for each searchable type based on the contents of the filter
+     * @throws \Exception
      * @param Request $request
      * @return Response
      */
     public function postFilterPagesAction(Request $request) : Response
     {
         $filter = Filter::fromRequest($request);
+        $transactionIdsByFilterItem = $this->transactionRepository->getIdsByFilter($filter);
 
         $filterPages = [];
         foreach ($this->getFilterableRepositories() as $type => $repository) {
-            $filterPages[$type] = $repository->getFilteredPage(
-                $filter,
-                $this->getPageByType($type)
+            // Make a copy of the set of transactions but remove each type's own filter results - the contents of any
+            // given filter type are not constrained by what's already been chosen in that filter type, only by the
+            // selection of other filter types. For example, if you pick a user, you can still pick any other user, not
+            // only other users that share transactions with the original user.
+            $transIds = $transactionIdsByFilterItem;
+            unset($transIds[$type]);
+            $filteredTransactionIds = array_of_arrays_intersect($transIds);
+
+            $filterPages[$type] = $repository->getPageByTransactionIds(
+                $filteredTransactionIds,
+                1,
+
+                 // Exclude results that are already selected in the filter - we don't want selected options to be offered to the user again
+                $filter->getIdsByType($repository->getModelClass())
             );
         }
-        return $this->handleView(View::create($filterPages));
-    }
 
-    private function getPageByType($type)
-    {
-        $pagesByType = $this->getPagesByType();
-        return $pagesByType[$type];
-    }
-    private function getPagesByType()
-    {
-        $pagesByType = $this->getSession()->get('pages_by_type');
-        if (null === $pagesByType) {
-            $pagesByType = [
-                Institution::getMachineName() => 1,
-                Instrument::getMachineName() => 1,
-                InstrumentType::getMachineName() => 1,
-                Proposal::getMachineName() => 1,
-                User::getMachineName() => 1
-            ];
-            $this->getSession()->set('pages_by_type', $pagesByType);
-        }
-        return $pagesByType;
-    }
-    private function setPageByType($type, $page)
-    {
-        $pagesByType = $this->getPagesByType();
-        $pagesByType[$type] = $page;
+        // Get a set of all transactions that fit the filter so that we can provide the UI with a count of transactions
+        // that pass the current filter.
+        $allTransactionIds = array_of_arrays_intersect($transactionIdsByFilterItem);
+
+        return $this->handleView(View::create([
+            'transaction_count' => count($allTransactionIds),
+            'filter_pages' => $filterPages
+        ]));
     }
 
     /**

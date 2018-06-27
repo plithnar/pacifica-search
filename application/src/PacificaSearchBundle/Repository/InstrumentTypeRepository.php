@@ -24,7 +24,7 @@ class InstrumentTypeRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getOwnIdsFromTransactionResults(array $transactionResults)
+    protected function getOwnIdsFromTransactionResults(array $transactionResults) : array
     {
         $instrumentRepository = $this->repositoryManager->getInstrumentRepository();
         $instrumentIds = $instrumentRepository->getOwnIdsFromTransactionResults($transactionResults);
@@ -35,7 +35,7 @@ class InstrumentTypeRepository extends Repository
     /**
      * @inheritdoc
      */
-    protected function getType()
+    protected function getType() : string
     {
         // TYPE_GROUP is not intuitive, but InstrumentType isn't a type of its own in ElasticSearch. Rather, it is the
         // subset of Group entries that have a relationship with the Instruments type

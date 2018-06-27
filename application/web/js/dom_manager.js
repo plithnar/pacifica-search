@@ -16,7 +16,7 @@
          * @returns {jQuery}
          */
         getTextSearchInput : function () {
-            return $$('#text-search');
+            return $$('#text_search');
         },
 
         /**
@@ -27,10 +27,28 @@
             return $$('.loading_blocker');
         },
 
+        getTransactionCountContainer : function () {
+            return $$('#transaction_count');
+        },
+
         /**
          * Retrieval methods associated with the faceted search filter
          */
         FacetedSearchFilter : {
+
+            /**
+             * Make the faceted search sidebar visible
+             */
+            show : function () {
+                this._getContainer().show();
+            },
+
+            /**
+             * Hide the faceted search sidebar
+             */
+            hide : function () {
+                this._getContainer().hide();
+            },
 
             /**
              * Retrieves the inputs used to toggle filter options on and off for a given filter type
@@ -52,10 +70,18 @@
              */
             getAllTypes : function() {
                 var types = [];
-                $$('fieldset[data-type]').each(function () {
+                $('fieldset[data-type]:visible').each(function () {
                     types.push($(this).attr('data-type'));
                 });
                 return types;
+            },
+
+            /**
+             * Gets the set of all DOM elements that are containers for the various type-specific filters
+             * @returns {jQuery}
+             */
+            getOptionContainersForAllTypes : function () {
+                return $$('fieldset[data-type]');
             },
 
             /**
@@ -73,7 +99,8 @@
              * @returns {jQuery}
              */
             getCurrentFilterContainerForType : function (type) {
-                return $$(this.getContainerForType(type).find('.current_filter_options'));
+                var container = this.getContainerForType(type);
+                return $$(container.find('.currently_selected_options'));
             },
 
             /**
@@ -94,6 +121,51 @@
             getTypeByElement : function (element) {
                 var fieldset = $$($(element).closest('fieldset'));
                 return PacificaSearch.Utilities.assertAttributeExists(fieldset, 'data-type');
+            },
+
+            _getContainer : function () {
+                return $$('#search_filter');
+            },
+
+            /**
+             * Methods for the "load more records" subsection of the faceted search filter
+             */
+            MoreRecords : {
+                /**
+                 * Gets the DOM element that contains the "load more..." link for a faceted search type
+                 * @param {string} type
+                 * @returns {jQuery}
+                 */
+                getContainer : function (type) {
+                    return $$(PacificaSearch.DomManager.FacetedSearchFilter.getContainerForType(type).find('.load_more_records_container'));
+                },
+
+                /**
+                 * Gets the span containing the number of records currently loaded
+                 * @param {string} type
+                 * @returns {jQuery}
+                 */
+                getCurrentRecordCountElement : function (type) {
+                    return $$(this.getContainer(type).find('.current_record_count'));
+                },
+
+                /**
+                 * Gets the span containing the total number of records available
+                 * @param {string} type
+                 * @returns {jQuery}
+                 */
+                getTotalRecordCountElement : function (type) {
+                    return $$(this.getContainer(type).find('.total_record_count'));
+                },
+
+                /**
+                 * Gets the <a> element that loads another page of records when clicked
+                 * @param {string} type
+                 * @returns {jQuery}
+                 */
+                getLink : function (type) {
+                    return $$(this.getContainer(type).find('.load_more_records_link'));
+                }
             }
         }
     };

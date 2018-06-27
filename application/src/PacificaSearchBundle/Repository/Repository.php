@@ -15,7 +15,7 @@ use PacificaSearchBundle\Service\SearchServiceInterface;
  */
 abstract class Repository
 {
-    const DEFAULT_PAGE_SIZE = 10;
+    const DEFAULT_PAGE_SIZE = 3;
 
     /** @var SearchServiceInterface */
     protected $searchService;
@@ -36,6 +36,7 @@ abstract class Repository
      * itself. The concrete reason for that difference is that we use this method to get That is because it is possible
      * for a user to select Proposals in the Filter in order to reduce the set of Proposals shown in the file tree.
      *
+     * @throws \Exception
      * @param Filter $filter
      * @return array
      */
@@ -49,8 +50,10 @@ abstract class Repository
      * Gets the name of the model class of the type that this repository is responsible for. Will attempt to find the
      * class by the convention that repository classes are named <ModelClass>Repository, override this method if that's
      * not the case.
+     *
+     * @throws \Exception
      */
-    public function getModelClass()
+    public function getModelClass() : string
     {
         // Remove the "Repository" suffix from the repo's class name
         $modelClassName = preg_replace('/Repository$/', '', static::class);
@@ -69,32 +72,33 @@ abstract class Repository
     }
 
     /**
-     * @param int|int[] $ids
+     * @throws \Exception
+     * @param int[] $ids
      * @return ElasticSearchTypeCollection
      */
-    public function getById($ids)
+    public function getById(array $ids) : ElasticSearchTypeCollection
     {
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
-
         $response = $this->searchService->getResults($this->getQueryBuilder()->whereIn('id', $ids));
-        return $this->resultsToTypeCollection($response);
+        return $this->searchResultsToTypeCollection($response);
     }
 
     /**
      * Retrieves a page of model objects that fit the passed filter.
      *
+     * @throws \Exception
      * @param Filter $filter
      * @param int $pageNumber 1-based page number
      * @return ElasticSearchTypeCollection
      */
-    public function getFilteredPage(Filter $filter, $pageNumber)
+    public function getFilteredPage(Filter $filter, $pageNumber) : ElasticSearchTypeCollection
     {
         $qb = $this->getQueryBuilder();
         $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
 
         $filteredIds = $this->getIdsThatMayBeAddedToFilter($filter);
+
+        // We exclude any IDs from the result that are already in the filter, because otherwise the returned
+        // page would include items the user has already selected and added to the filter.
         $idsToExclude = $filter->getIdsByType($this->getModelClass());
 
         // We can only call byId() or excludeIds() - the two are mutually incompatible calls (TODO: maybe fix that)
@@ -113,12 +117,34 @@ abstract class Repository
         }
 
         $response = $this->searchService->getResults($qb);
-        return $this->resultsToTypeCollection($response);
+        return $this->searchResultsToTypeCollection($response);
+    }
+
+    /**
+     * Retrieves a page of model objects that are related to the passed set of transactions.
+     *
+     * @throws \Exception
+     * @param array $transactionIds
+     * @param int $pageNumber
+     * @param array $ownIdsToExclude And IDs of the repository's own type that should be excluded from the result. This
+     *        allows us for example to exclude currently selected items from the result set.
+     * @return ElasticSearchTypeCollection
+     */
+    public function getPageByTransactionIds(array $transactionIds, int $pageNumber, array $ownIdsToExclude) : ElasticSearchTypeCollection
+    {
+        $qb = $this->getQueryBuilder();
+        $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
+        $qb->whereIn('transaction_ids', $transactionIds);
+        $qb->filterReturned('transaction_ids', $transactionIds);
+        $qb->excludeIds($ownIdsToExclude);
+
+        return $this->searchResultsToTypeCollection($this->searchService->getResults($qb));
     }
 
     /**
      * Retrieves a page of model objects that fit the passed query string
      *
+     * @throws \Exception
      * @param string $searchQuery
      * @param int $pageNumber 1-based page number
      * @return ElasticSearchTypeCollection
@@ -130,7 +156,7 @@ abstract class Repository
             ->byText($searchQuery);
 
         $response = $this->searchService->getResults($qb);
-        return $this->resultsToTypeCollection($response);
+        return $this->searchResultsToTypeCollection($response);
     }
 
     /**
@@ -139,11 +165,11 @@ abstract class Repository
      * Institution is selected, that should not prohibit the addition of further Institutions to the Filter - only
      * adding Filter items of other types should impact the options of a given type.
      *
+     * @throws \Exception
      * @param Filter $filter
-     * @return array|NULL NULL indicates that no filtering was performed because the filter was empty (possibly after
-     *   removing all of the Repository's own model class's items)
+     * @return array
      */
-    protected function getIdsThatMayBeAddedToFilter(Filter $filter)
+    protected function getIdsThatMayBeAddedToFilter(Filter $filter) : array
     {
         // Clone the filter before making any changes so that the caller's filter doesn't get changed
         $filter = clone $filter;
@@ -153,13 +179,7 @@ abstract class Repository
             $filter->setIdsByType($this->getModelClass(), []);
         }
 
-        // We don't do any filtering if the filter contains no values
-        if ($filter->isEmpty()) {
-            $ownIds = $this->repositoryManager->getTransactionRepository()->getIdsOfTypeAssociatedWithAtLeastOneTransaction($this->getModelClass());
-            return $ownIds;
-        }
-
-        $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
+        $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter, true);
         $ownIds = $this->getIdsByTransactionIds($transactionIds);
 
         return $ownIds;
@@ -171,7 +191,7 @@ abstract class Repository
      *
      * @return bool
      */
-    protected function isFilterRepository()
+    protected function isFilterRepository() : bool
     {
         return true;
     }
@@ -179,39 +199,44 @@ abstract class Repository
     /**
      * Gets IDs of this type that are associated with a set of transaction IDs
      *
-     * TODO: Figure out how to make the query here unique by the required field so that we don't have to process a
-     * large number of redundant results.
-     *
      * @throws \Exception
-     * @param array $transactionIds
+     * @param int[] $transactionIds
      * @return int[]
      */
     protected function getIdsByTransactionIds(array $transactionIds)
     {
-        // TODO: Don't do this any more! We are limiting the number of transaction IDs that we request to 1000 because
-        // the server limits out at 1024 clauses (we leave 24 in case other clauses are in the query)
-        $maxTransactionCount = 1000;
-        if (count($transactionIds) > $maxTransactionCount) {
-            $transactionIds = array_slice($transactionIds, 0, $maxTransactionCount);
+        $qb = $this->getQueryBuilder()
+            ->fetchOnlyMetaData()
+            ->whereIn('transaction_ids', $transactionIds);
+        $results = $this->searchService->getResults($qb)['hits'];
+        return array_map(function ($r) {
+            // TODO: remove this split when IDs are changed to integers
+            return (int) explode('_', $r['_id'])[1];
+        }, $results);
+    }
+
+    /**
+     * Given a set of IDs of the repository's own type, retrieves the IDs of all transactions associated with all of
+     * the records with those IDs.
+     *
+     * @param int[] $ownIds
+     * @return int[]
+     */
+    public function getTransactionIdsByOwnIds(array $ownIds) : array
+    {
+        // TODO: We should be able to craft a query such that it returns the unique set of transaction IDs instead of doing that work in PHP
+        $qb = $this->getQueryBuilder()->whereIn('id', $ownIds);
+        $results = $this->searchService->getResults($qb);
+
+        $transactionIds = [];
+        foreach ($results['hits'] as $result) {
+            // This array_replace() allows us to guarantee uniqueness using the val => val trick without having to call
+            // array_unique on a growing array for each loop
+            $newTransactionIds = $result['_source']['transaction_ids'];
+            $transactionIds = array_replace($transactionIds, array_combine($newTransactionIds, $newTransactionIds));
         }
 
-        $transactionQb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION)->byId($transactionIds);
-        $transactionResults = $this->searchService->getResults($transactionQb);
-
-        if (empty($transactionResults)) {
-            // This should be impossible, since we presumably are always passing transaction IDs that we already received via another query
-            throw new \Exception('No transactions were found with the following IDs: ' . implode(', ', $transactionIds));
-        }
-
-        $ownIds = $this->getOwnIdsFromTransactionResults($transactionResults);
-
-        if (empty($ownIds)) {
-            // This shouldn't happen because no records should exist in the database without a relationship to at least one transaction
-//            throw new \Exception('No records from the ' . static::class . ' repository could be found for the following transactions: ' . implode(', ', $transactionIds));
-        }
-
-        $ownIds = array_values(array_unique($ownIds)); // array_unique is only necessary because the query builder doesn't support unique queries yet. array_values() is to give the resulting array nice indices
-        return $ownIds;
+        return array_values($transactionIds); // array_values() so that
     }
 
     /**
@@ -219,18 +244,29 @@ abstract class Repository
      * @return int[] Array containing all IDs of this Repository's type that correspond to the returned transaction
      * records
      */
-    abstract protected function getOwnIdsFromTransactionResults(array $transactionResults);
+    abstract protected function getOwnIdsFromTransactionResults(array $transactionResults) : array;
 
-    protected function resultsToTypeCollection(array $results)
+    /**
+     * @throws \Exception
+     * @param array $searchResult in the form returned by SearchServiceInterface::getResults()
+     * @return ElasticSearchTypeCollection
+     */
+    protected function searchResultsToTypeCollection(array $searchResult) : ElasticSearchTypeCollection
     {
-        $instances = new ElasticSearchTypeCollection();
-        foreach ($results as $curHit) {
+        ['hits' => $hits, 'total_hits' => $totalHits] = $searchResult;
+
+        $collection = new ElasticSearchTypeCollection([], $totalHits);
+        foreach ($hits as $curHit) {
             $modelClass = $this->getModelClass();
-            $instance = new $modelClass($curHit['_id'], static::getNameFromSearchResult($curHit));
-            $instances->add($instance);
+            $instance = new $modelClass(
+                $curHit['_id'],
+                static::getNameFromSearchResult($curHit),
+                count($curHit['_source']['transaction_ids'])
+            );
+            $collection->add($instance);
         }
 
-        return $instances;
+        return $collection;
     }
 
     /**
@@ -240,16 +276,15 @@ abstract class Repository
      *
      * @return \PacificaSearchBundle\Service\ElasticSearchQueryBuilder
      */
-    protected function getQueryBuilder()
+    protected function getQueryBuilder() : ElasticSearchQueryBuilder
     {
         return $this->searchService->getQueryBuilder($this->getType());
     }
 
     /**
      * Gets the type (one of the ElasticSearchQueryBuilder::TYPE_* constants) that this repository is responsible for
-     * @return string
      */
-    abstract protected function getType();
+    abstract protected function getType() : string;
 
     /**
      * Given a single result (an entry from the "hits" field of an Elastic Search results object), returns a string
@@ -259,8 +294,8 @@ abstract class Repository
      * @param array $result
      * @return string
      */
-    protected static function getNameFromSearchResult(array $result)
+    protected static function getNameFromSearchResult(array $result) : string
     {
-        return $result['_source']['name'];
+        return $result['_source']['display_name'];
     }
 }
