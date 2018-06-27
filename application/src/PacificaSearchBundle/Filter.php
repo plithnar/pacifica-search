@@ -280,7 +280,12 @@ class Filter
 
         $machineNamesToSetters = self::machineNamesToMethods('get');
         $getter = $machineNamesToSetters[$class::getMachineName()];
-        return $this->$getter();
+
+        //TODO: Remove this once we have integer IDs again
+        $stringIds = $this->$getter();
+        $integerIds = array_map(function ($v) { return (int) explode('_', $v)[1]; }, $stringIds);
+
+        return $integerIds;
     }
 
     /**
