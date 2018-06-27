@@ -224,7 +224,6 @@ abstract class Repository
      */
     public function getTransactionIdsByOwnIds(array $ownIds) : array
     {
-        // TODO: We should be able to craft a query such that it returns the unique set of transaction IDs instead of doing that work in PHP
         $qb = $this->getQueryBuilder()->byId($ownIds);
 
         $results = $this->searchService->getAggregationResults(
