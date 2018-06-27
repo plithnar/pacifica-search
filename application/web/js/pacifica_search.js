@@ -5,7 +5,7 @@
     var DomMgr = PacificaSearch.DomManager;
 
     $(function () {
-        $$('#search_filter  ')
+        $$('#search_filter')
             .on('change', 'input', function () {
                 var selectedOption = $(this).closest('label');
                 var selectedOptionType = DomMgr.FacetedSearchFilter.getTypeByElement(selectedOption);
