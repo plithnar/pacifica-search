@@ -22,6 +22,8 @@ interface SearchServiceInterface
      */
     public function getResults(ElasticSearchQueryBuilder $queryBuilder);
 
+    public function getAggregationResults(ElasticSearchQueryBuilder $queryBuilder, array $aggregation);
+
     /**
      * Retrieve only the IDs of the fields matched by a query
      * @param ElasticSearchQueryBuilder $queryBuilder

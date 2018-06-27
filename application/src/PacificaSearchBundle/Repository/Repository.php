@@ -225,18 +225,25 @@ abstract class Repository
     public function getTransactionIdsByOwnIds(array $ownIds) : array
     {
         // TODO: We should be able to craft a query such that it returns the unique set of transaction IDs instead of doing that work in PHP
-        $qb = $this->getQueryBuilder()->whereIn('id', $ownIds);
-        $results = $this->searchService->getResults($qb);
+        $qb = $this->getQueryBuilder()->byId($ownIds);
 
-        $transactionIds = [];
-        foreach ($results['hits'] as $result) {
-            // This array_replace() allows us to guarantee uniqueness using the val => val trick without having to call
-            // array_unique on a growing array for each loop
-            $newTransactionIds = $result['_source']['transaction_ids'];
-            $transactionIds = array_replace($transactionIds, array_combine($newTransactionIds, $newTransactionIds));
-        }
+        $results = $this->searchService->getAggregationResults(
+            $qb,
+            [
+                'transaction_ids' => [
+                    'terms' => [
+                        'field' => 'transaction_ids',
+                        'size' => 1000000
+                    ]
+                ]
+            ]
+        );
 
-        return array_values($transactionIds); // array_values() so that
+        $transactionIds = array_map(function ($bucket) {
+            return (int) $bucket['key'];
+        }, $results['transaction_ids']['buckets']);
+
+        return $transactionIds;
     }
 
     /**

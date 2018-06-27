@@ -71,6 +71,23 @@ class SearchService implements SearchServiceInterface
         ];
     }
 
+    public function getAggregationResults(ElasticSearchQueryBuilder $queryBuilder, array $aggregation)
+    {
+        // Set the page size to 0 because we only care about aggregation results
+        $queryBuilder->paginate(1, 0);
+
+        $request = $queryBuilder->toArray();
+        $request['body']['aggs'] = $aggregation;
+
+        try {
+            $response = $this->getClient()->search($request);
+        } catch (\Exception $e) {
+            throw new \RuntimeException("ES search request failed. Request was \n\n" . json_encode($request) . "\n\nException message:" . $e->getMessage());
+        }
+
+        return $response['aggregations'];
+    }
+
     /**
      * @param ElasticSearchQueryBuilder $queryBuilder
      * @return int
