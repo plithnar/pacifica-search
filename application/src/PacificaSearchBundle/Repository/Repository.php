@@ -15,7 +15,7 @@ use PacificaSearchBundle\Service\SearchServiceInterface;
  */
 abstract class Repository
 {
-    const DEFAULT_PAGE_SIZE = 3;
+    const DEFAULT_PAGE_SIZE = 10;
 
     /** @var SearchServiceInterface */
     protected $searchService;
@@ -134,8 +134,12 @@ abstract class Repository
     {
         $qb = $this->getQueryBuilder();
         $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
-        $qb->whereIn('transaction_ids', $transactionIds);
-        $qb->filterReturned('transaction_ids', $transactionIds);
+
+        if (count($transactionIds)) {
+            $qb->whereIn('transaction_ids', $transactionIds);
+            $qb->filterReturned('transaction_ids', $transactionIds);
+        }
+
         $qb->excludeIds($ownIdsToExclude);
 
         return $this->searchResultsToTypeCollection($this->searchService->getResults($qb));
