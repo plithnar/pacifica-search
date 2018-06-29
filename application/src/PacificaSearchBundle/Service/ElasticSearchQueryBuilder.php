@@ -59,14 +59,14 @@ class ElasticSearchQueryBuilder
     /**
      * IDs on which to filter the results of this request
      *
-     * @var int[]
+     * @var string[]
      */
     private $ids;
 
     /**
      * IDs that will be excluded from the results of this request
      *
-     * @var int[]
+     * @var string[]
      */
     private $idsToExclude;
 
@@ -175,7 +175,7 @@ class ElasticSearchQueryBuilder
     }
 
     /**
-     * @param int|int[] $ids
+     * @param string|string[] $ids
      * @return ElasticSearchQueryBuilder
      */
     public function byId($ids) : ElasticSearchQueryBuilder
@@ -201,7 +201,7 @@ class ElasticSearchQueryBuilder
     }
 
     /**
-     * @param int|int[] $ids
+     * @param string|string[] $ids
      * @return ElasticSearchQueryBuilder
      */
     public function excludeIds($ids) : ElasticSearchQueryBuilder
@@ -262,25 +262,11 @@ class ElasticSearchQueryBuilder
         }
 
         if ($this->ids) {
-            // TODO: Once IDs are integers again, we can remove this.
-            if ($this->type === self::TYPE_ANY) {
-                throw new \Exception("Because of the type strings currently prepended to IDs, it's not possible to support ID queries for queries of TYPE_ANY");
-            }
-
-            $ids = array_map(function ($id) { return $this->type . '_' . $id; }, $this->ids);
-
-            $array['body']['query']['terms'] = [ '_id' => $ids ];
+            $array['body']['query']['terms'] = [ '_id' => $this->ids ];
         }
 
         if ($this->idsToExclude) {
-            // TODO: Once IDs are integers again, we can remove this.
-            if ($this->type === self::TYPE_ANY) {
-                throw new \Exception("Because of the type strings currently prepended to IDs, it's not possible to support ID queries for queries of TYPE_ANY");
-            }
-
-            $idsToExclude = array_map(function ($id) { return $this->type . '_' . $id; }, $this->idsToExclude);
-
-            $array['body']['query']['bool']['must_not'][]['ids']['values'] = $idsToExclude;
+            $array['body']['query']['bool']['must_not'][]['ids']['values'] = $this->idsToExclude;
         }
 
         foreach ($this->fields as $fieldName => $fieldValues) {

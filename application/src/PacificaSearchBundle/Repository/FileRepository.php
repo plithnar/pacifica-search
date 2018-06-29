@@ -15,7 +15,7 @@ class FileRepository extends Repository
     protected function getOwnIdsFromTransactionResults(array $transactionResults) : array
     {
         $transactionIds = array_map(function ($result) {
-            return (int) $result['_id'];
+            return $result['_id'];
         }, $transactionResults);
         $transactionIds = array_unique($transactionIds);
 

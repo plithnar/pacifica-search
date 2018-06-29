@@ -73,7 +73,7 @@ abstract class Repository
 
     /**
      * @throws \Exception
-     * @param int[] $ids
+     * @param string[] $ids
      * @return ElasticSearchTypeCollection
      */
     public function getById(array $ids) : ElasticSearchTypeCollection
@@ -124,9 +124,9 @@ abstract class Repository
      * Retrieves a page of model objects that are related to the passed set of transactions.
      *
      * @throws \Exception
-     * @param array $transactionIds
+     * @param string[] $transactionIds
      * @param int $pageNumber
-     * @param array $ownIdsToExclude And IDs of the repository's own type that should be excluded from the result. This
+     * @param string[] $ownIdsToExclude And IDs of the repository's own type that should be excluded from the result. This
      *        allows us for example to exclude currently selected items from the result set.
      * @return ElasticSearchTypeCollection
      */
@@ -204,8 +204,8 @@ abstract class Repository
      * Gets IDs of this type that are associated with a set of transaction IDs
      *
      * @throws \Exception
-     * @param int[] $transactionIds
-     * @return int[]
+     * @param string[] $transactionIds
+     * @return string[]
      */
     protected function getIdsByTransactionIds(array $transactionIds)
     {
@@ -214,8 +214,7 @@ abstract class Repository
             ->whereIn('transaction_ids', $transactionIds);
         $results = $this->searchService->getResults($qb)['hits'];
         return array_map(function ($r) {
-            // TODO: remove this split when IDs are changed to integers
-            return (int) explode('_', $r['_id'])[1];
+            return $r['_id'];
         }, $results);
     }
 
@@ -223,8 +222,8 @@ abstract class Repository
      * Given a set of IDs of the repository's own type, retrieves the IDs of all transactions associated with all of
      * the records with those IDs.
      *
-     * @param int[] $ownIds
-     * @return int[]
+     * @param string[] $ownIds
+     * @return string[]
      */
     public function getTransactionIdsByOwnIds(array $ownIds) : array
     {
@@ -243,7 +242,7 @@ abstract class Repository
         );
 
         $transactionIds = array_map(function ($bucket) {
-            return (int) $bucket['key'];
+            return $bucket['key'];
         }, $results['transaction_ids']['buckets']);
 
         return $transactionIds;
@@ -251,7 +250,7 @@ abstract class Repository
 
     /**
      * @param array $transactionResults An array returned by SearchService when given a query for TYPE_TRANSACTION
-     * @return int[] Array containing all IDs of this Repository's type that correspond to the returned transaction
+     * @return string[] Array containing all IDs of this Repository's type that correspond to the returned transaction
      * records
      */
     abstract protected function getOwnIdsFromTransactionResults(array $transactionResults) : array;

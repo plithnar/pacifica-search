@@ -27,7 +27,7 @@ interface SearchServiceInterface
     /**
      * Retrieve only the IDs of the fields matched by a query
      * @param ElasticSearchQueryBuilder $queryBuilder
-     * @return int[]
+     * @return string[]
      */
     public function getIds(ElasticSearchQueryBuilder $queryBuilder);
 }

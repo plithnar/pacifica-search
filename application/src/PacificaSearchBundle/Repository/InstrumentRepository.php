@@ -27,8 +27,8 @@ class InstrumentRepository extends Repository
 
     /**
      * Gets the IDs of all instruments belonging to a set of instrument types
-     * @param int[] $instrumentTypeIds
-     * @return int[]
+     * @param string[] $instrumentTypeIds
+     * @return string[]
      */
     public function getIdsByType(array $instrumentTypeIds) : array
     {

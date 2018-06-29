@@ -16,8 +16,8 @@ class UserRepository extends Repository
 
     /**
      * Gets the IDs of all users associated with a set of institutions
-     * @param int[] $institutionIds
-     * @return int[]
+     * @param string[] $institutionIds
+     * @return string[]
      */
     public function getIdsByInstitution(array $institutionIds) : array
     {

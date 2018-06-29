@@ -20,8 +20,8 @@ class InstitutionRepository extends Repository
 
     /**
      * Gets the IDs of a set of Institutions associated with a set of Users
-     * @param int[] $userIds
-     * @return int[]
+     * @param string[] $userIds
+     * @return string[]
      */
     protected function getIdsByUserIds(array $userIds)
     {
