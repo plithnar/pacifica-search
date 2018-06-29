@@ -37,7 +37,7 @@ class TransactionRepository implements TransactionRepositoryInterface
      * searchable type that matches the search.
      *
      * @param string $searchString
-     * @return int[]
+     * @return string[]
      */
     public function getIdsByTextSearch(string $searchString) : array
     {
@@ -46,11 +46,7 @@ class TransactionRepository implements TransactionRepositoryInterface
             ->fetchOnlyMetaData();
 
         ['hits' => $results] = $this->searchService->getResults($qb);
-        $transactionIds = array_map(function ($result) {
-            // The object IDs in the transaction object are formatted like transaction_<ID> but no other type uses
-            // that format, so convert to standard integer IDs before returning
-            return (int)explode('_', $result['_id'])[1];
-        }, $results);
+        $transactionIds = array_map(function ($result) { return $result['_id']; }, $results);
 
         return $transactionIds;
     }

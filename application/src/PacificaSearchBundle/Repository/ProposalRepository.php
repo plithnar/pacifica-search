@@ -13,7 +13,7 @@ class ProposalRepository extends Repository
     public function getOwnIdsFromTransactionResults(array $transactionResults) : array
     {
         $ids = array_map(function ($result) {
-            return (int) $result['_source']['proposal'];
+            return $result['_source']['proposal'];
         }, $transactionResults);
         $ids = array_unique($ids);
         return $ids;

@@ -8,8 +8,8 @@ class InstrumentTypeRepository extends Repository
 {
     /**
      * Gets the IDs of a set of InstrumentTypes associated with a set of Instruments
-     * @param int[] $instrumentIds
-     * @return int[]
+     * @param string[] $instrumentIds
+     * @return string[]
      */
     public function getIdsByInstrumentIds(array $instrumentIds)
     {

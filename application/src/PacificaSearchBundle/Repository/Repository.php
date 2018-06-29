@@ -15,7 +15,7 @@ use PacificaSearchBundle\Service\SearchServiceInterface;
  */
 abstract class Repository
 {
-    const DEFAULT_PAGE_SIZE = 3;
+    const DEFAULT_PAGE_SIZE = 10;
 
     /** @var SearchServiceInterface */
     protected $searchService;
@@ -73,7 +73,7 @@ abstract class Repository
 
     /**
      * @throws \Exception
-     * @param int[] $ids
+     * @param string[] $ids
      * @return ElasticSearchTypeCollection
      */
     public function getById(array $ids) : ElasticSearchTypeCollection
@@ -124,9 +124,9 @@ abstract class Repository
      * Retrieves a page of model objects that are related to the passed set of transactions.
      *
      * @throws \Exception
-     * @param array $transactionIds
+     * @param string[] $transactionIds
      * @param int $pageNumber
-     * @param array $ownIdsToExclude And IDs of the repository's own type that should be excluded from the result. This
+     * @param string[] $ownIdsToExclude And IDs of the repository's own type that should be excluded from the result. This
      *        allows us for example to exclude currently selected items from the result set.
      * @return ElasticSearchTypeCollection
      */
@@ -134,8 +134,12 @@ abstract class Repository
     {
         $qb = $this->getQueryBuilder();
         $qb->paginate($pageNumber, self::DEFAULT_PAGE_SIZE);
-        $qb->whereIn('transaction_ids', $transactionIds);
-        $qb->filterReturned('transaction_ids', $transactionIds);
+
+        if (count($transactionIds)) {
+            $qb->whereIn('transaction_ids', $transactionIds);
+            $qb->filterReturned('transaction_ids', $transactionIds);
+        }
+
         $qb->excludeIds($ownIdsToExclude);
 
         return $this->searchResultsToTypeCollection($this->searchService->getResults($qb));
@@ -200,8 +204,8 @@ abstract class Repository
      * Gets IDs of this type that are associated with a set of transaction IDs
      *
      * @throws \Exception
-     * @param int[] $transactionIds
-     * @return int[]
+     * @param string[] $transactionIds
+     * @return string[]
      */
     protected function getIdsByTransactionIds(array $transactionIds)
     {
@@ -210,8 +214,7 @@ abstract class Repository
             ->whereIn('transaction_ids', $transactionIds);
         $results = $this->searchService->getResults($qb)['hits'];
         return array_map(function ($r) {
-            // TODO: remove this split when IDs are changed to integers
-            return (int) explode('_', $r['_id'])[1];
+            return $r['_id'];
         }, $results);
     }
 
@@ -219,29 +222,35 @@ abstract class Repository
      * Given a set of IDs of the repository's own type, retrieves the IDs of all transactions associated with all of
      * the records with those IDs.
      *
-     * @param int[] $ownIds
-     * @return int[]
+     * @param string[] $ownIds
+     * @return string[]
      */
     public function getTransactionIdsByOwnIds(array $ownIds) : array
     {
-        // TODO: We should be able to craft a query such that it returns the unique set of transaction IDs instead of doing that work in PHP
-        $qb = $this->getQueryBuilder()->whereIn('id', $ownIds);
-        $results = $this->searchService->getResults($qb);
+        $qb = $this->getQueryBuilder()->byId($ownIds);
 
-        $transactionIds = [];
-        foreach ($results['hits'] as $result) {
-            // This array_replace() allows us to guarantee uniqueness using the val => val trick without having to call
-            // array_unique on a growing array for each loop
-            $newTransactionIds = $result['_source']['transaction_ids'];
-            $transactionIds = array_replace($transactionIds, array_combine($newTransactionIds, $newTransactionIds));
-        }
+        $results = $this->searchService->getAggregationResults(
+            $qb,
+            [
+                'transaction_ids' => [
+                    'terms' => [
+                        'field' => 'transaction_ids',
+                        'size' => 1000000
+                    ]
+                ]
+            ]
+        );
 
-        return array_values($transactionIds); // array_values() so that
+        $transactionIds = array_map(function ($bucket) {
+            return $bucket['key'];
+        }, $results['transaction_ids']['buckets']);
+
+        return $transactionIds;
     }
 
     /**
      * @param array $transactionResults An array returned by SearchService when given a query for TYPE_TRANSACTION
-     * @return int[] Array containing all IDs of this Repository's type that correspond to the returned transaction
+     * @return string[] Array containing all IDs of this Repository's type that correspond to the returned transaction
      * records
      */
     abstract protected function getOwnIdsFromTransactionResults(array $transactionResults) : array;
