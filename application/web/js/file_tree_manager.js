@@ -24,6 +24,13 @@
             }
             if(!$('#results_filetree').find('.ui-fancytree').length){
                 $('#results_filetree').fancytree({
+                    checkbox: function(event, data) {
+                        // Hide checkboxes for folders
+                        // return data.node.isFolder() ? false : true;
+
+                        // Hide all checkboxes for the moment
+                        return false;
+                    },
                     source: _getSourceObj(pageNumber),
                     lazyLoad: function(event, data){
                         var transactionId = data.node.key;

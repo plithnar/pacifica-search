@@ -19,10 +19,12 @@ parameters:
     secret: ThisTokenIsNotSoSecretChangeIt
 
     # Values below are for the Pacifica Search project
-    elasticsearch_host: 'IP_ADDRESS:9200'
-    elasticsearch_index: 'pacifica'
+    elasticsearch_host: '127.0.0.1:9201'
+    elasticsearch_index: 'pacifica_snapshot_search'
+    metadata_host: 'search_metadataserver:8121'
 
     # In a local development environment, you can replace the lines above with these settings to connect to the
     # snapshot server - this requires an SSH tunnel to be set up
     #    elasticsearch_host: '<Your IP address>:19200'
-    #    elasticsearch_index: pacifica_snapshot
+    #    elasticsearch_index: 'pacifica_snapshot_search'
+    #    metadata_host: '<metadata server ip address or container name>'

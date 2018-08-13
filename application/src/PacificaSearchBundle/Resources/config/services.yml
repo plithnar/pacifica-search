@@ -46,3 +46,4 @@ services:
             - "@PacificaSearchBundle\\Repository\\UserRepository"
             - "@PacificaSearchBundle\\Repository\\TransactionRepository"
             - "@PacificaSearchBundle\\Repository\\FileRepository"
+            - "%metadata_host%"

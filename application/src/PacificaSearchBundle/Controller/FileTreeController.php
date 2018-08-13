@@ -14,6 +14,8 @@ use PacificaSearchBundle\Repository\ProposalRepository;
 use PacificaSearchBundle\Repository\TransactionRepositoryInterface;
 use PacificaSearchBundle\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
+use DateTimeZone;
+use DateTime;
 
 /**
  * Class FileTreeController
@@ -28,6 +30,9 @@ class FileTreeController extends BaseRestController
     /** @var FileRepository */
     protected $fileRepository;
 
+    /** @string */
+    protected $metadataHost;
+
     public function __construct(
         InstitutionRepository $institutionRepository,
         InstrumentRepository $instrumentRepository,
@@ -35,7 +40,8 @@ class FileTreeController extends BaseRestController
         ProposalRepository $proposalRepository,
         UserRepository $userRepository,
         TransactionRepositoryInterface $transactionRepository,
-        FileRepository $fileRepository
+        FileRepository $fileRepository,
+        String $metadataHost
     ) {
         parent::__construct(
             $institutionRepository,
@@ -47,6 +53,7 @@ class FileTreeController extends BaseRestController
         );
 
         $this->fileRepository = $fileRepository;
+        $this->metadataHost = $metadataHost;
     }
 
     /**
@@ -93,7 +100,7 @@ class FileTreeController extends BaseRestController
      * @param Request $request
      * @return Response
      */
-    public function postPageAction($pageNumber, Request $request) : Response
+    public function postPageAction($pageNumber, Request $request) 
     {
         if ($pageNumber < 1 || intval($pageNumber) != $pageNumber) {
             return $this->handleView(View::create([]));
@@ -105,31 +112,18 @@ class FileTreeController extends BaseRestController
             return $this->handleView(View::create([]));
         }
 
-        // TODO: Obviously paginating the proposalIds at the query level would be better but there's not an obvious way
-        // to add pagination support to getFilteredIds(), so until we can we just use array_slice() here.
-        $proposalIds = $this->proposalRepository->getFilteredIds($filter);
-        $proposalIds = array_slice($proposalIds, ($pageNumber-1) * self::PAGE_SIZE, self::PAGE_SIZE);
-
-        // If there are no proposals on the requested page, return an empty set
-        if (empty($proposalIds)) {
+        $transactions = $this->transactionRepository->getAssocArrayByFilter($filter);
+        if (count($transactions) === 0) {
             return $this->handleView(View::create([]));
         }
-
         $response = [];
-        foreach ($proposalIds as $proposalId) {
-            $response[$proposalId] = [
-                'title' => "Proposal #$proposalId",
-                'key' => $proposalId,
-                'folder' => true,
-                'children' => []
-            ];
-        }
-
-        $transactions = $this->transactionRepository->getAssocArrayByFilter($filter);
         $instrumentIds = [];
         foreach ($transactions as $transaction) {
-            $instrumentId = $transaction['_source']['instrument'];
-            $instrumentIds[$instrumentId] = $instrumentId;
+            $instruments = $transaction['_source']['instruments'];
+            foreach($instruments as $instrument) {
+                $instrumentId = $instrument['obj_id'];
+                $instrumentIds[$instrumentId] = $instrumentId;
+            }
         }
 
         $instrumentCollection = $this->instrumentRepository->getById($instrumentIds);
@@ -140,13 +134,21 @@ class FileTreeController extends BaseRestController
         }
 
         foreach ($transactions as $transaction) {
-            $proposalId = $transaction['_source']['proposal'];
-            $instrumentId = $transaction['_source']['instrument'];
+            $proposalId = $transaction['_source']['proposals'][0]['obj_id'];
+            $instrumentId = $transaction['_source']['instruments'][0]['obj_id'];
             $transactionId = $transaction['_id'];
 
             // TODO: This outermost array_key_exists() check is necessary because we are artificially limiting the
             // transactions we handle to 1000 - see Respository::getIdsByTransactionIds(). We need to remove that
             // limitation, and once we have we can remove the check
+            if (!array_key_exists($proposalId, $response)) {
+                $response[$proposalId] = [
+                    'title' => "Proposal #$proposalId",
+                    'key' => $proposalId,
+                    'folder' => true,
+                    'children' => []
+                ];
+            }
             if (array_key_exists($proposalId, $response)) {
                 if (!array_key_exists($instrumentId, $response[$proposalId]['children'])) {
                     $instrumentName = $instrumentNames[$instrumentId];
@@ -157,18 +159,19 @@ class FileTreeController extends BaseRestController
                         'children' => []
                     ];
                 }
+                $transNumId = explode('_', $transactionId);
+                $transNumId = $transNumId[1];
+                $response[$proposalId]['children'][$instrumentId]['children'][] = [
+//                    'title' => "Files uploaded (<a href='http://status.local/view/$transactionId'>Transaction $transactionId</a>)",
+                    'title' => "Files uploaded (<a href='$this->metadataHost/transactioninfo/by_id/$transNumId'>Transaction $transNumId</a>)",
+                    'key' => $transNumId,
+                    'folder' => true,
+                    'lazy' => true
+                ];
             }
 
-            $dateCreated = new \DateTime($transaction['_source']['created']);
-            $dateFormatted = $dateCreated->format('Y-m-d');
-            $response[$proposalId]['children'][$instrumentId]['children'][] = [
-                'title' => "Files uploaded $dateFormatted (<a href='http://status.local/view/$transactionId'>Transaction $transactionId</a>)",
-                'key' => $transactionId,
-                'folder' => true,
-                'lazy' => true
-            ];
 
-            $instrumentIdsToTransactionIds[$transaction['_source']['instrument']][] = $transaction['_id'];
+            $instrumentIdsToTransactionIds[$transaction['_source']['instruments'][0]['obj_id']][] = $transaction['_id'];
         }
 
         // We use ID values above to make it easier to refer to specific records in code - for items that are meant to
@@ -200,7 +203,7 @@ class FileTreeController extends BaseRestController
      * @param int $transactionId
      * @return Response
      */
-    public function getTransactionFilesAction($transactionId) : Response
+    public function getTransactionFilesAction($transactionId)// : Response
     {
         if ($transactionId < 1 || intval($transactionId) != $transactionId) {
             return $this->handleView(View::create([]));
@@ -213,7 +216,14 @@ class FileTreeController extends BaseRestController
             $this->addToDirectoryStructure($directories, $filePathParts, $file->getId());
         }
 
-        $response = $this->convertDirectoryStructureToResponseArray($directories);
+        $ch = curl_init();
+        curl_setopt( $ch, CURLOPT_URL, "$this->metadataHost/transactioninfo/by_id/$transactionId" );
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+        $content = json_decode(curl_exec( $ch ), true);
+        curl_close ( $ch );
+
+        $treelist = $this->format_folder_to_tree($content['files']);
+        $response = $this->format_folder_object_json($treelist['treelist'], 'test');
         return $this->handleView(View::create($response));
     }
 
@@ -232,33 +242,170 @@ class FileTreeController extends BaseRestController
         }
     }
 
-    private function convertDirectoryStructureToResponseArray($nodes, $path = "")
+    private function format_folder_to_tree($results, $folder_name = "")
     {
-        $responseArray = [];
-        foreach ($nodes as $nodeName => $node) {
-            $nodeResult = [];
-            $isFolder = false;
-
-            if (is_array($node)) { // This node is a directory: recurse
-                $title = $nodeName;
-                $isFolder = true;
-                $children = $this->convertDirectoryStructureToResponseArray($node, ($path ? $path . '/' : '') . $nodeName);
-            } else { // This node is a file
-                list($fileName, $fileId) = explode('_*_ID_*_', $node);
-                $title = $fileName;
-            }
-
-            $nodeResult['fullpath'] = $path . '/' . $title;
-            $nodeResult['title'] = $title;
-            if ($isFolder) {
-                $nodeResult['folder'] = true;
-                $nodeResult['children'] = $children;
-            } else {
-                $nodeResult['key'] = $fileId;
-            }
-
-            $responseArray[] = $nodeResult;
+        $dirs = array();
+        $file_list = array();
+        foreach ($results as $item_id => $item_info) {
+            $subdir = trim($item_info['subdir'], '/');
+            $filename = $item_info['name'];
+            $path = !empty($subdir) ? "{$subdir}/{$filename}" : $filename;
+            $path_array = explode('/', $path);
+            $file_list[$path] = $item_id;
         }
-        return $responseArray;
+        ksort($file_list);
+        $temp_list = array_keys($file_list);
+        $first_path = array_shift($temp_list);
+        $temp_list = array_keys($file_list);
+        $last_path = array_pop($temp_list);
+        $common_path_prefix_array = $this->get_common_path_prefix($first_path, $last_path);
+        $common_path_prefix = implode('/', $common_path_prefix_array);
+        foreach ($file_list as $path => $item_id) {
+            $item_info = $results[$item_id];
+            $path = ltrim(preg_replace('/^' . preg_quote($common_path_prefix, '/') . '/', '', $path), '/');
+            $item_info['subdir'] = $path;
+            $path_array = explode('/', $path);
+            $this->build_folder_structure($dirs, $path_array, $item_info);
+        }
+        return array(
+            'treelist' => $dirs,
+            'files' => $results,
+            'common_path_prefix_array' => $common_path_prefix_array
+        );
+    }
+
+    /**
+     *  Construct an array of folders that can be translated to
+     *  a JSON object
+     *
+     *  @param array  $folder_obj  container for folders
+     *  @param string $folder_name display name for the folder object
+     *
+     *  @return array
+     *
+     *  @author Ken Auberry <kenneth.auberry@pnnl.gov>
+     */
+    private function format_folder_object_json($folder_obj, $folder_name)
+    {
+        $output = array();
+        if (array_key_exists('folders', $folder_obj)) {
+            foreach ($folder_obj['folders'] as $folder_entry => $folder_tree) {
+                $folder_output = array('title' => $folder_entry, 'folder' => true);
+                $children = $this->format_folder_object_json($folder_tree, $folder_entry);
+                if (!empty($children)) {
+                    foreach ($children as $child) {
+                        $folder_output['children'][] = $child;
+                    }
+                }
+                $output[] = $folder_output;
+            }
+        }
+        if (array_key_exists('files', $folder_obj)) {
+            foreach ($folder_obj['files'] as $item_id => $file_entry) {
+                $output[] = array('title' => $file_entry, 'key' => "ft_item_{$item_id}");
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * Get the common directory prefix for a set of paths so that we can remove it.
+     *
+     * @param  string $first_path first path to compare
+     * @param  string $last_path second path to compare
+     * @param  string $delimiter path delimiter (defaults to '/')
+     *
+     * @return array array of common path elements
+     *
+     * @author Ken Auberry <kenneth.auberry@pnnl.gov>
+     */
+    private function get_common_path_prefix($first_path, $last_path, $delimiter = '/')
+    {
+        $first_path_array = explode($delimiter, dirname($first_path));
+        $last_path_array = explode($delimiter, dirname($last_path));
+        $short_path_array = count($first_path_array) < count($last_path_array) ? $first_path_array : $last_path_array;
+        $longest_path_array = $short_path_array == $first_path_array ? $last_path_array : $first_path_array;
+        $common_path_array = array();
+        for ($i=0; $i<count($short_path_array); $i++) {
+            if ($short_path_array[$i] == $longest_path_array[$i]) {
+                $common_path_array[] = $short_path_array[$i];
+            } else {
+                break;
+            }
+        }
+        return $common_path_array;
+    }
+
+    /**
+     *  Recursively construct the proper HTML
+     *  for representing a folder full of items
+     *
+     *  @param array $dirs       array of directory objects to process
+     *  @param array $path_array path components in array form
+     *  @param array $item_info  metadata about each item
+     *
+     *  @return void
+     *
+     *  @author Ken Auberry <kenneth.auberry@pnnl.gov>
+     */
+    private function build_folder_structure(&$dirs, $path_array, $item_info)
+    {
+        if (count($path_array) > 1) {
+            if (!isset($dirs['folders'][$path_array[0]])) {
+                $dirs['folders'][$path_array[0]] = array();
+            }
+            $this->build_folder_structure($dirs['folders'][$path_array[0]], array_splice($path_array, 1), $item_info);
+        } else {
+            $size_string = $this->format_bytes($item_info['size']);
+            $date_string = $this->utc_to_local_time($item_info['mtime'], 'n/j/Y g:ia T');
+            $item_id = $item_info['_id'];
+            $hashsum = $item_info['hashsum'];
+            $url = "'test{$this->metadataHost}/files/sha1/{$hashsum}";
+            $item_info['url'] = $url;
+            $item_info_json = json_encode($item_info);
+            $fineprint = "[File Size: {$size_string}; Last Modified: {$date_string}]";
+            $dirs['files'][$item_id] = "<a class='item_link' title='{$fineprint}' id='item_{$item_id}' href='{$url}'>{$path_array[0]}</a> <span class='fineprint'>{$fineprint}</span><span class='item_data_json' id='item_id_{$item_id}' style='display:none;'>{$item_info_json}</span>";
+        }
+    }
+
+    private function format_bytes($bytes)
+    {
+        if ($bytes < 1024) {
+            return $bytes.' B';
+        } elseif ($bytes < 1048576) {
+            return round($bytes / 1024, 0).' KB';
+        } elseif ($bytes < 1073741824) {
+            return round($bytes / 1048576, 1).' MB';
+        } elseif ($bytes < 1099511627776) {
+            return round($bytes / 1073741824, 2).' GB';
+        } else {
+            return round($bytes / 1099511627776, 2).' TB';
+        }
+    }
+
+    /**
+     * Convert UTC to local time for end user display
+     *
+     * @param string $time          a strtotime parseable datetime string
+     * @param string $string_format Output format for the new timestring
+     *
+     * @return string new timestring in local timezone time
+     *
+     * @author Ken Auberry <kenneth.auberry@pnnl.gov>
+     */
+    private function utc_to_local_time($time, $string_format = false)
+    {
+        $tz_local = new DateTimeZone('America/Los_Angeles');
+        $tz_utc = new DateTimeZone('UTC');
+        if (is_string($time) && strtotime($time)) {
+            $time = new DateTime($time, $tz_utc);
+        }
+        if (is_a($time, 'DateTime')) {
+            $time->setTimeZone($tz_local);
+        }
+        if ($string_format) {
+            $time = $time->format($string_format);
+        }
+        return $time;
     }
 }

@@ -31,6 +31,40 @@ class TransactionRepository implements TransactionRepositoryInterface
         $this->repositoryManager = $repositoryManager;
     }
 
+
+    public function getAssocArrayByFilter(Filter $filter)
+    {
+        $qb = $this->searchService->getQueryBuilder(ElasticSearchQueryBuilder::TYPE_TRANSACTION);
+        $proposalIds = $filter->getProposalIds();
+        $instrumentIds = $filter->getInstrumentIds();
+        $userIds = $filter->getUserIds();
+        $institutionIds = $filter->getInstitutionIds();
+        $groupIds = $filter->getInstrumentTypeIds();
+        if(count($proposalIds)) {
+            $qb->whereIn('proposals.obj_id', $proposalIds);
+        }
+        if(count($instrumentIds)) {
+            $qb->whereIn('instruments.obj_id', $instrumentIds);
+        }
+        if(count($groupIds)) {
+            $qb->whereIn('instrument_groups.obj_id', $groupIds);
+        }
+        if(!count($userIds)) {
+            if (count($institutionIds)) {
+                $userIds = $this->repositoryManager->getUserRepository()->getIdsByInstitution($institutionIds);
+            }
+        }
+        if(count($userIds)) {
+            $qb->whereIn('users.obj_id', $userIds);
+        }
+        if($filter->getText()) {
+            $qb->byText($filter->getText());
+        }
+
+        $transactions = $this->searchService->getResults($qb);
+        return $transactions['hits'];
+    }
+
     /**
      * Retrieves the IDs of all transactions matching a text search. Because Transactions contain the searchable texts
      * of all related Persons, Proposals, etc, this gives us the set of all Transactions with a relationship to any

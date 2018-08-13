@@ -42,7 +42,7 @@ abstract class Repository
      */
     public function getFilteredIds(Filter $filter) : array
     {
-        $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter);
+        $transactionIds = $this->repositoryManager->getTransactionRepository()->getIdsByFilter($filter, true);
         return $this->getIdsByTransactionIds($transactionIds);
     }
 

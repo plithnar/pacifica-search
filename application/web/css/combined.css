@@ -46,7 +46,6 @@ label.bold_label {
 }
 
 #files {
-    position: absolute;
     top: 48px;
     left: 220px;
     width: 720px;

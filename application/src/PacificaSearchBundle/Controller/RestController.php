@@ -82,7 +82,8 @@ class RestController extends BaseRestController
 
         return $this->handleView(View::create([
             'transaction_count' => count($allTransactionIds),
-            'filter_pages' => $filterPages
+            'filter_pages' => $filterPages,
+            'transaction_ids' => $allTransactionIds,
         ]));
     }
 

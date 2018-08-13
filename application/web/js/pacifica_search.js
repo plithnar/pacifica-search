@@ -27,6 +27,7 @@
 
                 if($('#search_filter').find('input[type="checkbox"]:checked').length > 0){
                     $('.results_instructions').hide();
+                    PacificaSearch.FileTreeManager.updateTransactionList()
                 }else{
                     $('#results_filetree').hide();
                     $('.results_instructions').show();
