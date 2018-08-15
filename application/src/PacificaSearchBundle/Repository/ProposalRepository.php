@@ -32,6 +32,6 @@ class ProposalRepository extends Repository
      */
     protected static function getNameFromSearchResult(array $result) : string
     {
-        return "Proposal #" . $result['_id'];
+        return $result['_source']['display_name'] . ' (Proposal #' . explode('_', $result['_id'])[1] . ')';
     }
 }
