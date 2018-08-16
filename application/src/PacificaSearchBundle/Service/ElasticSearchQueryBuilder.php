@@ -276,6 +276,7 @@ class ElasticSearchQueryBuilder
         if ($this->text) {
             $array['body']['query']['bool']['must']['query_string']['default_field'] = '_all';
             $array['body']['query']['bool']['must']['query_string']['query'] = $this->text;
+            $array['body']['query']['bool']['must']['query_string']['default_operator'] = 'AND';
         }
 
         return $array;

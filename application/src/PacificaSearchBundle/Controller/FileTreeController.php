@@ -135,6 +135,8 @@ class FileTreeController extends BaseRestController
 
         foreach ($transactions as $transaction) {
             $proposalId = $transaction['_source']['proposals'][0]['obj_id'];
+            $proposalNumId = explode('_', $proposalId)[1];
+            $proposalName = $transaction['_source']['proposals'][0]['display_name'];
             $instrumentId = $transaction['_source']['instruments'][0]['obj_id'];
             $transactionId = $transaction['_id'];
 
@@ -143,7 +145,7 @@ class FileTreeController extends BaseRestController
             // limitation, and once we have we can remove the check
             if (!array_key_exists($proposalId, $response)) {
                 $response[$proposalId] = [
-                    'title' => "Proposal #$proposalId",
+                    'title' => "$proposalName (Proposal #$proposalNumId)",
                     'key' => $proposalId,
                     'folder' => true,
                     'children' => []
