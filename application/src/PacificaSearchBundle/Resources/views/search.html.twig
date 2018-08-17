@@ -5,17 +5,17 @@
 {% block page_header %}Main Search Page{% endblock %}
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/loading_animation.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/loading_animation.css') }}" />
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('js/namespace.js') }}"></script>
-    <script src="{{ asset('js/utilities.js') }}"></script>
-    <script src="{{ asset('js/dom_manager.js') }}"></script>
-    <script src="{{ asset('js/file_tree_manager.js') }}"></script>
-    <script src="{{ asset('js/filter.js') }}"></script>
-    <script src="{{ asset('js/filter_manager.js') }}"></script>
-    <script src="{{ asset('js/pacifica_search.js') }}"></script>
+    <script src="{{ asset('assets/js/namespace.js') }}"></script>
+    <script src="{{ asset('assets/js/utilities.js') }}"></script>
+    <script src="{{ asset('assets/js/dom_manager.js') }}"></script>
+    <script src="{{ asset('assets/js/file_tree_manager.js') }}"></script>
+    <script src="{{ asset('assets/js/filter.js') }}"></script>
+    <script src="{{ asset('assets/js/filter_manager.js') }}"></script>
+    <script src="{{ asset('assets/js/pacifica_search.js') }}"></script>
 {% endblock %}
 {% block body %}
     <section id="text_search_section">
