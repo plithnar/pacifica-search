@@ -111,6 +111,7 @@
                     DomManager.FacetedSearchFilter.getOptionContainerForType(type).empty();
 
                     var instances = result[type].instances;
+                    var instances = result[type].instances.sort(function(a,b) {return b.transaction_count - a.transaction_count});
                     instances.forEach(function (instance) {
                         self.addInstanceToType(instance, type);
                     });
