@@ -1,0 +1,21 @@
+{
+  "name": "pacifica-search",
+  "version": "1.0.0",
+  "description": "Node module information for pacifica search",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "requirejs": "^2.3.5",
+    "searchkit": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
