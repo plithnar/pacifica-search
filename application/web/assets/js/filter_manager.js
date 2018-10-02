@@ -66,8 +66,6 @@
                 // console.log(index);
                 // console.log($(container).find('input'), index);
             });
-            debugger;
-
         },
 
         /**
@@ -95,8 +93,6 @@
          */
         updateAvailableFilterOptions : function(callback) {
             var filterObj = this.getFilter().toObj();
-            console.log(filterObj);
-            debugger;
             if(this.lastTextSearch !== filterObj.text) {
                 this.clearExistingFilters();
                 this.lastTextSearch = filterObj.text;

@@ -105,7 +105,7 @@ export default class SearchApplication extends React.Component {
                                 size={10}
                             />
                             <Searchkit.RefinementListFilter
-                                id="instruments"
+                                id="instrument_groups"
                                 title="Instrument Groups"
                                 field="instrument_groups.keyword"
                                 operator="AND"

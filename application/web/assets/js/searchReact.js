@@ -11087,7 +11087,6 @@ var TransactionListItem = function (_Component) {
     }, {
         key: 'openFilePanel',
         value: function openFilePanel() {
-            debugger;
             var source = this.props.result._source;
             $('#' + source.obj_id + '.filesPanel').show();
         }
@@ -29928,7 +29927,7 @@ var SearchApplication = function (_React$Component) {
                                 size: 10
                             }),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                id: 'instruments',
+                                id: 'instrument_groups',
                                 title: 'Instrument Groups',
                                 field: 'instrument_groups.keyword',
                                 operator: 'AND',

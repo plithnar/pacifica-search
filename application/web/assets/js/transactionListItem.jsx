@@ -87,7 +87,6 @@ export default class TransactionListItem extends Component {
     }
 
     openFilePanel() {
-        debugger;
         const source = this.props.result._source;
         $('#'+source.obj_id+'.filesPanel').show();
     }
