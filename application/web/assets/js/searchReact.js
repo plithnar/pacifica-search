@@ -29794,6 +29794,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__transactionListItem__ = __webpack_require__(155);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_moment__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_moment__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -29811,12 +29813,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var SearchApplication = function (_React$Component) {
     _inherits(SearchApplication, _React$Component);
 
-    function SearchApplication() {
+    function SearchApplication(props) {
         _classCallCheck(this, SearchApplication);
 
-        var _this = _possibleConstructorReturn(this, (SearchApplication.__proto__ || Object.getPrototypeOf(SearchApplication)).call(this));
+        var _this = _possibleConstructorReturn(this, (SearchApplication.__proto__ || Object.getPrototypeOf(SearchApplication)).call(this, props));
 
-        var host = _this.getHost();
+        var host = _this.getHost(props.esHost);
         _this.searchkit = new __WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchkitManager"](host);
 
         _this.searchkit.translateFunction = function (key) {
@@ -29829,8 +29831,8 @@ var SearchApplication = function (_React$Component) {
 
     _createClass(SearchApplication, [{
         key: 'getHost',
-        value: function getHost() {
-            return 'http://localhost:9200';
+        value: function getHost(host) {
+            return host;
         }
     }, {
         key: 'getDefaultQuery',
@@ -29988,8 +29990,8 @@ var SearchApplication = function (_React$Component) {
 /* harmony default export */ __webpack_exports__["default"] = (SearchApplication);
 
 
-window.startSearchApp = function () {
-    __WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(SearchApplication, null), document.getElementById('searchkit_section'));
+window.startSearchApp = function (esHost) {
+    __WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(SearchApplication, _extends({ esHost: esHost }, this.props)), document.getElementById('searchkit_section'));
 };
 
 /***/ }),

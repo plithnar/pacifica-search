@@ -6,10 +6,10 @@ import moment from 'moment';
 
 export default class SearchApplication extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
-        const host = this.getHost();
+        const host = this.getHost(props.esHost);
         this.searchkit = new Searchkit.SearchkitManager(host);
 
         this.searchkit.translateFunction = (key)=> {
@@ -19,8 +19,8 @@ export default class SearchApplication extends React.Component {
         this.searchkit.addDefaultQuery(this.getDefaultQuery());
     }
     
-    getHost() {
-        return 'http://localhost:9200';
+    getHost(host) {
+        return host;
     }
 
     getDefaultQuery() {
@@ -155,6 +155,6 @@ export default class SearchApplication extends React.Component {
     }
 }
 
-window.startSearchApp = function() {
-    ReactDOM.render(<SearchApplication />, document.getElementById('searchkit_section'));
+window.startSearchApp = function(esHost) {
+    ReactDOM.render(<SearchApplication esHost={esHost} {...this.props} />, document.getElementById('searchkit_section'));
 };

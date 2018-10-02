@@ -27,6 +27,7 @@
     </div>
 
     <script>
-        window.startSearchApp();
+        var esHost = '{{ elastic_search_host }}';
+        window.startSearchApp(esHost);
     </script>
 {% endblock %}

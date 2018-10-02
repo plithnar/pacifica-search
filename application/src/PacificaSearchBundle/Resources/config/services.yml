@@ -20,6 +20,7 @@ services:
 
     PacificaSearchBundle\Controller\GuiController:
         arguments:
+            - "%elasticsearch_host%"
             - "@PacificaSearchBundle\\Repository\\InstitutionRepository"
             - "@PacificaSearchBundle\\Repository\\InstrumentRepository"
             - "@PacificaSearchBundle\\Repository\\InstrumentTypeRepository"

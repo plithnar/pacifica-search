@@ -30,6 +30,9 @@ class GuiController
     /** @var EngineInterface */
     protected $renderingEngine;
 
+    /** @string **/
+    protected $elasticSearchHost;
+
     private $page_data = [
         'script_uris' => [
             'assets/js/lib/spinner/spin.min.js',
@@ -45,6 +48,7 @@ class GuiController
     ];
 
     public function __construct(
+        $elasticSearchHost,
         InstitutionRepository $institutionRepository,
         InstrumentRepository $instrumentRepository,
         InstrumentTypeRepository $instrumentTypeRepository,
@@ -63,6 +67,7 @@ class GuiController
 
         $this->transactionRepository = $transactionRepository;
         $this->renderingEngine = $renderingEngine;
+        $this->elasticSearchHost = $elasticSearchHost;
     }
 
     /**
@@ -75,6 +80,7 @@ class GuiController
             'PacificaSearchBundle::search.html.twig',
             [
                 'page_data' => $this->page_data,
+                'elastic_search_host' => $this->elasticSearchHost,
                 'filter_types' => [
                     Institution::getMachineName()    => Institution::getTypeDisplayName(),
                     Instrument::getMachineName()     => Instrument::getTypeDisplayName(),
