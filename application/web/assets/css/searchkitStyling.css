@@ -1,0 +1,21 @@
+.transactionResultHit {
+    padding: 10px;
+    border-bottom: black solid;
+}
+
+.sk-hits {
+    border-top: black solid;
+}
+
+.sk-layout__top-bar {
+    position: relative;
+}
+
+.sk-layout__body {
+     margin: 5px auto 0;
+    min-width: 600px;
+}
+
+.sk-results-list {
+    padding: 10px 5px;
+}

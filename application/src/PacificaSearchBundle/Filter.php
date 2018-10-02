@@ -153,7 +153,7 @@ class Filter
      * @param string $text
      * @return Filter
      */
-    public function setText(?string $text) : Filter
+    public function setText(string $text) : Filter
     {
         $this->text = $text;
         return $this;

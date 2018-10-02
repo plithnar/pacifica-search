@@ -1,8 +1,11 @@
+// import React from 'react';
+
 (function ($, $$) {
     "use strict";
 
     var FilterManager = PacificaSearch.FilterManager;
     var DomMgr = PacificaSearch.DomManager;
+    var PacificaSearchkit = PacificaSearch.Searchkit;
 
     $(function () {
         $$('#search_filter')

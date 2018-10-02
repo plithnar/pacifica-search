@@ -7,13 +7,28 @@
     "test": "tests"
   },
   "dependencies": {
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
+    "moment": "^2.22.2",
+    "react": "^16.5.0",
+    "react-addons-update": "^15.6.2",
+    "react-dom": "^16.5.0",
     "requirejs": "^2.3.5",
-    "searchkit": "^2.3.0"
+    "searchkit": "^2.3.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-preset-react": "^6.23.0",
+    "browser-sync": "^2.24.7",
+    "browser-sync-webpack-plugin": "^2.2.2",
+    "cross-env": "^5.1.6",
+    "laravel-mix": "^2.1.14"
+  },
   "scripts": {
+    "dev": "npm run development",
+    "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "npm run development -- --watch",
+    "watch-poll": "npm run watch -- --watch-poll",
+    "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "prod": "npm run production",
+    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

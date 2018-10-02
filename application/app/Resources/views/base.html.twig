@@ -19,9 +19,6 @@
 <script src="{{ asset('assets/js/lib/jquery/jquery-3.2.1.js') }}" type="text/javascript"></script>
         <script src="{{ asset('assets/js/lib/jquery-ui/jquery-ui.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/js/lib/moment/moment.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/js/node_modules/react/umd/react.development.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/js/node_modules/react-dom/umd/react-dom.development.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/js/node_modules/searchkit/release/bundle.js') }}" type="text/javascript"></script>
         <link rel="stylesheet" type="text/css" href="{{ asset('assets/js/lib/jquery-ui/jquery-ui.css') }}" />
   {% else %}
 <script src="{{ asset('assets/js/lib/jquery/jquery-3.2.1.min.js') }}" type="text/javascript"></script>
@@ -45,7 +42,7 @@
 {% block stylesheets %}{% endblock %}
     </head>
     <body>
-      <div class="page_content">
+      <div id="app" class="page_content">
         <header class="secondary">
           <div class="page_header">
             <div class="graphic_logo">

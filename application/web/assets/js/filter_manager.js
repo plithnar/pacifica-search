@@ -15,6 +15,8 @@
      */
     PacificaSearch.FilterManager = {
 
+        lastTextSearch: '',
+
         /**
          * Gets an instance of Filter representing the currently selected Filter options
          *
@@ -49,6 +51,25 @@
             DomManager.FacetedSearchFilter.getOptionContainerForType(type).append(label);
         },
 
+        clearExistingFilters : function() {
+            // Remove all the existing facets to search on
+            // Clear the text search filter
+            // return the state of the application to the base state.
+            var containers = PacificaSearch.DomManager.FacetedSearchFilter.getOptionContainersForAllTypes();
+            containers.each(function(index, container) {
+                if($(container).find('.currently_selected_options').children().length !== 0) {
+
+                }
+                $(container).find('input').each(function(inputIndex, input) {
+                    input.checked = false;
+                });
+                // console.log(index);
+                // console.log($(container).find('input'), index);
+            });
+            debugger;
+
+        },
+
         /**
          * Makes the border separating the upper and lower sections of a filter (the selected and unselected options,
          * respectively) visible or hidden depending on whether both sections contain elements.
@@ -74,7 +95,12 @@
          */
         updateAvailableFilterOptions : function(callback) {
             var filterObj = this.getFilter().toObj();
-
+            console.log(filterObj);
+            debugger;
+            if(this.lastTextSearch !== filterObj.text) {
+                this.clearExistingFilters();
+                this.lastTextSearch = filterObj.text;
+            }
             PacificaSearch.Utilities.showLoadingAnimationUntilResolved(
                 PacificaSearch.Utilities.postJson(
                     '/filters/pages',
@@ -102,15 +128,18 @@
                 // If only a single filter item or no items are available for selection, and the filter has no selected
                 // values, then there's no reason to show it.
                 var areOptionsSelected = DomManager.FacetedSearchFilter.getCurrentFilterContainerForType(type).find(':checked').length > 0;
-                if (result[type].total_hits <= 1 && !areOptionsSelected) {
+                if (result[type].total_hits < 1 && !areOptionsSelected) {
                     typeContainer.hide();
                 } else {
+                    if(result[type].total_hits === 1) {
+                        // debugger;
+                    }
                     typeContainer.show();
 
                     // Remove all of the options currently being shown
                     DomManager.FacetedSearchFilter.getOptionContainerForType(type).empty();
 
-                    var instances = result[type].instances;
+                    // debugger;
                     var instances = result[type].instances.sort(function(a,b) {return b.transaction_count - a.transaction_count});
                     instances.forEach(function (instance) {
                         self.addInstanceToType(instance, type);
