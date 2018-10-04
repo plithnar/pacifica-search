@@ -29903,6 +29903,7 @@ var SearchApplication = function (_React$Component) {
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchBox"], {
                             translations: { "searchbox.placeholder": "Search Datasets" },
                             queryOptions: { "minimum_should_match": "95%" },
+                            queryBuilder: __WEBPACK_IMPORTED_MODULE_2_searchkit__["QueryString"],
                             auotfocus: true,
                             searchOnChange: true,
                             queryFields: ["_all"]

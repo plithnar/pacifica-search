@@ -82,6 +82,7 @@ export default class SearchApplication extends React.Component {
                         <Searchkit.SearchBox
                             translations={{"searchbox.placeholder":"Search Datasets"}}
                             queryOptions={{"minimum_should_match":"95%"}}
+                            queryBuilder={Searchkit.QueryString}
                             auotfocus={true}
                             searchOnChange={true}
                             queryFields={["_all"]}
