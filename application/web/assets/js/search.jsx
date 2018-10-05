@@ -75,83 +75,94 @@ export default class SearchApplication extends React.Component {
     }
 
     render() {
+        var informationText = 'To search multiple terms at once, insert "AND" between them. If a term contains a space, place the term in quotes';
         return(
-            <Searchkit.SearchkitProvider searchkit={this.searchkit}>
-                <Searchkit.Layout size="1">
-                    <Searchkit.TopBar>
-                        <Searchkit.SearchBox
-                            translations={{"searchbox.placeholder":"Search Datasets"}}
-                            queryOptions={{"minimum_should_match":"95%"}}
-                            queryBuilder={Searchkit.QueryString}
-                            auotfocus={true}
-                            searchOnChange={true}
-                            queryFields={["_all"]}
-                        />
-                    </Searchkit.TopBar>
-                    <Searchkit.LayoutBody>
-                        {/* Facets/Filters */}
-                        <Searchkit.SideBar>
-                            <Searchkit.RefinementListFilter
-                                id="institution"
-                                title="Institutions"
-                                field="institutions.keyword"
-                                operator="AND"
-                                size={10}
+            <div>
+                <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+                <Searchkit.SearchkitProvider searchkit={this.searchkit}>
+                    <Searchkit.Layout size="1">
+                        <Searchkit.TopBar>
+                            <Searchkit.SearchBox
+                                translations={{"searchbox.placeholder":"Search Datasets"}}
+                                queryOptions={{"minimum_should_match":"95%"}}
+                                queryBuilder={Searchkit.QueryString}
+                                auotfocus={true}
+                                searchOnChange={true}
+                                queryFields={["_all"]}
                             />
-                            <Searchkit.RefinementListFilter
-                                id="instruments"
-                                title="Instruments"
-                                field="instruments.keyword"
-                                operator="AND"
-                                size={10}
+                            <i
+                            class="fas fa-info-circle fa-2x"
+                            style={{marginLeft: '10px', marginTop: '5px', color: 'white'}}
+                            dataToggle="tooltip"
+                            title={informationText}
                             />
-                            <Searchkit.RefinementListFilter
-                                id="instrument_groups"
-                                title="Instrument Groups"
-                                field="instrument_groups.keyword"
-                                operator="AND"
-                                size={10}
-                            />
-                            <Searchkit.RefinementListFilter
-                                id="users"
-                                title="Users"
-                                field="users.keyword"
-                                operator="AND"
-                                size={10}
-                            />
-                            <Searchkit.RefinementListFilter
-                                id="proposals"
-                                title="Proposals"
-                                field="proposals.keyword"
-                                operator="AND"
-                                size={10}
-                            />
-                            <Searchkit.RefinementListFilter
-                                id="theme"
-                                title="Science Themes"
-                                field="science_themes.keyword"
-                                operator="AND"
-                                size={10}
-                            />
-                        </Searchkit.SideBar>
-                        <Searchkit.LayoutResults>
-                            <Searchkit.ActionBarRow>
-                                <Searchkit.HitsStats translations={{"hitstats.results_found":"{hitCount} results found"}}/>
-                            </Searchkit.ActionBarRow>
-                            <Searchkit.ActionBarRow>
-                                <Searchkit.SelectedFilters />
-                                <Searchkit.ResetFilters />
-                            </Searchkit.ActionBarRow>
-                            <Searchkit.Hits 
-                                hitsPerPage={15}
-                                itemComponent={TransactionListItem}
-                                scrollTo="body"
-                            />
-                            <Searchkit.Pagination showNumbers={true} />
-                        </Searchkit.LayoutResults>
-                    </Searchkit.LayoutBody>
-                </Searchkit.Layout>
-            </Searchkit.SearchkitProvider>
+                        </Searchkit.TopBar>
+                        <Searchkit.LayoutBody>
+                            {/* Facets/Filters */}
+                            <Searchkit.SideBar>
+                                <Searchkit.RefinementListFilter
+                                    id="institution"
+                                    title="Institutions"
+                                    field="institutions.keyword"
+                                    operator="AND"
+                                    size={10}
+                                />
+                                <Searchkit.RefinementListFilter
+                                    id="instruments"
+                                    title="Instruments"
+                                    field="instruments.keyword"
+                                    operator="AND"
+                                    size={10}
+                                />
+                                <Searchkit.RefinementListFilter
+                                    id="instrument_groups"
+                                    title="Instrument Groups"
+                                    field="instrument_groups.keyword"
+                                    operator="AND"
+                                    size={10}
+                                />
+                                <Searchkit.RefinementListFilter
+                                    id="users"
+                                    title="Users"
+                                    field="users.keyword"
+                                    operator="AND"
+                                    size={10}
+                                />
+                                <Searchkit.RefinementListFilter
+                                    id="proposals"
+                                    title="Proposals"
+                                    field="proposals.keyword"
+                                    operator="AND"
+                                    size={10}
+                                />
+                                <Searchkit.RefinementListFilter
+                                    id="theme"
+                                    title="Science Themes"
+                                    field="science_themes.keyword"
+                                    operator="AND"
+                                    size={10}
+                                />
+                            </Searchkit.SideBar>
+                            <Searchkit.LayoutResults>
+                                <Searchkit.ActionBarRow>
+                                    <Searchkit.HitsStats translations={{"hitstats.results_found":"{hitCount} results found"}}/>
+                                </Searchkit.ActionBarRow>
+                                <Searchkit.ActionBarRow>
+                                    <Searchkit.SelectedFilters />
+                                    <Searchkit.ResetFilters />
+                                </Searchkit.ActionBarRow>
+                                <Searchkit.Hits
+                                    hitsPerPage={15}
+                                    itemComponent={TransactionListItem}
+                                    scrollTo="body"
+                                />
+                                <Searchkit.Pagination showNumbers={true} />
+                            </Searchkit.LayoutResults>
+                        </Searchkit.LayoutBody>
+                    </Searchkit.Layout>
+                </Searchkit.SearchkitProvider>
+            </div>
         );
     }
 }

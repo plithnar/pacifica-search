@@ -29891,93 +29891,106 @@ var SearchApplication = function (_React$Component) {
     }, {
         key: 'render',
         value: function render() {
+            var informationText = 'To search multiple terms at once, insert "AND" between them. If a term contains a space, place the term in quotes';
             return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                __WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchkitProvider"],
-                { searchkit: this.searchkit },
+                'div',
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.3.1/css/all.css' }),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    __WEBPACK_IMPORTED_MODULE_2_searchkit__["Layout"],
-                    { size: '1' },
+                    __WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchkitProvider"],
+                    { searchkit: this.searchkit },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                        __WEBPACK_IMPORTED_MODULE_2_searchkit__["TopBar"],
-                        null,
-                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchBox"], {
-                            translations: { "searchbox.placeholder": "Search Datasets" },
-                            queryOptions: { "minimum_should_match": "95%" },
-                            queryBuilder: __WEBPACK_IMPORTED_MODULE_2_searchkit__["QueryString"],
-                            auotfocus: true,
-                            searchOnChange: true,
-                            queryFields: ["_all"]
-                        })
-                    ),
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                        __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutBody"],
-                        null,
+                        __WEBPACK_IMPORTED_MODULE_2_searchkit__["Layout"],
+                        { size: '1' },
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                            __WEBPACK_IMPORTED_MODULE_2_searchkit__["SideBar"],
+                            __WEBPACK_IMPORTED_MODULE_2_searchkit__["TopBar"],
                             null,
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                id: 'institution',
-                                title: 'Institutions',
-                                field: 'institutions.keyword',
-                                operator: 'AND',
-                                size: 10
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchBox"], {
+                                translations: { "searchbox.placeholder": "Search Datasets" },
+                                queryOptions: { "minimum_should_match": "95%" },
+                                queryBuilder: __WEBPACK_IMPORTED_MODULE_2_searchkit__["QueryString"],
+                                auotfocus: true,
+                                searchOnChange: true,
+                                queryFields: ["_all"]
                             }),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                id: 'instruments',
-                                title: 'Instruments',
-                                field: 'instruments.keyword',
-                                operator: 'AND',
-                                size: 10
-                            }),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                id: 'instrument_groups',
-                                title: 'Instrument Groups',
-                                field: 'instrument_groups.keyword',
-                                operator: 'AND',
-                                size: 10
-                            }),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                id: 'users',
-                                title: 'Users',
-                                field: 'users.keyword',
-                                operator: 'AND',
-                                size: 10
-                            }),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                id: 'proposals',
-                                title: 'Proposals',
-                                field: 'proposals.keyword',
-                                operator: 'AND',
-                                size: 10
-                            }),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                id: 'theme',
-                                title: 'Science Themes',
-                                field: 'science_themes.keyword',
-                                operator: 'AND',
-                                size: 10
+                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', {
+                                'class': 'fas fa-info-circle fa-2x',
+                                style: { marginLeft: '10px', marginTop: '5px', color: 'white' },
+                                dataToggle: 'tooltip',
+                                title: informationText
                             })
                         ),
                         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                            __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutResults"],
+                            __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutBody"],
                             null,
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
+                                __WEBPACK_IMPORTED_MODULE_2_searchkit__["SideBar"],
                                 null,
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["HitsStats"], { translations: { "hitstats.results_found": "{hitCount} results found" } })
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                    id: 'institution',
+                                    title: 'Institutions',
+                                    field: 'institutions.keyword',
+                                    operator: 'AND',
+                                    size: 10
+                                }),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                    id: 'instruments',
+                                    title: 'Instruments',
+                                    field: 'instruments.keyword',
+                                    operator: 'AND',
+                                    size: 10
+                                }),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                    id: 'instrument_groups',
+                                    title: 'Instrument Groups',
+                                    field: 'instrument_groups.keyword',
+                                    operator: 'AND',
+                                    size: 10
+                                }),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                    id: 'users',
+                                    title: 'Users',
+                                    field: 'users.keyword',
+                                    operator: 'AND',
+                                    size: 10
+                                }),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                    id: 'proposals',
+                                    title: 'Proposals',
+                                    field: 'proposals.keyword',
+                                    operator: 'AND',
+                                    size: 10
+                                }),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                    id: 'theme',
+                                    title: 'Science Themes',
+                                    field: 'science_themes.keyword',
+                                    operator: 'AND',
+                                    size: 10
+                                })
                             ),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
+                                __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutResults"],
                                 null,
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SelectedFilters"], null),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["ResetFilters"], null)
-                            ),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Hits"], {
-                                hitsPerPage: 15,
-                                itemComponent: __WEBPACK_IMPORTED_MODULE_3__transactionListItem__["default"],
-                                scrollTo: 'body'
-                            }),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Pagination"], { showNumbers: true })
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
+                                    null,
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["HitsStats"], { translations: { "hitstats.results_found": "{hitCount} results found" } })
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
+                                    null,
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SelectedFilters"], null),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["ResetFilters"], null)
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Hits"], {
+                                    hitsPerPage: 15,
+                                    itemComponent: __WEBPACK_IMPORTED_MODULE_3__transactionListItem__["default"],
+                                    scrollTo: 'body'
+                                }),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Pagination"], { showNumbers: true })
+                            )
                         )
                     )
                 )
