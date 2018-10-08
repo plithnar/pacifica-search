@@ -92,7 +92,7 @@ export default class SearchApplication extends React.Component {
                                 queryFields={["_all"]}
                             />
                             <i
-                            class="fas fa-info-circle fa-2x"
+                            className="fas fa-info-circle fa-2x"
                             style={{marginLeft: '10px', marginTop: '5px', color: 'white'}}
                             dataToggle="tooltip"
                             title={informationText}

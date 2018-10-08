@@ -29915,7 +29915,7 @@ var SearchApplication = function (_React$Component) {
                                 queryFields: ["_all"]
                             }),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', {
-                                'class': 'fas fa-info-circle fa-2x',
+                                className: 'fas fa-info-circle fa-2x',
                                 style: { marginLeft: '10px', marginTop: '5px', color: 'white' },
                                 dataToggle: 'tooltip',
                                 title: informationText
