@@ -211,18 +211,12 @@ class FileTreeController extends BaseRestController
             return $this->handleView(View::create([]));
         }
 
-        $directories = [];
-        $files = $this->fileRepository->getByTransactionId($transactionId);
-        foreach ($files->getInstances() as $file) {
-            $filePathParts = explode('/', $file->getDisplayName());
-            $this->addToDirectoryStructure($directories, $filePathParts, $file->getId());
-        }
-
         $ch = curl_init();
         curl_setopt( $ch, CURLOPT_URL, "$this->metadataHost/transactioninfo/by_id/$transactionId" );
         curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
         $content = json_decode(curl_exec( $ch ), true);
         curl_close ( $ch );
+
 
         $treelist = $this->format_folder_to_tree($content['files']);
         $response = $this->format_folder_object_json($treelist['treelist'], 'test');
