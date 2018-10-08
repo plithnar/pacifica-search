@@ -2,33 +2,11 @@
 
 namespace PacificaSearchBundle\Controller;
 
-use PacificaSearchBundle\Exception\NoRecordsFoundException;
-use PacificaSearchBundle\Filter;
-use PacificaSearchBundle\Model\ElasticSearchTypeCollection;
-use PacificaSearchBundle\Model\Institution;
-use PacificaSearchBundle\Model\Instrument;
-use PacificaSearchBundle\Model\InstrumentType;
-use PacificaSearchBundle\Model\Proposal;
-use PacificaSearchBundle\Model\User;
-use PacificaSearchBundle\Repository\InstitutionRepository;
-use PacificaSearchBundle\Repository\InstrumentRepository;
-use PacificaSearchBundle\Repository\InstrumentTypeRepository;
-use PacificaSearchBundle\Repository\ProposalRepository;
-use PacificaSearchBundle\Repository\Repository;
-use PacificaSearchBundle\Repository\TransactionRepository;
-use PacificaSearchBundle\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
 
 class GuiController
 {
-    use FilterAwareController;
-
-    /** @var TransactionRepository */
-    protected $transactionRepository;
-
-    /** @var EngineInterface */
-    protected $renderingEngine;
 
     /** @string **/
     protected $elasticSearchHost;
@@ -49,23 +27,8 @@ class GuiController
 
     public function __construct(
         $elasticSearchHost,
-        InstitutionRepository $institutionRepository,
-        InstrumentRepository $instrumentRepository,
-        InstrumentTypeRepository $instrumentTypeRepository,
-        ProposalRepository $proposalRepository,
-        UserRepository $userRepository,
-        TransactionRepository $transactionRepository,
         EngineInterface $renderingEngine
     ) {
-        $this->initFilterableRepositories(
-            $institutionRepository,
-            $instrumentRepository,
-            $instrumentTypeRepository,
-            $proposalRepository,
-            $userRepository
-        );
-
-        $this->transactionRepository = $transactionRepository;
         $this->renderingEngine = $renderingEngine;
         $this->elasticSearchHost = $elasticSearchHost;
     }
@@ -80,34 +43,10 @@ class GuiController
             'PacificaSearchBundle::search.html.twig',
             [
                 'page_data' => $this->page_data,
-                'elastic_search_host' => $this->elasticSearchHost,
-                'filter_types' => [
-                    Institution::getMachineName()    => Institution::getTypeDisplayName(),
-                    Instrument::getMachineName()     => Instrument::getTypeDisplayName(),
-                    InstrumentType::getMachineName() => InstrumentType::getTypeDisplayName(),
-                    Proposal::getMachineName()       => Proposal::getTypeDisplayName(),
-                    User::getMachineName()           => User::getTypeDisplayName()
-                ]
+                'elastic_search_host' => $this->elasticSearchHost
             ]
         );
 
         return new Response($renderedContent);
-    }
-
-    /**
-     * Gets all Repository classes that implement the FilterRepository base class, which is the same as the set of
-     * Repositories that contain items that can be filtered on in the GUI.
-     *
-     * @return Repository[]
-     */
-    protected function getFilterableRepositories() : array
-    {
-        return [
-            $this->institutionRepository,
-            $this->instrumentRepository,
-            $this->instrumentTypeRepository,
-            $this->proposalRepository,
-            $this->userRepository
-        ];
     }
 }

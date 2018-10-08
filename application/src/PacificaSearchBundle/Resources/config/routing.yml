@@ -4,10 +4,6 @@ pacifica_search_homepage:
     # reference to the GuiController *service*, not directly a reference to the class.
     defaults: { _controller: "PacificaSearchBundle\\Controller\\GuiController:indexAction" }
 
-rest:
-    type: rest
-    resource: PacificaSearchBundle\Controller\RestController
-
 file_tree:
     type: rest
     prefix: file_tree

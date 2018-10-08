@@ -2,18 +2,9 @@
 
 namespace PacificaSearchBundle\Controller;
 
-use PacificaSearchBundle\Filter;
-use PacificaSearchBundle\Model\Instrument;
 use PacificaSearchBundle\Repository\FileRepository;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\View\View;
-use PacificaSearchBundle\Repository\InstitutionRepository;
-use PacificaSearchBundle\Repository\InstrumentRepository;
-use PacificaSearchBundle\Repository\InstrumentTypeRepository;
-use PacificaSearchBundle\Repository\ProposalRepository;
-use PacificaSearchBundle\Repository\TransactionRepositoryInterface;
-use PacificaSearchBundle\Repository\UserRepository;
-use Symfony\Component\HttpFoundation\Request;
 use DateTimeZone;
 use DateTime;
 
@@ -34,156 +25,9 @@ class FileTreeController extends BaseRestController
     protected $metadataHost;
 
     public function __construct(
-        InstitutionRepository $institutionRepository,
-        InstrumentRepository $instrumentRepository,
-        InstrumentTypeRepository $instrumentTypeRepository,
-        ProposalRepository $proposalRepository,
-        UserRepository $userRepository,
-        TransactionRepositoryInterface $transactionRepository,
-        FileRepository $fileRepository,
         String $metadataHost
     ) {
-        parent::__construct(
-            $institutionRepository,
-            $instrumentRepository,
-            $instrumentTypeRepository,
-            $proposalRepository,
-            $userRepository,
-            $transactionRepository
-        );
-
-        $this->fileRepository = $fileRepository;
         $this->metadataHost = $metadataHost;
-    }
-
-    /**
-     * Gets the top level of the tree (everything excluding the files, which have to be lazy-loaded on a per-transaction
-     * basis). Pagination is done at the level of Proposals, so we limit the number of Proposals returned but return all
-     * children of any Proposals in the page.
-     *
-     * The response is formatted like this:
-     * [
-     *     {
-     *         "title": "Proposal #31390",
-     *         "key": "31390",
-     *         "folder": true,
-     *         "children": [
-     *             {
-     *                 "title": "TOF-SIMS 2007 (Instrument ID: 34073)",
-     *                 "key": "34073",
-     *                 "folder": true,
-     *                 "children": [
-     *                     {
-     *                         "title": "Files Uploaded 2017-01-02 (Transaction 37778)",
-     *                         "key": "37778",
-     *                         "folder": true,
-     *                         "lazy": true
-     *                     }, ... ( More transactions )
-     *                 ]
-     *             }, ... ( More instruments )
-     *         ]
-     *     }, ... ( More proposals )
-     * ]
-     *  {
-     *
-     *
-     * This gives a directory hierarchy like this:
-     *
-     * Root directory
-     *   |-- Proposal #31390
-     *     |-- TOF-SIMS 2007 (Instrument ID: 34073)
-     *       |-- Files Uploaded 2017-01-02 (Transaction 37778)
-     *         |-- (Contents of this folder are the actual files, which are lazy loaded)
-     *
-     *
-     * @param int $pageNumber
-     * @param Request $request
-     * @return Response
-     */
-    public function postPageAction($pageNumber, Request $request) 
-    {
-        if ($pageNumber < 1 || intval($pageNumber) != $pageNumber) {
-            return $this->handleView(View::create([]));
-        }
-
-        $filter = Filter::fromRequest($request);
-        if ($filter->isEmpty()) {
-            // Without a filter we do not show a file tree - the result set would be too large to handle in any case
-            return $this->handleView(View::create([]));
-        }
-
-        $transactions = $this->transactionRepository->getAssocArrayByFilter($filter);
-        if (count($transactions) === 0) {
-            return $this->handleView(View::create([]));
-        }
-        $response = [];
-        $instrumentIds = [];
-        foreach ($transactions as $transaction) {
-            $instruments = $transaction['_source']['instruments'];
-            foreach($instruments as $instrument) {
-                $instrumentId = $instrument['obj_id'];
-                $instrumentIds[$instrumentId] = $instrumentId;
-            }
-        }
-
-        $instrumentCollection = $this->instrumentRepository->getById($instrumentIds);
-        $instrumentNames = [];
-        foreach ($instrumentCollection->getInstances() as $instrument) {
-            /** @var $instrument Instrument */
-            $instrumentNames[$instrument->getId()] = $instrument->getDisplayName();
-        }
-
-        foreach ($transactions as $transaction) {
-            $proposalId = $transaction['_source']['proposals'][0]['obj_id'];
-            $proposalNumId = explode('_', $proposalId)[1];
-            $proposalName = $transaction['_source']['proposals'][0]['display_name'];
-            $instrumentId = $transaction['_source']['instruments'][0]['obj_id'];
-            $transactionId = $transaction['_id'];
-
-            // TODO: This outermost array_key_exists() check is necessary because we are artificially limiting the
-            // transactions we handle to 1000 - see Respository::getIdsByTransactionIds(). We need to remove that
-            // limitation, and once we have we can remove the check
-            if (!array_key_exists($proposalId, $response)) {
-                $response[$proposalId] = [
-                    'title' => "$proposalName (Proposal #$proposalNumId)",
-                    'key' => $proposalId,
-                    'folder' => true,
-                    'children' => []
-                ];
-            }
-            if (array_key_exists($proposalId, $response)) {
-                if (!array_key_exists($instrumentId, $response[$proposalId]['children'])) {
-                    $instrumentName = $instrumentNames[$instrumentId];
-                    $response[$proposalId]['children'][$instrumentId] = [
-                        'title' => "$instrumentName (Instrument ID: $instrumentId)",
-                        'key' => $instrumentId,
-                        'folder' => true,
-                        'children' => []
-                    ];
-                }
-                $transNumId = explode('_', $transactionId);
-                $transNumId = $transNumId[1];
-                $response[$proposalId]['children'][$instrumentId]['children'][] = [
-//                    'title' => "Files uploaded (<a href='http://status.local/view/$transactionId'>Transaction $transactionId</a>)",
-                    'title' => "Files uploaded (<a href='$this->metadataHost/transactioninfo/by_id/$transNumId'>Transaction $transNumId</a>)",
-                    'key' => $transNumId,
-                    'folder' => true,
-                    'lazy' => true
-                ];
-            }
-
-
-            $instrumentIdsToTransactionIds[$transaction['_source']['instruments'][0]['obj_id']][] = $transaction['_id'];
-        }
-
-        // We use ID values above to make it easier to refer to specific records in code - for items that are meant to
-        // be arrays rather than hashes in the produced JSON, we have to strip those out
-        $response = array_values($response);
-        foreach ($response as &$proposal) {
-            $proposal['children'] = array_values($proposal['children']);
-        }
-
-        return $this->handleView(View::create($response));
     }
 
     /**
