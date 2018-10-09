@@ -94,7 +94,7 @@ export default class SearchApplication extends React.Component {
                             <i
                             className="fas fa-info-circle fa-2x"
                             style={{marginLeft: '10px', marginTop: '5px', color: 'white'}}
-                            dataToggle="tooltip"
+                            datatoggle="tooltip"
                             title={informationText}
                             />
                         </Searchkit.TopBar>

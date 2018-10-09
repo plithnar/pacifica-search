@@ -61,7 +61,6 @@ class FileTreeController extends BaseRestController
         $content = json_decode(curl_exec( $ch ), true);
         curl_close ( $ch );
 
-
         $treelist = $this->format_folder_to_tree($content['files']);
         $response = $this->format_folder_object_json($treelist['treelist'], 'test');
         return $this->handleView(View::create($response));
