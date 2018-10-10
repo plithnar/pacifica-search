@@ -61,6 +61,7 @@ class FileTreeController extends BaseRestController
         $content = json_decode(curl_exec( $ch ), true);
         curl_close ( $ch );
 
+
         $treelist = $this->format_folder_to_tree($content['files']);
         $response = $this->format_folder_object_json($treelist['treelist'], 'test');
         return $this->handleView(View::create($response));
@@ -203,7 +204,7 @@ class FileTreeController extends BaseRestController
             $item_info['url'] = $url;
             $item_info_json = json_encode($item_info);
             $fineprint = "[File Size: {$size_string}; Last Modified: {$date_string}]";
-            $dirs['files'][$item_id] = "<a class='item_link' title='{$fineprint}' id='item_{$item_id}' href='{$url}'>{$path_array[0]}</a> <span class='fineprint'>{$fineprint}</span><span class='item_data_json' id='item_id_{$item_id}' style='display:none;'>{$item_info_json}</span>";
+            $dirs['files'][$item_id] = "<span title='{$fineprint}' id='item_{$item_id}' href='{$url}'>{$path_array[0]}</span> <span class='fineprint'>{$fineprint}</span><span class='item_data_json' id='item_id_{$item_id}' style='display:none;'>{$item_info_json}</span>";
         }
     }
 

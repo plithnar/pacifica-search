@@ -11,6 +11,10 @@ ul.fancytree-container {
   margin: 0 0 0 0 !important;
 }
 
+span.fancytree-title {
+    cursor: default !important;
+}
+
 ul.fancytree-container li{
   margin-bottom:0 !important;
 }
