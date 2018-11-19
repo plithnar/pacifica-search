@@ -314,10 +314,33 @@ button:hover, .buttons input[type="button"]:hover {
 }
 
 .graphic_logo {
-    display:none;
+    display:block;
+    padding: 10px;
+}
+
+.graphic_logo span {
+    display: inline-flex;
+}
+
+.graphic_logo span .logo_image {
+    display: block;
+    width: 90px;
+    height: 36px;
+    background: url(/assets/images/emsl_logos/emsl_logo_white.png) 0% 0% / 87px 36px no-repeat;
+    /* background-size: 174px 73px; */
+    /* text-shadow: 0 0 black; */
+}
+
+.graphic_logo span .site_slogan {
+    text-transform: uppercase;
+    color: #FDA508;
+    font-size: 16px;
+    padding-top: 16px;
+    padding-left: 0.5em
 }
 
 .text_logo {
+    display: none;
     color: white;
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 2em;
