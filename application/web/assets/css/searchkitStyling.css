@@ -9,6 +9,7 @@
 
 .sk-layout__top-bar {
     position: relative;
+    background: rgb(83, 105, 43);
 }
 
 .sk-layout__body {
@@ -18,4 +19,18 @@
 
 .sk-results-list {
     padding: 10px 5px;
+}
+
+.sk-toggle-option {
+    color: rgb(113, 149, 0);
+}
+
+.sk-refinement-list__view-more-action {
+    color: rgb(113, 149, 0);
+}
+
+.sk-toggle-option.is-active {
+    color: #fff;
+    background-color: rgb(113, 149, 0);
+    border-color: rgb(113, 149, 0);
 }

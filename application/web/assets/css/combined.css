@@ -308,7 +308,7 @@ button:hover, .buttons input[type="button"]:hover {
 
 .page_header {
     width: 100%;
-    background-color: rgb(61, 101, 149);
+    background-color: rgb(113, 149, 0);
     padding-top: 0.25em;
     position: relative;
 }
@@ -330,7 +330,7 @@ button:hover, .buttons input[type="button"]:hover {
     color: white;
     padding: 0.25em;
     padding-left: 0.5em;
-    background-color: rgb(42, 70, 103);
+    background-color: rgb(83, 105, 43);
     margin-top: 0px;
     font-weight: normal;
     border-radius: 0px 0px 8px 8px;
@@ -515,6 +515,7 @@ dl.metadata_description_list {
 
 .site_slogan {
     text-transform: uppercase;
+    color: #FDA508;
     font-size: 0.45em;
     padding-left: 0.5em
 }
