@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as Searchkit from 'searchkit';
 import TransactionListItem from './transactionListItem';
+import DateRangeFilter from './dateRangeFilter';
 import moment from 'moment';
 
 export default class SearchApplication extends React.Component {
@@ -21,6 +22,15 @@ export default class SearchApplication extends React.Component {
     
     getHost(host) {
         return host;
+    }
+
+    formatDateForDatePicker(date) {
+        // convert to proper format for date picker component
+        return moment(date).format("D MMM YYYY");
+    }
+
+    getOneYearFromToday() {
+        return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
     }
 
     getDefaultQuery() {
@@ -109,6 +119,16 @@ export default class SearchApplication extends React.Component {
                                     operator="AND"
                                     translations={{"true": "Released Data", "false": "Proprietary Data"}}
                                 />
+                                {/*
+                                <DateRangeFilter
+                                    id="upload_date"
+                                    field="upload_date"
+                                    queryDateFormat="YYYY-MM-DD"
+                                    title="Upload Date"
+                                    startDate={"1 Jan 1986"}
+                                    endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
+                                />
+                                */}
                                 <Searchkit.RefinementListFilter
                                     id="institution"
                                     title="Institutions"
