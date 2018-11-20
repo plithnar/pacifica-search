@@ -29844,7 +29844,9 @@ var SearchApplication = function (_React$Component) {
 
             var instance = this;
             return function (query) {
-                return query.addQuery(BoolMust([TermQuery("_type", "transactions")]));
+                return query.addQuery(BoolMust([TermQuery("_type", "transactions")]
+                // TermQuery("release", "true")
+                ));
             };
         }
     }, {
@@ -29892,6 +29894,7 @@ var SearchApplication = function (_React$Component) {
         key: 'render',
         value: function render() {
             var informationText = 'To search multiple terms at once, insert "AND" between them. If a term contains a space, place the term in quotes';
+            var TermQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["TermQuery"];
             return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'div',
                 null,
@@ -29927,6 +29930,13 @@ var SearchApplication = function (_React$Component) {
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 __WEBPACK_IMPORTED_MODULE_2_searchkit__["SideBar"],
                                 null,
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                    id: 'release_data',
+                                    title: 'Is Released',
+                                    field: 'release',
+                                    operator: 'AND',
+                                    translations: { "true": "Released Data", "false": "Proprietary Data" }
+                                }),
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
                                     id: 'institution',
                                     title: 'Institutions',

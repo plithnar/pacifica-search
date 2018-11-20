@@ -32,7 +32,7 @@ export default class SearchApplication extends React.Component {
         const instance = this;
         return (query)=> {
             return query.addQuery( BoolMust([
-                    TermQuery("_type", "transactions")
+                    TermQuery("_type", "transactions"),
                 ])
             )}
 
@@ -76,6 +76,7 @@ export default class SearchApplication extends React.Component {
 
     render() {
         var informationText = 'To search multiple terms at once, insert "AND" between them. If a term contains a space, place the term in quotes';
+        var TermQuery = Searchkit.TermQuery;
         return(
             <div>
                 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
@@ -101,6 +102,13 @@ export default class SearchApplication extends React.Component {
                         <Searchkit.LayoutBody>
                             {/* Facets/Filters */}
                             <Searchkit.SideBar>
+                                <Searchkit.RefinementListFilter
+                                    id="release_data"
+                                    title="Is Released"
+                                    field="release"
+                                    operator="AND"
+                                    translations={{"true": "Released Data", "false": "Proprietary Data"}}
+                                />
                                 <Searchkit.RefinementListFilter
                                     id="institution"
                                     title="Institutions"
