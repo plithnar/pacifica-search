@@ -13,6 +13,9 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import _ from 'lodash';
 
+// CSS for the React datepicker
+import "react-datepicker/dist/react-datepicker.css";
+
 /**
  * Searchkit filter accessor for date range
  */
@@ -219,33 +222,35 @@ export default class DateRangeFilter extends SearchkitComponent {
         var endDate = _.get(state, "endDate", this.props.endDate);
         return (
             <div className={"date-picker"}>
-                    <DatePicker
-                        ref="datePickerStart"
-                        data-picker-id="date-picker-start"
-                        dateFormat="D MMM YYYY"
-                        selected={moment(startDate,"D MMM YYYY")}
-                        onChange={this.startDateChanged.bind(this)}
-                        adjustDateOnChange
-                        peekNextMonth
-                        showMonthDropdown
-                        showYearDropdown
-                        dropdownMode="select"
-                        customInput={<DatePickerCustomInput />}
-                    />
-                    &mdash;
-                    <DatePicker
-                        ref="datePickerEnd"
-                        data-picker-id="date-picker-end"
-                        dateFormat="D MMM YYYY"
-                        selected={moment(endDate,"D MMM YYYY")}
-                        onChange={this.endDateChanged.bind(this)}
-                        adjustDateOnChange
-                        peekNextMonth
-                        showMonthDropdown
-                        showYearDropdown
-                        dropdownMode="select"
-                        customInput={<DatePickerCustomInput />}
-                    />
+                <DatePicker
+                    ref="datePickerStart"
+                    data-picker-id="date-picker-start"
+                    dateFormat="D MMM YYYY"
+                    selected={moment(startDate,"D MMM YYYY")}
+                    onChange={this.startDateChanged.bind(this)}
+                    adjustDateOnChange
+                    peekNextMonth
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    customInput={<DatePickerCustomInput />}
+                />
+                &nbsp;
+                &mdash;
+                &nbsp;
+                <DatePicker
+                    ref="datePickerEnd"
+                    data-picker-id="date-picker-end"
+                    dateFormat="D MMM YYYY"
+                    selected={moment(endDate,"D MMM YYYY")}
+                    onChange={this.endDateChanged.bind(this)}
+                    adjustDateOnChange
+                    peekNextMonth
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    customInput={<DatePickerCustomInput />}
+                />
 
             </div>
         )

@@ -52,18 +52,10 @@ export default class SearchApplication extends React.Component {
         // put code in here that happens after the component is refreshed
     }
 
-    formatDateForDatePicker(date) {
-        // convert to proper format for date picker component
-        return moment(date).format("D MMM YYYY");
-    }
-
     formatDateForElasticSearch(date) {
         // convert to proper format for search_date queries
-        return moment(date).format("YYYY-MM-DD");
-    }
-
-    getOneYearFromToday() {
-        return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+        console.log('convert date for elastic_search', date);
+        return moment(date).format("YYYY-MM-DDTHH:MM:SS");
     }
 
     decayingScoreQuery(scoreFunction, field, scale, origin, decay, query) {
@@ -119,16 +111,16 @@ export default class SearchApplication extends React.Component {
                                     operator="AND"
                                     translations={{"true": "Released Data", "false": "Proprietary Data"}}
                                 />
-                                {/*
+
                                 <DateRangeFilter
                                     id="upload_date"
-                                    field="upload_date"
-                                    queryDateFormat="YYYY-MM-DD"
+                                    field="updated_date"
+                                    queryDateFormat="YYYY-MM-DDTHH:MM:SS"
                                     title="Upload Date"
                                     startDate={"1 Jan 1986"}
                                     endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
                                 />
-                                */}
+
                                 <Searchkit.RefinementListFilter
                                     id="institution"
                                     title="Institutions"
