@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import * as Searchkit from 'searchkit';
 import TransactionListItem from './transactionListItem';
 import DateRangeFilter from './dateRangeFilter';
+import CollapsiblePanel from './collapsiblePanel';
 import moment from 'moment';
 
 export default class SearchApplication extends React.Component {
@@ -54,7 +55,6 @@ export default class SearchApplication extends React.Component {
 
     formatDateForElasticSearch(date) {
         // convert to proper format for search_date queries
-        console.log('convert date for elastic_search', date);
         return moment(date).format("YYYY-MM-DDTHH:MM:SS");
     }
 
@@ -104,65 +104,86 @@ export default class SearchApplication extends React.Component {
                         <Searchkit.LayoutBody>
                             {/* Facets/Filters */}
                             <Searchkit.SideBar>
-                                <Searchkit.RefinementListFilter
-                                    id="release_data"
-                                    title="Is Released"
-                                    field="release"
-                                    operator="AND"
-                                    translations={{"true": "Released Data", "false": "Proprietary Data"}}
-                                />
+                                <CollapsiblePanel title="Dataset">
+                                    <Searchkit.RefinementListFilter
+                                        id="release_data"
+                                        title="Is Released"
+                                        field="release"
+                                        operator="AND"
+                                        translations={{"true": "Released Data", "false": "Proprietary Data"}}
+                                    />
 
-                                <DateRangeFilter
-                                    id="upload_date"
-                                    field="updated_date"
-                                    queryDateFormat="YYYY-MM-DDTHH:MM:SS"
-                                    title="Upload Date"
-                                    startDate={"1 Jan 1986"}
-                                    endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
-                                />
+                                    <DateRangeFilter
+                                        id="created_date"
+                                        field="created_date"
+                                        queryDateFormat="YYYY-MM-DDTHH:MM:SS"
+                                        title="Upload Date"
+                                        startDate={"1 Jan 2010"}
+                                        endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
+                                    />
+                                </CollapsiblePanel>
 
-                                <Searchkit.RefinementListFilter
-                                    id="institution"
-                                    title="Institutions"
-                                    field="institutions.keyword"
-                                    operator="AND"
-                                    size={10}
-                                />
-                                <Searchkit.RefinementListFilter
-                                    id="instruments"
-                                    title="Instruments"
-                                    field="instruments.keyword"
-                                    operator="AND"
-                                    size={10}
-                                />
-                                <Searchkit.RefinementListFilter
-                                    id="instrument_groups"
-                                    title="Instrument Groups"
-                                    field="instrument_groups.keyword"
-                                    operator="AND"
-                                    size={10}
-                                />
-                                <Searchkit.RefinementListFilter
-                                    id="users"
-                                    title="Users"
-                                    field="users.keyword"
-                                    operator="AND"
-                                    size={10}
-                                />
-                                <Searchkit.RefinementListFilter
-                                    id="proposals"
-                                    title="Proposals"
-                                    field="proposals.keyword"
-                                    operator="AND"
-                                    size={10}
-                                />
-                                <Searchkit.RefinementListFilter
-                                    id="theme"
-                                    title="Science Themes"
-                                    field="science_themes.keyword"
-                                    operator="AND"
-                                    size={10}
-                                />
+                                <CollapsiblePanel title="Institution">
+                                    <Searchkit.RefinementListFilter
+                                        id="institution"
+                                        title="Institution Name"
+                                        field="institutions.keyword"
+                                        operator="AND"
+                                        size={10}
+                                    />
+                                </CollapsiblePanel>
+                                <CollapsiblePanel title="Instruments" >
+                                    <Searchkit.RefinementListFilter
+                                        id="instruments"
+                                        title="Instruments Name"
+                                        field="instruments.keyword"
+                                        operator="AND"
+                                        size={10}
+                                    />
+                                </CollapsiblePanel>
+                                <CollapsiblePanel title="Instrument Groups" >
+                                    <Searchkit.RefinementListFilter
+                                        id="instrument_groups"
+                                        title="Group Name"
+                                        field="instrument_groups.keyword"
+                                        operator="AND"
+                                        size={10}
+                                    />
+                                </CollapsiblePanel>
+                                <CollapsiblePanel title="Users" >
+                                    <Searchkit.RefinementListFilter
+                                        id="users"
+                                        title="User Name"
+                                        field="users.keyword"
+                                        operator="AND"
+                                        size={10}
+                                    />
+                                </CollapsiblePanel>
+                                <CollapsiblePanel title="Proposals" >
+                                    <DateRangeFilter
+                                        id="proposals.actual_start_date"
+                                        field="proposals.actual_start_date"
+                                        queryDateFormat="YYYY-MM-DD"
+                                        title="Start Date"
+                                        startDate={"1 Jan 2002"}
+                                        endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
+                                    />
+                                    <DateRangeFilter
+                                        id="proposals.actual_end_date"
+                                        field="proposals.actual_end_date"
+                                        queryDateFormat="YYYY-MM-DD"
+                                        title="End Date"
+                                        startDate={"1 Jan 2002"}
+                                        endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
+                                    />
+                                    <Searchkit.RefinementListFilter
+                                        id="proposals"
+                                        title="Proposal Title"
+                                        field="proposals.keyword"
+                                        operator="AND"
+                                        size={10}
+                                    />
+                                </CollapsiblePanel>
                             </Searchkit.SideBar>
                             <Searchkit.LayoutResults>
                                 <Searchkit.ActionBarRow>

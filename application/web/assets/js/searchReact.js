@@ -30094,8 +30094,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_searchkit___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_searchkit__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__transactionListItem__ = __webpack_require__(157);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__ = __webpack_require__(745);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__ = __webpack_require__(764);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_moment__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -30105,6 +30106,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 
 
 
@@ -30141,7 +30143,7 @@ var SearchApplication = function (_React$Component) {
         key: 'formatDateForDatePicker',
         value: function formatDateForDatePicker(date) {
             // convert to proper format for date picker component
-            return __WEBPACK_IMPORTED_MODULE_5_moment___default()(date).format("D MMM YYYY");
+            return __WEBPACK_IMPORTED_MODULE_6_moment___default()(date).format("D MMM YYYY");
         }
     }, {
         key: 'getOneYearFromToday',
@@ -30170,8 +30172,7 @@ var SearchApplication = function (_React$Component) {
         key: 'formatDateForElasticSearch',
         value: function formatDateForElasticSearch(date) {
             // convert to proper format for search_date queries
-            console.log('convert date for elastic_search', date);
-            return __WEBPACK_IMPORTED_MODULE_5_moment___default()(date).format("YYYY-MM-DDTHH:MM:SS");
+            return __WEBPACK_IMPORTED_MODULE_6_moment___default()(date).format("YYYY-MM-DDTHH:MM:SS");
         }
     }, {
         key: 'decayingScoreQuery',
@@ -30232,63 +30233,96 @@ var SearchApplication = function (_React$Component) {
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 __WEBPACK_IMPORTED_MODULE_2_searchkit__["SideBar"],
                                 null,
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                    id: 'release_data',
-                                    title: 'Is Released',
-                                    field: 'release',
-                                    operator: 'AND',
-                                    translations: { "true": "Released Data", "false": "Proprietary Data" }
-                                }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
-                                    id: 'upload_date',
-                                    field: 'updated_date',
-                                    queryDateFormat: 'YYYY-MM-DDTHH:MM:SS',
-                                    title: 'Upload Date',
-                                    startDate: "1 Jan 1986",
-                                    endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
-                                }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                    id: 'institution',
-                                    title: 'Institutions',
-                                    field: 'institutions.keyword',
-                                    operator: 'AND',
-                                    size: 10
-                                }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                    id: 'instruments',
-                                    title: 'Instruments',
-                                    field: 'instruments.keyword',
-                                    operator: 'AND',
-                                    size: 10
-                                }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                    id: 'instrument_groups',
-                                    title: 'Instrument Groups',
-                                    field: 'instrument_groups.keyword',
-                                    operator: 'AND',
-                                    size: 10
-                                }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                    id: 'users',
-                                    title: 'Users',
-                                    field: 'users.keyword',
-                                    operator: 'AND',
-                                    size: 10
-                                }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                    id: 'proposals',
-                                    title: 'Proposals',
-                                    field: 'proposals.keyword',
-                                    operator: 'AND',
-                                    size: 10
-                                }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                    id: 'theme',
-                                    title: 'Science Themes',
-                                    field: 'science_themes.keyword',
-                                    operator: 'AND',
-                                    size: 10
-                                })
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                                    { title: 'Dataset' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                        id: 'release_data',
+                                        title: 'Is Released',
+                                        field: 'release',
+                                        operator: 'AND',
+                                        translations: { "true": "Released Data", "false": "Proprietary Data" }
+                                    }),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
+                                        id: 'created_date',
+                                        field: 'created_date',
+                                        queryDateFormat: 'YYYY-MM-DDTHH:MM:SS',
+                                        title: 'Upload Date',
+                                        startDate: "1 Jan 2010",
+                                        endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
+                                    })
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                                    { title: 'Institution' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                        id: 'institution',
+                                        title: 'Institution Name',
+                                        field: 'institutions.keyword',
+                                        operator: 'AND',
+                                        size: 10
+                                    })
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                                    { title: 'Instruments' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                        id: 'instruments',
+                                        title: 'Instruments Name',
+                                        field: 'instruments.keyword',
+                                        operator: 'AND',
+                                        size: 10
+                                    })
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                                    { title: 'Instrument Groups' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                        id: 'instrument_groups',
+                                        title: 'Group Name',
+                                        field: 'instrument_groups.keyword',
+                                        operator: 'AND',
+                                        size: 10
+                                    })
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                                    { title: 'Users' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                        id: 'users',
+                                        title: 'User Name',
+                                        field: 'users.keyword',
+                                        operator: 'AND',
+                                        size: 10
+                                    })
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                                    { title: 'Proposals' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
+                                        id: 'proposals.actual_start_date',
+                                        field: 'proposals.actual_start_date',
+                                        queryDateFormat: 'YYYY-MM-DD',
+                                        title: 'Start Date',
+                                        startDate: "1 Jan 2002",
+                                        endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
+                                    }),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
+                                        id: 'proposals.actual_end_date',
+                                        field: 'proposals.actual_end_date',
+                                        queryDateFormat: 'YYYY-MM-DD',
+                                        title: 'End Date',
+                                        startDate: "1 Jan 2002",
+                                        endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
+                                    }),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                        id: 'proposals',
+                                        title: 'Proposal Title',
+                                        field: 'proposals.keyword',
+                                        operator: 'AND',
+                                        size: 10
+                                    })
+                                )
                             ),
                             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                 __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutResults"],
@@ -96278,6 +96312,84 @@ module.exports = function (css) {
 	return fixedCss;
 };
 
+
+/***/ }),
+/* 764 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+
+/**
+ * Utility class to wrap a collapsible panel around facets
+ */
+
+var CollapsiblePanel = function (_React$Component) {
+    _inherits(CollapsiblePanel, _React$Component);
+
+    function CollapsiblePanel(props) {
+        _classCallCheck(this, CollapsiblePanel);
+
+        // set state collapsed = true
+        var _this = _possibleConstructorReturn(this, (CollapsiblePanel.__proto__ || Object.getPrototypeOf(CollapsiblePanel)).call(this, props));
+
+        _this.state = { collapsed: true };
+
+        // This binding is necessary to make `this` work in the callback
+        _this.toggleDisplay = _this.toggleDisplay.bind(_this);
+        return _this;
+    }
+
+    _createClass(CollapsiblePanel, [{
+        key: "toggleDisplay",
+        value: function toggleDisplay() {
+            // toggle the value of the collapsed state variable - this will trigger a render any time state changes
+            this.setState(function (prevState) {
+                return {
+                    collapsed: !prevState.collapsed
+                };
+            });
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            // if collapsed, then use display:none on the panel
+            var classname = void 0;
+            if (this.state.collapsed) {
+                classname = "collapsible-panel collapsed";
+            } else {
+                classname = "collapsible-panel expanded";
+            }
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                "div",
+                { className: classname },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    "div",
+                    { className: "collapsible-title", onClick: this.toggleDisplay },
+                    this.props.title
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    "div",
+                    { className: "collapsible-body" },
+                    this.props.children
+                )
+            );
+        }
+    }]);
+
+    return CollapsiblePanel;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+
+/* harmony default export */ __webpack_exports__["a"] = (CollapsiblePanel);
 
 /***/ })
 /******/ ]);
