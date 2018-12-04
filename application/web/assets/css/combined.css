@@ -342,7 +342,8 @@ button:hover, .buttons input[type="button"]:hover {
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 10em;
-    width: 960px;
+    min-width: 960px;
+    width: 80%;
 }
 
 .menu_separator {
