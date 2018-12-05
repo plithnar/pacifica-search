@@ -9,6 +9,7 @@
 
 .sk-layout__top-bar {
     position: relative;
+    z-index: 1;
 }
 
 .sk-layout__body {

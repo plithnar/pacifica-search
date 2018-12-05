@@ -30335,7 +30335,14 @@ var SearchApplication = function (_React$Component) {
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
                                     null,
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SelectedFilters"], null),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SelectedFilters"], {
+                                        translations: {
+                                            "End Date": "Proposal End Date",
+                                            "Start Date": "Proposal Start Date",
+                                            "Upload Date": "Dataset Upload Date",
+                                            "User Name": "Dataset Author"
+                                        }
+                                    }),
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["ResetFilters"], null)
                                 ),
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Hits"], {
