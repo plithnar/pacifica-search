@@ -51,3 +51,20 @@
 .collapsible-panel .collapsible-title:hover {
     cursor: pointer;
 }
+
+.truncate-abstract {
+    position: relative;
+    height: 60px;
+    overflow: hidden;
+}
+
+.truncate-abstract:after {
+    content: "";
+    text-align: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50%;
+    height: 20px;
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1));
+}

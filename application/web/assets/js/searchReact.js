@@ -11091,6 +11091,11 @@ var TransactionListItem = function (_Component) {
         var _this = _possibleConstructorReturn(this, (TransactionListItem.__proto__ || Object.getPrototypeOf(TransactionListItem)).call(this, props));
 
         _this.displayFileList = _this.displayFileList.bind(_this);
+        _this.state = {
+            truncate: true
+        };
+
+        _this.toggleAbstract = _this.toggleAbstract.bind(_this);
         return _this;
     }
 
@@ -11098,14 +11103,6 @@ var TransactionListItem = function (_Component) {
         key: 'loadFiles',
         value: function loadFiles() {
             var source = this.props.result._source;
-            // debugger;
-            // $.ajax({
-            //     url: '/file_tree/transactions/' + this.props.result._source.obj_id + '/files'
-            // }).success((result) => {
-            //     console.log('ajax result', result);
-            //     debugger;
-            // });
-
             $('#' + source.obj_id + '.results_filetree').fancytree({
                 checkbox: function checkbox(event, data) {
                     // Hide checkboxes for folders
@@ -11117,23 +11114,7 @@ var TransactionListItem = function (_Component) {
                 source: {
                     url: '/file_tree/transactions/' + source.obj_id.split('_')[1] + '/files',
                     cache: false
-                    // source: this.buildSourceObj(),
-                    // lazyLoad: function(event, data){
-                    //     var transactionId = data.node.key;
-                    //     data.result = {
-                    //         url: '/file_tree/transactions/' + transactionId + '/files',
-                    //         data: {mode: 'children', parent: transactionId},
-                    //         cache: false
-                    //     };
                 }
-                // createNode: function(event, data){
-                //     if($('#results_pager').is(':hidden')){
-                //         $('#results_pager').show();
-                //     }
-                //     $('#files .page_number').html(1);
-                //     $('.results_instructions').hide();
-                //     $('#results_filetree').show()
-                // }
             });
         }
     }, {
@@ -11159,9 +11140,9 @@ var TransactionListItem = function (_Component) {
              *                  folder: true
              *                  lazy: true
              *                  }
-            *                  ]
-            *                  }
-            *                  ]
+             *                  ]
+             *                  }
+             *                  ]
              */
             var fileTreeObj = {
                 title: "Files uploaded (Transaction " + source.obj_id.split('_')[1] + ")",
@@ -11184,6 +11165,39 @@ var TransactionListItem = function (_Component) {
             $('#' + source.obj_id + '.filesPanel').show();
         }
     }, {
+        key: 'toggleAbstract',
+        value: function toggleAbstract() {
+            this.setState({ truncate: !this.state.truncate });
+        }
+    }, {
+        key: 'renderAbstract',
+        value: function renderAbstract(abstractText) {
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'p',
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'p',
+                    { className: this.state.truncate ? 'truncate-abstract' : '' },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'b',
+                        null,
+                        'Abstract:'
+                    ),
+                    ' ',
+                    abstractText
+                ),
+                this.state.truncate ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'div',
+                    { onClick: this.toggleAbstract, style: { 'color': '#08c' } },
+                    'Display full abstract'
+                ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'div',
+                    { onClick: this.toggleAbstract, style: { 'color': '#08c' } },
+                    'Display truncated abstract'
+                )
+            );
+        }
+    }, {
         key: 'render',
         value: function render() {
             var source = this.props.result._source;
@@ -11197,31 +11211,50 @@ var TransactionListItem = function (_Component) {
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'div',
                     null,
-                    'Dataset: ',
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'b',
+                        null,
+                        'Dataset:'
+                    ),
+                    ' ',
                     source.obj_id.split('_')[1]
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'p',
                     null,
-                    'Proposal: ',
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'b',
+                        null,
+                        'Proposal:'
+                    ),
+                    ' ',
                     proposals.title,
                     ' (#',
                     proposals.obj_id.split('_')[1],
                     ') ',
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-                    'Abstract: ',
-                    proposals.abstract
+                    this.renderAbstract(proposals.abstract)
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'p',
                     null,
-                    'Instrument: ',
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'b',
+                        null,
+                        'Instrument:'
+                    ),
+                    ' ',
                     instruments.display_name,
                     ' (#',
                     instruments.obj_id.split('_')[1],
                     ') ',
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-                    'Insturment Long Name: ',
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'b',
+                        null,
+                        'Insturment Long Name:'
+                    ),
+                    ' ',
                     instruments.long_name
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
