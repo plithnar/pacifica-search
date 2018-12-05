@@ -10,10 +10,11 @@
 .sk-layout__top-bar {
     position: relative;
     background: rgb(83, 105, 43);
+    z-index: 1;
 }
 
 .sk-layout__body {
-     margin: 5px auto 0;
+    margin: 5px auto 0;
     min-width: 600px;
 }
 
@@ -33,4 +34,35 @@
     color: #fff;
     background-color: rgb(113, 149, 0);
     border-color: rgb(113, 149, 0);
+}
+
+.collapsible-panel.collapsed {
+    margin-bottom: 16px;
+}
+
+.collapsible-panel.collapsed .collapsible-title::before {
+    content: "\f0da";
+    font-family: FontAwesome;
+    padding-right: 2px;
+}
+
+.collapsible-panel.collapsed .collapsible-body {
+    display: none;
+}
+
+.collapsible-panel.expanded .collapsible-title::before {
+    content: "\f0d7";
+    font-family: FontAwesome;
+    padding-right: 2px;
+}
+
+.collapsible-panel .collapsible-title {
+    font-weight: 800;
+    font-size: 16px;
+    color: #000;
+    margin-bottom: 5px;
+}
+
+.collapsible-panel .collapsible-title:hover {
+    cursor: pointer;
 }
