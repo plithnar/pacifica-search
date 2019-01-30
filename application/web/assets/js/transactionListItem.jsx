@@ -4,18 +4,15 @@ export default class TransactionListItem extends Component {
     constructor(props) {
         super(props);
         this.displayFileList = this.displayFileList.bind(this);
+        this.state = {
+            truncate: true
+        };
+
+        this.toggleAbstract = this.toggleAbstract.bind(this);
     }
 
     loadFiles() {
         const source = this.props.result._source;
-        // debugger;
-        // $.ajax({
-        //     url: '/file_tree/transactions/' + this.props.result._source.obj_id + '/files'
-        // }).success((result) => {
-        //     console.log('ajax result', result);
-        //     debugger;
-        // });
-
         $('#'+source.obj_id+'.results_filetree').fancytree({
             checkbox: function(event, data) {
                 // Hide checkboxes for folders
@@ -27,23 +24,7 @@ export default class TransactionListItem extends Component {
             source: {
                 url: '/file_tree/transactions/' + source.obj_id.split('_')[1] + '/files',
                 cache: false
-            // source: this.buildSourceObj(),
-            // lazyLoad: function(event, data){
-            //     var transactionId = data.node.key;
-            //     data.result = {
-            //         url: '/file_tree/transactions/' + transactionId + '/files',
-            //         data: {mode: 'children', parent: transactionId},
-            //         cache: false
-            //     };
             },
-            // createNode: function(event, data){
-            //     if($('#results_pager').is(':hidden')){
-            //         $('#results_pager').show();
-            //     }
-            //     $('#files .page_number').html(1);
-            //     $('.results_instructions').hide();
-            //     $('#results_filetree').show()
-            // }
         });
     }
 
@@ -68,9 +49,9 @@ export default class TransactionListItem extends Component {
          *                  folder: true
          *                  lazy: true
          *                  }
-     *                  ]
- *                  }
-*                  ]
+         *                  ]
+         *                  }
+         *                  ]
          */
         const fileTreeObj = {
             title: "Files uploaded (Transaction " + source.obj_id.split('_')[1]+")",
@@ -91,6 +72,25 @@ export default class TransactionListItem extends Component {
         $('#'+source.obj_id+'.filesPanel').show();
     }
 
+    toggleAbstract() {
+        this.setState({truncate: !this.state.truncate});
+    }
+
+    renderAbstract(abstractText) {
+        return (
+            <p>
+                <p className={this.state.truncate ? 'truncate-abstract': ''}>
+                    <b>Abstract:</b> {abstractText}
+                </p>
+                {this.state.truncate ? (
+                    <div onClick={this.toggleAbstract} style={{'color':'#08c'}}>Display full abstract</div>
+                ) : (
+                    <div onClick={this.toggleAbstract} style={{'color':'#08c'}}>Display truncated abstract</div>
+                )}
+            </p>
+        )
+    }
+
     render() {
         const source = this.props.result._source;
         const proposals = source.proposals[0];
@@ -100,15 +100,15 @@ export default class TransactionListItem extends Component {
         return(
             <div className="transactionResultHit">
                 <div>
-                    Dataset: {source.obj_id.split('_')[1]}
+                    <b>Dataset:</b> {source.obj_id.split('_')[1]}
                 </div>
                 <p>
-                    Proposal: {proposals.title} (#{proposals.obj_id.split('_')[1]}) <br />
-                    Abstract: {proposals.abstract}
+                    <b>Proposal:</b> {proposals.title} (#{proposals.obj_id.split('_')[1]}) <br />
+                    {this.renderAbstract(proposals.abstract)}
                 </p>
                 <p>
-                    Instrument: {instruments.display_name} (#{instruments.obj_id.split('_')[1]}) <br />
-                    Insturment Long Name: {instruments.long_name}
+                    <b>Instrument:</b> {instruments.display_name} (#{instruments.obj_id.split('_')[1]}) <br />
+                    <b>Insturment Long Name:</b> {instruments.long_name}
                 </p>
                 <button onClick={this.displayFileList}>View Files</button>
                 <div className="transactionFileResults">

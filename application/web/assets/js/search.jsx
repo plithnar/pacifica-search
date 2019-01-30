@@ -190,7 +190,14 @@ export default class SearchApplication extends React.Component {
                                     <Searchkit.HitsStats translations={{"hitstats.results_found":"{hitCount} results found"}}/>
                                 </Searchkit.ActionBarRow>
                                 <Searchkit.ActionBarRow>
-                                    <Searchkit.SelectedFilters />
+                                    <Searchkit.SelectedFilters
+                                        translations={{
+                                            "End Date":"Proposal End Date",
+                                            "Start Date":"Proposal Start Date",
+                                            "Upload Date":"Dataset Upload Date",
+                                            "User Name":"Dataset Author"
+                                        }}
+                                    />
                                     <Searchkit.ResetFilters />
                                 </Searchkit.ActionBarRow>
                                 <Searchkit.Hits
