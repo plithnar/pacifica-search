@@ -11173,7 +11173,7 @@ var TransactionListItem = function (_Component) {
         key: 'renderAbstract',
         value: function renderAbstract(abstractText) {
             return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'p',
+                'div',
                 null,
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'p',
@@ -11205,10 +11205,25 @@ var TransactionListItem = function (_Component) {
             var instruments = source.instruments[0];
             var themes = source.science_themes[0];
             var users = source.users[0];
+            var access_url = source.access_url;
+            console.log('source!', source);
             return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'div',
                 { className: 'transactionResultHit' },
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                access_url !== undefined ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'div',
+                    null,
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'b',
+                        null,
+                        'Dataset:'
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'a',
+                        { href: access_url, target: '_blank' },
+                        source.obj_id.split('_')[1]
+                    )
+                ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'div',
                     null,
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -30275,6 +30290,13 @@ var SearchApplication = function (_React$Component) {
                                         field: 'release',
                                         operator: 'AND',
                                         translations: { "true": "Released Data", "false": "Proprietary Data" }
+                                    }),
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                        id: 'doi',
+                                        title: 'Has Data DOI',
+                                        field: 'has_doi',
+                                        operator: 'AND',
+                                        translations: { "true": "Yes", "false": "No" }
                                     }),
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
                                         id: 'created_date',

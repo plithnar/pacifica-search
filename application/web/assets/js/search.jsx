@@ -112,7 +112,13 @@ export default class SearchApplication extends React.Component {
                                         operator="AND"
                                         translations={{"true": "Released Data", "false": "Proprietary Data"}}
                                     />
-
+                                    <Searchkit.RefinementListFilter
+                                        id="doi"
+                                        title="Has Data DOI"
+                                        field="has_doi"
+                                        operator="AND"
+                                        translations={{"true": "Yes", "false": "No"}}
+                                    />
                                     <DateRangeFilter
                                         id="created_date"
                                         field="created_date"
