@@ -78,7 +78,7 @@ export default class TransactionListItem extends Component {
 
     renderAbstract(abstractText) {
         return (
-            <div>
+            <p>
                 <p className={this.state.truncate ? 'truncate-abstract': ''}>
                     <b>Abstract:</b> {abstractText}
                 </p>
@@ -87,7 +87,7 @@ export default class TransactionListItem extends Component {
                 ) : (
                     <div onClick={this.toggleAbstract} style={{'color':'#08c'}}>Display truncated abstract</div>
                 )}
-            </div>
+            </p>
         )
     }
 
@@ -97,20 +97,11 @@ export default class TransactionListItem extends Component {
         const instruments = source.instruments[0];
         const themes = source.science_themes[0];
         const users = source.users[0];
-        const access_url = source.access_url;
-        console.log('source!', source);
         return(
             <div className="transactionResultHit">
-                {access_url !== undefined ? (
-                    <div>
-                        <b>Dataset:</b>
-                        <a href={access_url} target="_blank">{source.obj_id.split('_')[1]}</a>
-                    </div>
-                ) : (
-                    <div>
-                        <b>Dataset:</b> {source.obj_id.split('_')[1]}
-                    </div>
-                    )}
+                <div>
+                    <b>Dataset:</b> {source.obj_id.split('_')[1]}
+                </div>
                 <p>
                     <b>Proposal:</b> {proposals.title} (#{proposals.obj_id.split('_')[1]}) <br />
                     {this.renderAbstract(proposals.abstract)}
