@@ -21,6 +21,7 @@ services:
     PacificaSearchBundle\Controller\GuiController:
         arguments:
             - "%elasticsearch_host%"
+            - "%metadata_host%"
             - "@templating"
 
     PacificaSearchBundle\Controller\FileTreeController:

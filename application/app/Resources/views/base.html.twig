@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>{% filter title %}{% block site_id %}Site Identifier{% endblock %} - {% block title %}Welcome!{% endblock %}{% endfilter %}</title>
+        <title>{% block site_id %}Site Identifier{% endblock %} - {% block title %}Welcome!{% endblock %}</title>
         <meta http-equiv="Content-Type" content="{% block meta_content_type %}text/html;charset=UTF-8{% endblock %}" />
         <meta name="description" content="{% block meta_description %}{% endblock %}" />
         <meta name="keywords" content="{% block meta_keywords %}{% endblock %}" />
@@ -76,7 +76,7 @@
             <div id="header_container">
               <h1 class="underline">{% block page_header %}Default Page Header{% endblock %}</h1>
               <div id="login_id_container">
-                <em>{{ app.user.fullName|default('Anonymous Stranger') }}</em>
+                <em>{{  user_string|default('Anonymous Stranger') }}</em>
               </div>
             </div>
             {% block body %}{% endblock %}

@@ -119,7 +119,10 @@ export default class TransactionListItem extends Component {
                     <b>Instrument:</b> {instruments.display_name} (#{instruments.obj_id.split('_')[1]}) <br />
                     <b>Insturment Long Name:</b> {instruments.long_name}
                 </p>
-                <button onClick={this.displayFileList}>View Files</button>
+                <span style={{display:'flex'}}>
+                    <button className="btn btn-default" onClick={this.displayFileList}>View Files</button>
+                    <button className="btn btn-default" style={{float:'right'}}>Download Files</button>
+                </span>
                 <div className="transactionFileResults">
                     <div id={source.obj_id} className="filesPanel">
                         <div id={source.obj_id} className="results_filetree"></div>

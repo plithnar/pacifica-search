@@ -11273,9 +11273,18 @@ var TransactionListItem = function (_Component) {
                     instruments.long_name
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    'button',
-                    { onClick: this.displayFileList },
-                    'View Files'
+                    'span',
+                    { style: { display: 'flex' } },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'button',
+                        { className: 'btn btn-default', onClick: this.displayFileList },
+                        'View Files'
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'button',
+                        { className: 'btn btn-default', style: { float: 'right' } },
+                        'Download Files'
+                    )
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'div',
