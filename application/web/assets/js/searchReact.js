@@ -11072,6 +11072,7 @@ var Manager = function (_React$Component) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__itemAbstract__ = __webpack_require__(765);
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -11079,6 +11080,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 
 
 
@@ -11091,11 +11093,6 @@ var TransactionListItem = function (_Component) {
         var _this = _possibleConstructorReturn(this, (TransactionListItem.__proto__ || Object.getPrototypeOf(TransactionListItem)).call(this, props));
 
         _this.displayFileList = _this.displayFileList.bind(_this);
-        _this.state = {
-            truncate: true
-        };
-
-        _this.toggleAbstract = _this.toggleAbstract.bind(_this);
         return _this;
     }
 
@@ -11165,37 +11162,9 @@ var TransactionListItem = function (_Component) {
             $('#' + source.obj_id + '.filesPanel').show();
         }
     }, {
-        key: 'toggleAbstract',
-        value: function toggleAbstract() {
-            this.setState({ truncate: !this.state.truncate });
-        }
-    }, {
         key: 'renderAbstract',
         value: function renderAbstract(abstractText) {
-            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'div',
-                null,
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    'p',
-                    { className: this.state.truncate ? 'truncate-abstract' : '' },
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                        'b',
-                        null,
-                        'Abstract:'
-                    ),
-                    ' ',
-                    abstractText
-                ),
-                this.state.truncate ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    'div',
-                    { onClick: this.toggleAbstract, style: { 'color': '#08c' } },
-                    'Display full abstract'
-                ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    'div',
-                    { onClick: this.toggleAbstract, style: { 'color': '#08c' } },
-                    'Display truncated abstract'
-                )
-            );
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__itemAbstract__["a" /* default */], { abstractText: abstractText });
         }
     }, {
         key: 'render',
@@ -11206,7 +11175,6 @@ var TransactionListItem = function (_Component) {
             var themes = source.science_themes[0];
             var users = source.users[0];
             var access_url = source.access_url;
-            console.log('source!', source);
             return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'div',
                 { className: 'transactionResultHit' },
@@ -11235,21 +11203,17 @@ var TransactionListItem = function (_Component) {
                     source.obj_id.split('_')[1]
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    'p',
+                    'b',
                     null,
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                        'b',
-                        null,
-                        'Proposal:'
-                    ),
-                    ' ',
-                    proposals.title,
-                    ' (#',
-                    proposals.obj_id.split('_')[1],
-                    ') ',
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-                    this.renderAbstract(proposals.abstract)
+                    'Proposal:'
                 ),
+                ' ',
+                proposals.title,
+                ' (#',
+                proposals.obj_id.split('_')[1],
+                ') ',
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+                this.renderAbstract(proposals.abstract),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'p',
                     null,
@@ -11273,16 +11237,16 @@ var TransactionListItem = function (_Component) {
                     instruments.long_name
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    'span',
-                    { style: { display: 'flex' } },
+                    'div',
+                    { style: { display: 'inline' } },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                         'button',
                         { className: 'btn btn-default', onClick: this.displayFileList },
                         'View Files'
                     ),
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                        'button',
-                        { className: 'btn btn-default', style: { float: 'right' } },
+                        'a',
+                        { className: 'btn btn-default', style: { marginLeft: '100px' }, href: access_url, target: '_blank' },
                         'Download Files'
                     )
                 ),
@@ -96461,6 +96425,102 @@ var CollapsiblePanel = function (_React$Component) {
 }(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
 
 /* harmony default export */ __webpack_exports__["a"] = (CollapsiblePanel);
+
+/***/ }),
+/* 765 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+
+
+var ItemAbstract = function (_Component) {
+    _inherits(ItemAbstract, _Component);
+
+    function ItemAbstract(props) {
+        _classCallCheck(this, ItemAbstract);
+
+        var _this = _possibleConstructorReturn(this, (ItemAbstract.__proto__ || Object.getPrototypeOf(ItemAbstract)).call(this, props));
+
+        _this.state = {
+            showTruncate: false,
+            truncate: false
+        };
+        _this.toggleAbstract = _this.toggleAbstract.bind(_this);
+        return _this;
+    }
+
+    _createClass(ItemAbstract, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var height = this.abstractElement.clientHeight;
+            if (height > 60) {
+                this.setState({
+                    showTruncate: true,
+                    truncate: true
+                });
+            }
+        }
+    }, {
+        key: 'toggleAbstract',
+        value: function toggleAbstract() {
+            this.setState({ truncate: !this.state.truncate });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            var abstractText = this.props.abstractText;
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'p',
+                    {
+                        ref: function ref(abstractElement) {
+                            return _this2.abstractElement = abstractElement;
+                        },
+                        className: this.state.truncate ? 'truncate-abstract' : ''
+                    },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'b',
+                        null,
+                        'Abstract:'
+                    ),
+                    ' ',
+                    abstractText
+                ),
+                this.state.showTruncate ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'div',
+                    null,
+                    this.state.truncate ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'div',
+                        { onClick: this.toggleAbstract, style: { 'color': '#08c' } },
+                        'Display full abstract'
+                    ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                        'div',
+                        { onClick: this.toggleAbstract, style: { 'color': '#08c' } },
+                        'Display truncated abstract'
+                    )
+                ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', null)
+            );
+        }
+    }]);
+
+    return ItemAbstract;
+}(__WEBPACK_IMPORTED_MODULE_0_react__["Component"]);
+
+/* harmony default export */ __webpack_exports__["a"] = (ItemAbstract);
 
 /***/ })
 /******/ ]);

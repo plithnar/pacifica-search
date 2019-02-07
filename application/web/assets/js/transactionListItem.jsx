@@ -1,14 +1,10 @@
 import React, {Component} from 'react';
+import ItemAbstract from './itemAbstract';
 
 export default class TransactionListItem extends Component {
     constructor(props) {
         super(props);
         this.displayFileList = this.displayFileList.bind(this);
-        this.state = {
-            truncate: true
-        };
-
-        this.toggleAbstract = this.toggleAbstract.bind(this);
     }
 
     loadFiles() {
@@ -72,23 +68,11 @@ export default class TransactionListItem extends Component {
         $('#'+source.obj_id+'.filesPanel').show();
     }
 
-    toggleAbstract() {
-        this.setState({truncate: !this.state.truncate});
-    }
 
     renderAbstract(abstractText) {
         return (
-            <div>
-                <p className={this.state.truncate ? 'truncate-abstract': ''}>
-                    <b>Abstract:</b> {abstractText}
-                </p>
-                {this.state.truncate ? (
-                    <div onClick={this.toggleAbstract} style={{'color':'#08c'}}>Display full abstract</div>
-                ) : (
-                    <div onClick={this.toggleAbstract} style={{'color':'#08c'}}>Display truncated abstract</div>
-                )}
-            </div>
-        )
+            <ItemAbstract abstractText={abstractText}/>
+        );
     }
 
     render() {
@@ -98,7 +82,6 @@ export default class TransactionListItem extends Component {
         const themes = source.science_themes[0];
         const users = source.users[0];
         const access_url = source.access_url;
-        console.log('source!', source);
         return(
             <div className="transactionResultHit">
                 {access_url !== undefined ? (
@@ -111,18 +94,16 @@ export default class TransactionListItem extends Component {
                         <b>Dataset:</b> {source.obj_id.split('_')[1]}
                     </div>
                     )}
-                <p>
-                    <b>Proposal:</b> {proposals.title} (#{proposals.obj_id.split('_')[1]}) <br />
-                    {this.renderAbstract(proposals.abstract)}
-                </p>
+                <b>Proposal:</b> {proposals.title} (#{proposals.obj_id.split('_')[1]}) <br />
+                {this.renderAbstract(proposals.abstract)}
                 <p>
                     <b>Instrument:</b> {instruments.display_name} (#{instruments.obj_id.split('_')[1]}) <br />
                     <b>Insturment Long Name:</b> {instruments.long_name}
                 </p>
-                <span style={{display:'flex'}}>
+                <div style={{display:'inline'}}>
                     <button className="btn btn-default" onClick={this.displayFileList}>View Files</button>
-                    <button className="btn btn-default" style={{float:'right'}}>Download Files</button>
-                </span>
+                    <a className="btn btn-default" style={{marginLeft:'100px'}} href={access_url} target="_blank">Download Files</a>
+                </div>
                 <div className="transactionFileResults">
                     <div id={source.obj_id} className="filesPanel">
                         <div id={source.obj_id} className="results_filetree"></div>
