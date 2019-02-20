@@ -98,7 +98,6 @@ export default class TransactionListItem extends Component {
                 {this.renderAbstract(proposals.abstract)}
                 <p>
                     <b>Instrument:</b> {instruments.display_name} (#{instruments.obj_id.split('_')[1]}) <br />
-                    <b>Insturment Long Name:</b> {instruments.long_name}
                 </p>
                 <div style={{display:'inline'}}>
                     <button className="btn btn-default" onClick={this.displayFileList}>View Files</button>
