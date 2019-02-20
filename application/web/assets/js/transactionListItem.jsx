@@ -79,8 +79,6 @@ export default class TransactionListItem extends Component {
         const source = this.props.result._source;
         const proposals = source.proposals[0];
         const instruments = source.instruments[0];
-        const themes = source.science_themes[0];
-        const users = source.users[0];
         const access_url = source.access_url;
         return(
             <div className="transactionResultHit">
