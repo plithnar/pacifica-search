@@ -30236,10 +30236,13 @@ var SearchApplication = function (_React$Component) {
     function SearchApplication(props) {
         _classCallCheck(this, SearchApplication);
 
+        // this.state = {
+        //     keys: this.getAllKeyValuePairs()
+        // }
         var _this = _possibleConstructorReturn(this, (SearchApplication.__proto__ || Object.getPrototypeOf(SearchApplication)).call(this, props));
 
         _this.state = {
-            keys: _this.getAllKeyValuePairs()
+            keys: []
         };
 
         var host = _this.getHost(props.esHost);
@@ -30251,7 +30254,7 @@ var SearchApplication = function (_React$Component) {
 
         _this.searchkit.addDefaultQuery(_this.getDefaultQuery());
 
-        _this.getAllKeyValuePairs();
+        // this.getAllKeyValuePairs();
         return _this;
     }
 
@@ -30306,7 +30309,6 @@ var SearchApplication = function (_React$Component) {
                 // {scroll:1m, scroll_id: <scroll ID from result>}
                 // Add the results to the existing map/store
                 hits.forEach(function (hit) {
-                    debugger;
                     if (hit._source && hit._source.key_value_pairs && hit._source.key_value_pairs.key_value_objs) {
                         hit._source.key_value_pairs.key_value_objs.forEach(function (key) {
                             if (!keyArray.includes(key.key)) {
