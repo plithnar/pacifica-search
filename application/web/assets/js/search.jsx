@@ -80,6 +80,7 @@ export default class SearchApplication extends React.Component {
             // {scroll:1m, scroll_id: <scroll ID from result>}
             // Add the results to the existing map/store
             hits.forEach((hit)=> {
+                debugger;
                 if(hit._source && hit._source.key_value_pairs && hit._source.key_value_pairs.key_value_objs) {
                     hit._source.key_value_pairs.key_value_objs.forEach((key) => {
                         if (!keyArray.includes(key.key)) {
