@@ -28,3 +28,7 @@ parameters:
     #    elasticsearch_host: '<Your IP address>:19200'
     #    elasticsearch_index: 'pacifica_search'
     #    metadata_host: '<metadata server ip address or container name>'
+
+    site_name: 'EMSL'
+
+    
