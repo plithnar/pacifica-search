@@ -85,15 +85,45 @@
 }
 
 .level_1 {
-    margin-left: 5px;
+    margin-left: 15px;
     font-size: 14px;
+}
+.level_1 .collapsible-panel.expanded .collapsible-title::before {
+    content: "\f0d7";
+    font-family: FontAwesome;
+    padding-right: 2px;
+}
+.level_1 .collapsible-panel.collapsed .collapsible-title::before {
+    content: "\f0da";
+    font-family: FontAwesome;
+    padding-right: 2px;
 }
 
 .level_2 {
-    margin-left: 10px;
+    margin-left: 15px;
     font-size: 12px;
+}
+.level_2 .collapsible-panel.expanded .collapsible-title::before {
+    content: "\f0d7";
+    font-family: FontAwesome;
+    padding-right: 2px;
+}
+.level_2 .collapsible-panel.collapsed .collapsible-title::before {
+    content: "\f0da";
+    font-family: FontAwesome;
+    padding-right: 2px;
 }
 .level_3 {
     margin-left: 15px;
     font-size: 10px;
+}
+.level_3 .collapsible-panel.expanded .collapsible-title::before {
+    content: "\f0d7";
+    font-family: FontAwesome;
+    padding-right: 2px;
+}
+.level_3 .collapsible-panel.collapsed .collapsible-title::before {
+    content: "\f0da";
+    font-family: FontAwesome;
+    padding-right: 2px;
 }
