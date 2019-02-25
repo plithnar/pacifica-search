@@ -60,13 +60,11 @@ class GuiController
     public function __construct(
         $elasticSearchHost,
         $metadataHost,
-        EngineInterface $renderingEngine,
-        $siteName
+        EngineInterface $renderingEngine
     ) {
         $this->renderingEngine = $renderingEngine;
         $this->elasticSearchHost = $elasticSearchHost;
         $this->metadataHost = $metadataHost;
-        $this->siteName = $siteName;
     }
 
     /**
@@ -81,7 +79,6 @@ class GuiController
                 'page_data' => $this->page_data,
                 'elastic_search_host' => $this->elasticSearchHost,
                 'user_string' => $this->get_user(),
-                'site_name' => $this->siteName
             ]
         );
 
