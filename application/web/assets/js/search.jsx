@@ -5,11 +5,19 @@ import TransactionListItem from './transactionListItem';
 import DateRangeFilter from './dateRangeFilter';
 import CollapsiblePanel from './collapsiblePanel';
 import moment from 'moment';
+import * as $ from 'jquery';
+
+const SIZE = 10000; // Good enough for the initial development
 
 export default class SearchApplication extends React.Component {
 
+
     constructor(props) {
         super(props);
+
+        this.state = {
+            keys: this.getAllKeyValuePairs()
+        }
 
         const host = this.getHost(props.esHost);
         this.searchkit = new Searchkit.SearchkitManager(host);
@@ -19,8 +27,66 @@ export default class SearchApplication extends React.Component {
         };
 
         this.searchkit.addDefaultQuery(this.getDefaultQuery());
+
+        this.getAllKeyValuePairs();
     }
-    
+
+    getAllKeyValuePairs() {
+        const query = {
+            _source: [
+                "key_value_pairs.key_value_objs.key"
+            ],
+            query: {
+                term: {
+                    _type: "transactions"
+                }
+            },
+            size: SIZE // Temporary to test the scroll logic
+        };
+        const keyArray = [];
+        $.ajax({
+            type:"POST",
+            async: false,
+            url: this.props.esHost + '/_search?scroll=1m',
+            data: JSON.stringify(query),
+            contentType:'application/json'
+
+        }).done((data) => {
+            const scrollId = data._scroll_id;
+            const hits = data.hits.hits;
+            let finished = data.hits.hits.length !== SIZE;
+            const followUpQuery = {
+                scroll: '1m',
+                scroll_id: scrollId
+            };
+            while (!finished) {
+                $.ajax({
+                    type:"POST",
+                    async: false,
+                    url: this.props.esHost + '/_search/scroll',
+                    data: JSON.stringify(followUpQuery),
+                    contentType:'application/json'
+                }).done((scrollData) => {
+                    console.log('scrollData', scrollData);
+                    finished = true;
+                });
+                // TODO: TEMPORARY FIX UNTIL WE HAVE THE SCROLL CAPABILITY ENABLED
+                finished = true;
+            }
+            // if the number of hits is equal to the size, store what we have and then query to /_search/scroll with the body
+            // {scroll:1m, scroll_id: <scroll ID from result>}
+            // Add the results to the existing map/store
+            hits.forEach((hit)=> {
+                hit._source.key_value_pairs.key_value_objs.forEach((key) => {
+                    if(!keyArray.includes(key.key)) {
+                        keyArray.push(key.key);
+                    }
+                });
+            });
+        });
+        return keyArray.sort();
+    }
+
     getHost(host) {
         return host;
     }
@@ -76,9 +142,64 @@ export default class SearchApplication extends React.Component {
         }
     }
 
+    buildPanels(panel, level) {
+        const content = [];
+        //Build child panels
+        Object.keys(panel.panels).forEach((panelKey) => {
+            content.push(this.buildPanels(panel.panels[panelKey], level+1));
+        });
+        //Build facets
+        Object.keys(panel.facets).forEach((facetKey) => {
+            content.push(panel.facets[facetKey]);
+        });
+        return (
+            <div key={panel.panelTitle} className={"level_"+level}>
+                <CollapsiblePanel key={panel.panelTitle} title={panel.panelTitle}>
+                    {content}
+                </CollapsiblePanel>
+            </div>
+        )
+    }
+
+    buildMetadataFacets(keys) {
+        const panels = {facets: {}, panels: {}, panelTitle: 'In-Depth Metadata'};
+        keys.forEach((key) => {
+            let keyText = key;
+            let panelToAdd = panels;
+            while(keyText.includes('.')) {
+                const panelText = keyText.slice(0, keyText.indexOf('.'));
+                if(!panelToAdd.panels[panelText]) {
+                    panelToAdd.panels[panelText] = {
+                        panelTitle: panelText.replace(/_/g,' ').toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' '),
+                        facets: {},
+                        panels: {}
+                    }
+                }
+                panelToAdd = panelToAdd.panels[panelText];
+                keyText = keyText.slice(keyText.indexOf('.')+1)
+            }
+            panelToAdd.facets[key] =(
+                <Searchkit.RefinementListFilter
+                    id={key}
+                    key={key}
+                    title={keyText.replace(/_/g, ' ').toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ')}
+                    field={'key_value_pairs.key_value_hash.'+key+'.keyword'}
+                    operator="AND"
+                    size={10}
+                    translations={{'': 'Not Specified'}}
+                />
+                );
+        });
+        return this.buildPanels(panels, 0);
+
+    }
+
     render() {
         var informationText = 'To search multiple terms at once, insert "AND" between them. If a term contains a space, place the term in quotes';
         var TermQuery = Searchkit.TermQuery;
+
+        const content = this.buildMetadataFacets(this.state.keys);
+
         return(
             <div>
                 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
@@ -128,6 +249,7 @@ export default class SearchApplication extends React.Component {
                                         endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
                                     />
                                 </CollapsiblePanel>
+                                <hr />
 
                                 <CollapsiblePanel title="Institution">
                                     <Searchkit.RefinementListFilter
@@ -138,6 +260,8 @@ export default class SearchApplication extends React.Component {
                                         size={10}
                                     />
                                 </CollapsiblePanel>
+                                <hr />
+
                                 <CollapsiblePanel title="Instruments" >
                                     <Searchkit.RefinementListFilter
                                         id="instruments"
@@ -147,6 +271,8 @@ export default class SearchApplication extends React.Component {
                                         size={10}
                                     />
                                 </CollapsiblePanel>
+                                <hr />
+
                                 <CollapsiblePanel title="Instrument Groups" >
                                     <Searchkit.RefinementListFilter
                                         id="instrument_groups"
@@ -156,6 +282,8 @@ export default class SearchApplication extends React.Component {
                                         size={10}
                                     />
                                 </CollapsiblePanel>
+                                <hr />
+
                                 <CollapsiblePanel title="Users" >
                                     <Searchkit.RefinementListFilter
                                         id="users"
@@ -165,6 +293,8 @@ export default class SearchApplication extends React.Component {
                                         size={10}
                                     />
                                 </CollapsiblePanel>
+                                <hr />
+
                                 <CollapsiblePanel title="Proposals" >
                                     <DateRangeFilter
                                         id="proposals.actual_start_date"
@@ -190,6 +320,13 @@ export default class SearchApplication extends React.Component {
                                         size={10}
                                     />
                                 </CollapsiblePanel>
+                                <hr />
+
+                                {this.state.keys.length > 0 && (
+                                    <div>
+                                        {content}
+                                    </div>
+                                )}
                             </Searchkit.SideBar>
                             <Searchkit.LayoutResults>
                                 <Searchkit.ActionBarRow>

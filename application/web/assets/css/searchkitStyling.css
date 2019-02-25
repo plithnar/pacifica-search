@@ -83,3 +83,17 @@
     height: 20px;
     background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1));
 }
+
+.level_1 {
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+.level_2 {
+    margin-left: 10px;
+    font-size: 12px;
+}
+.level_3 {
+    margin-left: 15px;
+    font-size: 10px;
+}
