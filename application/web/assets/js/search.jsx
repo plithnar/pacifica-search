@@ -55,6 +55,9 @@ export default class SearchApplication extends React.Component {
             const scrollId = data._scroll_id;
             const hits = data.hits.hits;
             let finished = data.hits.hits.length !== SIZE;
+
+            //TODO: Temporary fix until we have the scroll capability enabled
+            finished = true;
             const followUpQuery = {
                 scroll: '1m',
                 scroll_id: scrollId

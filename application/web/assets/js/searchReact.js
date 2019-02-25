@@ -30281,6 +30281,9 @@ var SearchApplication = function (_React$Component) {
                 var scrollId = data._scroll_id;
                 var hits = data.hits.hits;
                 var finished = data.hits.hits.length !== SIZE;
+
+                //TODO: Temporary fix until we have the scroll capability enabled
+                finished = true;
                 var followUpQuery = {
                     scroll: '1m',
                     scroll_id: scrollId
