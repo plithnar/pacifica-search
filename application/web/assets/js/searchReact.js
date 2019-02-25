@@ -30236,13 +30236,10 @@ var SearchApplication = function (_React$Component) {
     function SearchApplication(props) {
         _classCallCheck(this, SearchApplication);
 
-        // this.state = {
-        //     keys: this.getAllKeyValuePairs()
-        // }
         var _this = _possibleConstructorReturn(this, (SearchApplication.__proto__ || Object.getPrototypeOf(SearchApplication)).call(this, props));
 
         _this.state = {
-            keys: []
+            keys: _this.getAllKeyValuePairs()
         };
 
         var host = _this.getHost(props.esHost);
@@ -30253,8 +30250,6 @@ var SearchApplication = function (_React$Component) {
         };
 
         _this.searchkit.addDefaultQuery(_this.getDefaultQuery());
-
-        // this.getAllKeyValuePairs();
         return _this;
     }
 

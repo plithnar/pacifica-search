@@ -15,11 +15,8 @@ export default class SearchApplication extends React.Component {
     constructor(props) {
         super(props);
 
-        // this.state = {
-        //     keys: this.getAllKeyValuePairs()
-        // }
         this.state = {
-            keys: []
+            keys: this.getAllKeyValuePairs()
         }
 
         const host = this.getHost(props.esHost);
@@ -30,8 +27,6 @@ export default class SearchApplication extends React.Component {
         };
 
         this.searchkit.addDefaultQuery(this.getDefaultQuery());
-
-        // this.getAllKeyValuePairs();
     }
 
     getAllKeyValuePairs() {
