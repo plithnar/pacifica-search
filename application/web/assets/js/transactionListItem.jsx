@@ -92,7 +92,7 @@ export default class TransactionListItem extends Component {
                         <b>Dataset:</b> {source.obj_id.split('_')[1]}
                     </div>
                     )}
-                <b>Proposal:</b> {proposals.title} (#{proposals.obj_id.split('_')[1]}) <br />
+                <b>Project:</b> {proposals.title} (#{proposals.obj_id.split('_')[1]}) <br />
                 {this.renderAbstract(proposals.abstract)}
                 <p>
                     <b>Instrument:</b> {instruments.display_name} (#{instruments.obj_id.split('_')[1]}) <br />

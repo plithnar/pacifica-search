@@ -11203,7 +11203,7 @@ var TransactionListItem = function (_Component) {
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'b',
                     null,
-                    'Proposal:'
+                    'Project:'
                 ),
                 ' ',
                 proposals.title,
@@ -30541,10 +30541,10 @@ var SearchApplication = function (_React$Component) {
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'Users' },
+                                    { title: 'People' },
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'users',
-                                        title: 'User Name',
+                                        id: 'staff_scientists',
+                                        title: 'Staff Scientists',
                                         field: 'users.keyword',
                                         operator: 'OR',
                                         size: 10
@@ -30553,7 +30553,7 @@ var SearchApplication = function (_React$Component) {
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'Proposals' },
+                                    { title: 'Projects' },
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
                                         id: 'proposals.actual_start_date',
                                         field: 'proposals.actual_start_date',
@@ -30571,8 +30571,8 @@ var SearchApplication = function (_React$Component) {
                                         endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
                                     }),
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'proposals',
-                                        title: 'Proposal Title',
+                                        id: 'project_title',
+                                        title: 'Project Title',
                                         field: 'proposals.keyword',
                                         operator: 'OR',
                                         size: 10

@@ -287,10 +287,11 @@ export default class SearchApplication extends React.Component {
                                 </CollapsiblePanel>
                                 <hr />
 
-                                <CollapsiblePanel title="Users" >
+                                <CollapsiblePanel title="People" >
+                                    {/* PROJECT TEAM MEMBER FILTER */}
                                     <Searchkit.RefinementListFilter
-                                        id="users"
-                                        title="User Name"
+                                        id="staff_scientists"
+                                        title="Staff Scientists"
                                         field="users.keyword"
                                         operator="OR"
                                         size={10}
@@ -298,7 +299,7 @@ export default class SearchApplication extends React.Component {
                                 </CollapsiblePanel>
                                 <hr />
 
-                                <CollapsiblePanel title="Proposals" >
+                                <CollapsiblePanel title="Projects" >
                                     <DateRangeFilter
                                         id="proposals.actual_start_date"
                                         field="proposals.actual_start_date"
@@ -316,8 +317,8 @@ export default class SearchApplication extends React.Component {
                                         endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
                                     />
                                     <Searchkit.RefinementListFilter
-                                        id="proposals"
-                                        title="Proposal Title"
+                                        id="project_title"
+                                        title="Project Title"
                                         field="proposals.keyword"
                                         operator="OR"
                                         size={10}
