@@ -30547,7 +30547,13 @@ var SearchApplication = function (_React$Component) {
                                         title: 'Staff Scientists',
                                         field: 'users.keyword',
                                         operator: 'OR',
-                                        size: 10
+                                        size: 10,
+                                        translations: {
+                                            "svc-dms, svc-dms ": "Mass Spec Uploader",
+                                            "svc-nmr1, svc-nmr1 ": "NMR Uploader",
+                                            "svc-quiet1, svc-quiet1 ": "Microscopy Uploader"
+
+                                        }
                                     })
                                 ),
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),

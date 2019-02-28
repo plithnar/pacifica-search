@@ -295,6 +295,14 @@ export default class SearchApplication extends React.Component {
                                         field="users.keyword"
                                         operator="OR"
                                         size={10}
+                                        translations={
+                                            {
+                                                "svc-dms, svc-dms ": "Mass Spec Uploader",
+                                                "svc-nmr1, svc-nmr1 ": "NMR Uploader",
+                                                "svc-quiet1, svc-quiet1 ": "Microscopy Uploader",
+
+                                            }
+                                        }
                                     />
                                 </CollapsiblePanel>
                                 <hr />
