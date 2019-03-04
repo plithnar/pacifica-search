@@ -30484,7 +30484,7 @@ var SearchApplication = function (_React$Component) {
                                         title: 'Is Released',
                                         field: 'release',
                                         operator: 'AND',
-                                        translations: { "true": "Released Data", "false": "Proprietary Data" }
+                                        translations: { "true": "Released Data", "false": "Private Data" }
                                     }),
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
                                         id: 'doi',

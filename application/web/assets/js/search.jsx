@@ -234,7 +234,7 @@ export default class SearchApplication extends React.Component {
                                         title="Is Released"
                                         field="release"
                                         operator="AND"
-                                        translations={{"true": "Released Data", "false": "Proprietary Data"}}
+                                        translations={{"true": "Released Data", "false": "Private Data"}}
                                     />
                                     <Searchkit.RefinementListFilter
                                         id="doi"
