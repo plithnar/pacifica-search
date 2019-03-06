@@ -60,6 +60,7 @@ class DateRangeAccessor extends FilterBasedAccessor {
     buildSharedQuery(query) {
         if (this.state.hasValue()) {
             let val = this.state.getValue();
+            console.log(val.endDate);
             let min = this.formatQueryDate(val.startDate);
             let max = this.formatQueryDate(val.endDate);
             let rangeFilter = this.fieldContext.wrapFilter(RangeQuery(this.options.field,{
@@ -67,7 +68,7 @@ class DateRangeAccessor extends FilterBasedAccessor {
             }));
             let selectedFilter = {
                 name:this.translate(this.options.title),
-                value:`${this.formatDisplayDate(val.startDate)} - ${this.formatDisplayDate(val.endDate)}`,
+                value:`${this.formatDisplayDate(val.startDate)} - ${this.formatDisplayDate(moment(val.endDate).subtract(1,'day').format("D MMM YYYY"))}`,
                 id:this.options.id,
                 remove:()=> {
                     this.state = this.state.clear()
@@ -165,9 +166,12 @@ export default class DateRangeFilter extends SearchkitComponent {
     startDateChanged(date)
     {
         const state = this.accessor.state.getValue();
-        var startDate = this.accessor.formatStateDate(date);
         var endDate = _.get(state, "endDate", this.props.endDate);
-
+        var startDate = this.accessor.formatStateDate(date);
+        if(moment(endDate).isSameOrBefore(date)) {
+            const endMoment = moment(startDate);
+            endDate = this.accessor.formatStateDate(endMoment.add(1,'day'));
+        }
         this.accessor.state = this.accessor.state.setValue({startDate: startDate, endDate: endDate});
         this.forceUpdate();
         this.search();
@@ -176,9 +180,11 @@ export default class DateRangeFilter extends SearchkitComponent {
     endDateChanged(date)
     {
         const state = this.accessor.state.getValue();
-        var endDate = this.accessor.formatStateDate(date);
         var startDate = _.get(state, "startDate", this.props.startDate);
-
+        if(moment(startDate).isSameOrAfter(date)) {
+            startDate = this.accessor.formatStateDate(date);
+        }
+        var endDate = this.accessor.formatStateDate(date.add(1, 'day'));
         this.accessor.state = this.accessor.state.setValue({startDate: startDate, endDate: endDate});
         this.forceUpdate();
         this.search();
@@ -242,7 +248,7 @@ export default class DateRangeFilter extends SearchkitComponent {
                     ref="datePickerEnd"
                     data-picker-id="date-picker-end"
                     dateFormat="D MMM YYYY"
-                    selected={moment(endDate,"D MMM YYYY")}
+                    selected={moment(endDate,"D MMM YYYY").subtract(1, 'day')}
                     onChange={this.endDateChanged.bind(this)}
                     adjustDateOnChange
                     peekNextMonth

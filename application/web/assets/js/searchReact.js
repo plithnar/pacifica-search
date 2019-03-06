@@ -30228,7 +30228,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 
-var SIZE = 10000; // Good enough for the initial development
+var SIZE = 10000;
 
 var SearchApplication = function (_React$Component) {
     _inherits(SearchApplication, _React$Component);
@@ -30279,9 +30279,8 @@ var SearchApplication = function (_React$Component) {
                 var scrollId = data._scroll_id;
                 var hits = data.hits.hits;
                 var finished = data.hits.hits.length !== SIZE;
-
-                //TODO: Temporary fix until we have the scroll capability enabled
                 finished = true;
+
                 var followUpQuery = {
                     scroll: '1m',
                     scroll_id: scrollId
@@ -30294,11 +30293,12 @@ var SearchApplication = function (_React$Component) {
                         data: JSON.stringify(followUpQuery),
                         contentType: 'application/json'
                     }).done(function (scrollData) {
-                        console.log('scrollData', scrollData);
-                        finished = true;
+                        hits = hits.concat(scrollData.hits.hits);
+                        debugger;
+                        if (scrollData.hits.hits.length !== SIZE) {
+                            finished = true;
+                        }
                     });
-                    // TODO: TEMPORARY FIX UNTIL WE HAVE THE SCROLL CAPABILITY ENABLED
-                    finished = true;
                 }
                 // if the number of hits is equal to the size, store what we have and then query to /_search/scroll with the body
                 // {scroll:1m, scroll_id: <scroll ID from result>}
@@ -71517,6 +71517,7 @@ var DateRangeAccessor = function (_FilterBasedAccessor) {
 
             if (this.state.hasValue()) {
                 var val = this.state.getValue();
+                console.log(val.endDate);
                 var min = this.formatQueryDate(val.startDate);
                 var max = this.formatQueryDate(val.endDate);
                 var rangeFilter = this.fieldContext.wrapFilter(Object(__WEBPACK_IMPORTED_MODULE_1_searchkit__["RangeQuery"])(this.options.field, {
@@ -71524,7 +71525,7 @@ var DateRangeAccessor = function (_FilterBasedAccessor) {
                 }));
                 var selectedFilter = {
                     name: this.translate(this.options.title),
-                    value: this.formatDisplayDate(val.startDate) + ' - ' + this.formatDisplayDate(val.endDate),
+                    value: this.formatDisplayDate(val.startDate) + ' - ' + this.formatDisplayDate(__WEBPACK_IMPORTED_MODULE_4_moment___default()(val.endDate).subtract(1, 'day').format("D MMM YYYY")),
                     id: this.options.id,
                     remove: function remove() {
                         _this2.state = _this2.state.clear();
@@ -71652,9 +71653,12 @@ var DateRangeFilter = function (_SearchkitComponent) {
         key: 'startDateChanged',
         value: function startDateChanged(date) {
             var state = this.accessor.state.getValue();
-            var startDate = this.accessor.formatStateDate(date);
             var endDate = __WEBPACK_IMPORTED_MODULE_5_lodash___default.a.get(state, "endDate", this.props.endDate);
-
+            var startDate = this.accessor.formatStateDate(date);
+            if (__WEBPACK_IMPORTED_MODULE_4_moment___default()(endDate).isSameOrBefore(date)) {
+                var endMoment = __WEBPACK_IMPORTED_MODULE_4_moment___default()(startDate);
+                endDate = this.accessor.formatStateDate(endMoment.add(1, 'day'));
+            }
             this.accessor.state = this.accessor.state.setValue({ startDate: startDate, endDate: endDate });
             this.forceUpdate();
             this.search();
@@ -71663,9 +71667,11 @@ var DateRangeFilter = function (_SearchkitComponent) {
         key: 'endDateChanged',
         value: function endDateChanged(date) {
             var state = this.accessor.state.getValue();
-            var endDate = this.accessor.formatStateDate(date);
             var startDate = __WEBPACK_IMPORTED_MODULE_5_lodash___default.a.get(state, "startDate", this.props.startDate);
-
+            if (__WEBPACK_IMPORTED_MODULE_4_moment___default()(startDate).isSameOrAfter(date)) {
+                startDate = this.accessor.formatStateDate(date);
+            }
+            var endDate = this.accessor.formatStateDate(date.add(1, 'day'));
             this.accessor.state = this.accessor.state.setValue({ startDate: startDate, endDate: endDate });
             this.forceUpdate();
             this.search();
@@ -71735,7 +71741,7 @@ var DateRangeFilter = function (_SearchkitComponent) {
                     ref: 'datePickerEnd',
                     'data-picker-id': 'date-picker-end',
                     dateFormat: 'D MMM YYYY',
-                    selected: __WEBPACK_IMPORTED_MODULE_4_moment___default()(endDate, "D MMM YYYY"),
+                    selected: __WEBPACK_IMPORTED_MODULE_4_moment___default()(endDate, "D MMM YYYY").subtract(1, 'day'),
                     onChange: this.endDateChanged.bind(this),
                     adjustDateOnChange: true,
                     peekNextMonth: true,

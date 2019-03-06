@@ -7,7 +7,7 @@ import CollapsiblePanel from './collapsiblePanel';
 import moment from 'moment';
 import * as $ from 'jquery';
 
-const SIZE = 10000; // Good enough for the initial development
+const SIZE = 10000;
 
 export default class SearchApplication extends React.Component {
 
@@ -51,11 +51,10 @@ export default class SearchApplication extends React.Component {
 
         }).done((data) => {
             const scrollId = data._scroll_id;
-            const hits = data.hits.hits;
+            let hits = data.hits.hits;
             let finished = data.hits.hits.length !== SIZE;
-
-            //TODO: Temporary fix until we have the scroll capability enabled
             finished = true;
+
             const followUpQuery = {
                 scroll: '1m',
                 scroll_id: scrollId
@@ -68,11 +67,12 @@ export default class SearchApplication extends React.Component {
                     data: JSON.stringify(followUpQuery),
                     contentType:'application/json'
                 }).done((scrollData) => {
-                    console.log('scrollData', scrollData);
-                    finished = true;
+                    hits = hits.concat(scrollData.hits.hits);
+                    debugger;
+                    if(scrollData.hits.hits.length !== SIZE) {
+                        finished = true;
+                    }
                 });
-                // TODO: TEMPORARY FIX UNTIL WE HAVE THE SCROLL CAPABILITY ENABLED
-                finished = true;
             }
             // if the number of hits is equal to the size, store what we have and then query to /_search/scroll with the body
             // {scroll:1m, scroll_id: <scroll ID from result>}
