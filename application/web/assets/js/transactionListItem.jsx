@@ -77,7 +77,7 @@ export default class TransactionListItem extends Component {
 
     render() {
         const source = this.props.result._source;
-        const proposals = source.proposals[0];
+        const projects = source.projects[0];
         const instruments = source.instruments[0];
         const access_url = source.access_url;
         return(
@@ -92,8 +92,8 @@ export default class TransactionListItem extends Component {
                         <b>Dataset:</b> {source.obj_id.split('_')[1]}
                     </div>
                     )}
-                <b>Project:</b> {proposals.title} (#{proposals.obj_id.split('_')[1]}) <br />
-                {this.renderAbstract(proposals.abstract)}
+                <b>Project:</b> {projects.title} (#{projects.obj_id.split('_')[1]}) <br />
+                {this.renderAbstract(projects.abstract)}
                 <p>
                     <b>Instrument:</b> {instruments.display_name} (#{instruments.obj_id.split('_')[1]}) <br />
                 </p>

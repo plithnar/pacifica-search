@@ -31,63 +31,34 @@ export default class SearchApplication extends React.Component {
 
     getAllKeyValuePairs() {
         const query = {
-            _source: [
-                "key_value_pairs.key_value_objs.key"
-            ],
             query: {
                 term: {
-                    _type: "transactions"
+                    type: "keys"
                 }
             },
             size: SIZE // Temporary to test the scroll logic
         };
-        const keyArray = [];
+        const keyArray = {};
         $.ajax({
             type:"POST",
             async: false,
-            url: this.props.esHost + '/_search?scroll=1m',
+            url: this.props.esHost + '/_search',
             data: JSON.stringify(query),
             contentType:'application/json'
 
         }).done((data) => {
-            const scrollId = data._scroll_id;
             let hits = data.hits.hits;
-            let finished = data.hits.hits.length !== SIZE;
-            finished = true;
-
-            const followUpQuery = {
-                scroll: '1m',
-                scroll_id: scrollId
-            };
-            while (!finished) {
-                $.ajax({
-                    type:"POST",
-                    async: false,
-                    url: this.props.esHost + '/_search/scroll',
-                    data: JSON.stringify(followUpQuery),
-                    contentType:'application/json'
-                }).done((scrollData) => {
-                    hits = hits.concat(scrollData.hits.hits);
-                    debugger;
-                    if(scrollData.hits.hits.length !== SIZE) {
-                        finished = true;
-                    }
-                });
-            }
-            // if the number of hits is equal to the size, store what we have and then query to /_search/scroll with the body
-            // {scroll:1m, scroll_id: <scroll ID from result>}
-            // Add the results to the existing map/store
             hits.forEach((hit)=> {
-                if(hit._source && hit._source.key_value_pairs && hit._source.key_value_pairs.key_value_objs) {
-                    hit._source.key_value_pairs.key_value_objs.forEach((key) => {
-                        if (!keyArray.includes(key.key)) {
-                            keyArray.push(key.key);
-                        }
-                    });
+                if(hit._source && hit._source.keyword) {
+                  var key = hit._source.keyword;
+                  var display_name = hit._source.display_name;
+                  if(!Object.keys(keyArray).includes(key)) {
+                    keyArray[key] = {key, display_name};
+                  }
                 }
             });
         });
-        return keyArray.sort();
+      return keyArray
     }
 
     getHost(host) {
@@ -112,7 +83,7 @@ export default class SearchApplication extends React.Component {
         const instance = this;
         return (query)=> {
             return query.addQuery( BoolMust([
-                    TermQuery("_type", "transactions"),
+                    TermQuery("type", "transactions"),
                 ])
             )}
 
@@ -166,21 +137,22 @@ export default class SearchApplication extends React.Component {
 
     buildMetadataFacets(keys) {
         const panels = {facets: {}, panels: {}, panelTitle: 'In-Depth Metadata'};
-        keys.forEach((key) => {
+        Object.keys(keys).forEach((key) => {
             let keyText = key;
             let panelToAdd = panels;
-            while(keyText.includes('.')) {
-                const panelText = keyText.slice(0, keyText.indexOf('.'));
-                if(!panelToAdd.panels[panelText]) {
-                    panelToAdd.panels[panelText] = {
-                        panelTitle: panelText.replace(/_/g,' ').toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' '),
-                        facets: {},
-                        panels: {}
-                    }
-                }
-                panelToAdd = panelToAdd.panels[panelText];
-                keyText = keyText.slice(keyText.indexOf('.')+1)
-            }
+            // while(keyText.includes('.')) {
+            //     const panelText = keyText.slice(0, keyText.indexOf('.'));
+            //     if(!panelToAdd.panels[panelText]) {
+            //         panelToAdd.panels[panelText] = {
+            //             panelTitle: panelText.replace(/_/g,' ').toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' '),
+            //             facets: {},
+            //             panels: {}
+            //         }
+            //     }
+            //     panelToAdd = panelToAdd.panels[panelText];
+            //     keyText = keyText.slice(keyText.indexOf('.')+1)
+            // }
+            keyText = key.split('.').pop();
             panelToAdd.facets[key] =(
                 <Searchkit.RefinementListFilter
                     id={key}
@@ -278,9 +250,9 @@ export default class SearchApplication extends React.Component {
 
                                 <CollapsiblePanel title="Instrument Groups" >
                                     <Searchkit.RefinementListFilter
-                                        id="instrument_groups"
+                                        id="groups"
                                         title="Group Name"
-                                        field="instrument_groups.keyword"
+                                        field="groups.keyword"
                                         operator="OR"
                                         size={10}
                                     />
@@ -290,9 +262,24 @@ export default class SearchApplication extends React.Component {
                                 <CollapsiblePanel title="People" >
                                     {/* PROJECT TEAM MEMBER FILTER */}
                                     <Searchkit.RefinementListFilter
-                                        id="staff_scientists"
+                                        id="submitter"
                                         title="Staff Scientists"
-                                        field="users.keyword"
+                                        field="users.submitter.keyword"
+                                        operator="OR"
+                                        size={10}
+                                        translations={
+                                            {
+                                                "svc-dms, svc-dms ": "Mass Spec Uploader",
+                                                "svc-nmr1, svc-nmr1 ": "NMR Uploader",
+                                                "svc-quiet1, svc-quiet1 ": "Microscopy Uploader",
+
+                                            }
+                                        }
+                                    />
+                                    <Searchkit.RefinementListFilter
+                                        id="releaser"
+                                        title="Authorized Releaser"
+                                        field="users.authorized_releaser.keyword"
                                         operator="OR"
                                         size={10}
                                         translations={
@@ -309,16 +296,16 @@ export default class SearchApplication extends React.Component {
 
                                 <CollapsiblePanel title="Projects" >
                                     <DateRangeFilter
-                                        id="proposals.actual_start_date"
-                                        field="proposals.actual_start_date"
+                                        id="projects.actual_start_date"
+                                        field="projects.actual_start_date"
                                         queryDateFormat="YYYY-MM-DD"
                                         title="Start Date"
                                         startDate={"1 Jan 2002"}
                                         endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
                                     />
                                     <DateRangeFilter
-                                        id="proposals.actual_end_date"
-                                        field="proposals.actual_end_date"
+                                        id="projects.actual_end_date"
+                                        field="projects.actual_end_date"
                                         queryDateFormat="YYYY-MM-DD"
                                         title="End Date"
                                         startDate={"1 Jan 2002"}
@@ -327,14 +314,14 @@ export default class SearchApplication extends React.Component {
                                     <Searchkit.RefinementListFilter
                                         id="project_title"
                                         title="Project Title"
-                                        field="proposals.keyword"
+                                        field="projects.keyword"
                                         operator="OR"
                                         size={10}
                                     />
                                 </CollapsiblePanel>
                                 <hr />
 
-                                {this.state.keys.length > 0 && (
+                                {Object.keys(this.state.keys).length > 0 && (
                                     <div>
                                         {content}
                                     </div>
