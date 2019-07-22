@@ -77,16 +77,21 @@ export default class SearchApplication extends React.Component {
     getDefaultQuery() {
         const BoolMust = Searchkit.BoolMust;
         const TermQuery = Searchkit.TermQuery;
-        const MatchQuery = Searchkit.MatchQuery;
-        const FilteredQuery = Searchkit.FilteredQuery;
 
-        const instance = this;
         return (query)=> {
             return query.addQuery( BoolMust([
                     TermQuery("type", "transactions"),
                 ])
             )}
 
+    }
+
+    buildProjectIdQuery(e) {
+      const BoolMust = Searchkit.BoolMust;
+      const TermQuery = Searchkit.TermQuery;
+      return BoolMust([
+        TermQuery("projects.obj_id.keyword", `projects_${e}`),
+      ])
     }
 
     componentDidUpdate () {
@@ -103,14 +108,12 @@ export default class SearchApplication extends React.Component {
             return {
                 function_score: {
                     query: query,
-
                 }
             }
         } else {
             return {
                 function_score: {
                     query: query,
-
                 }
             }
         }
@@ -140,18 +143,6 @@ export default class SearchApplication extends React.Component {
         Object.keys(keys).forEach((key) => {
             let keyText = key;
             let panelToAdd = panels;
-            // while(keyText.includes('.')) {
-            //     const panelText = keyText.slice(0, keyText.indexOf('.'));
-            //     if(!panelToAdd.panels[panelText]) {
-            //         panelToAdd.panels[panelText] = {
-            //             panelTitle: panelText.replace(/_/g,' ').toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' '),
-            //             facets: {},
-            //             panels: {}
-            //         }
-            //     }
-            //     panelToAdd = panelToAdd.panels[panelText];
-            //     keyText = keyText.slice(keyText.indexOf('.')+1)
-            // }
             keyText = key.split('.').pop();
             panelToAdd.facets[key] =(
                 <Searchkit.RefinementListFilter
@@ -295,6 +286,14 @@ export default class SearchApplication extends React.Component {
                                 <hr />
 
                                 <CollapsiblePanel title="Projects" >
+                                    <Searchkit.InputFilter
+                                        id="project_id_search"
+                                        title="Project ID Filter"
+                                        placeholder="Enter project ID"
+                                        searchOnChange={true}
+                                        queryBuilder={this.buildProjectIdQuery.bind(this)}
+                                        queryFields={["projects.obj_id.keyword"]}
+                                    />
                                     <DateRangeFilter
                                         id="projects.actual_start_date"
                                         field="projects.actual_start_date"
@@ -315,6 +314,16 @@ export default class SearchApplication extends React.Component {
                                         id="project_title"
                                         title="Project Title"
                                         field="projects.keyword"
+                                        operator="OR"
+                                        size={10}
+                                    />
+                                </CollapsiblePanel>
+                                <hr />
+                                <CollapsiblePanel title="Capability">
+                                    <Searchkit.RefinementListFilter
+                                        id="science_theme"
+                                        title="Science Theme"
+                                        field="science_themes.keyword"
                                         operator="OR"
                                         size={10}
                                     />

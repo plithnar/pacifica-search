@@ -30307,13 +30307,17 @@ var SearchApplication = function (_React$Component) {
         value: function getDefaultQuery() {
             var BoolMust = __WEBPACK_IMPORTED_MODULE_2_searchkit__["BoolMust"];
             var TermQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["TermQuery"];
-            var MatchQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["MatchQuery"];
-            var FilteredQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["FilteredQuery"];
 
-            var instance = this;
             return function (query) {
                 return query.addQuery(BoolMust([TermQuery("type", "transactions")]));
             };
+        }
+    }, {
+        key: 'buildProjectIdQuery',
+        value: function buildProjectIdQuery(e) {
+            var BoolMust = __WEBPACK_IMPORTED_MODULE_2_searchkit__["BoolMust"];
+            var TermQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["TermQuery"];
+            return BoolMust([TermQuery("projects.obj_id.keyword", 'projects_' + e)]);
         }
     }, {
         key: 'componentDidUpdate',
@@ -30333,14 +30337,12 @@ var SearchApplication = function (_React$Component) {
                 return {
                     function_score: {
                         query: query
-
                     }
                 };
             } else {
                 return {
                     function_score: {
                         query: query
-
                     }
                 };
             }
@@ -30376,18 +30378,6 @@ var SearchApplication = function (_React$Component) {
             Object.keys(keys).forEach(function (key) {
                 var keyText = key;
                 var panelToAdd = panels;
-                // while(keyText.includes('.')) {
-                //     const panelText = keyText.slice(0, keyText.indexOf('.'));
-                //     if(!panelToAdd.panels[panelText]) {
-                //         panelToAdd.panels[panelText] = {
-                //             panelTitle: panelText.replace(/_/g,' ').toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' '),
-                //             facets: {},
-                //             panels: {}
-                //         }
-                //     }
-                //     panelToAdd = panelToAdd.panels[panelText];
-                //     keyText = keyText.slice(keyText.indexOf('.')+1)
-                // }
                 keyText = key.split('.').pop();
                 panelToAdd.facets[key] = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
                     id: key,
@@ -30543,6 +30533,14 @@ var SearchApplication = function (_React$Component) {
                                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                                     __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
                                     { title: 'Projects' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["InputFilter"], {
+                                        id: 'project_id_search',
+                                        title: 'Project ID Filter',
+                                        placeholder: 'Enter project ID',
+                                        searchOnChange: true,
+                                        queryBuilder: this.buildProjectIdQuery.bind(this),
+                                        queryFields: ["projects.obj_id.keyword"]
+                                    }),
                                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
                                         id: 'projects.actual_start_date',
                                         field: 'projects.actual_start_date',
@@ -30563,6 +30561,18 @@ var SearchApplication = function (_React$Component) {
                                         id: 'project_title',
                                         title: 'Project Title',
                                         field: 'projects.keyword',
+                                        operator: 'OR',
+                                        size: 10
+                                    })
+                                ),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                                    { title: 'Capability' },
+                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                                        id: 'science_theme',
+                                        title: 'Science Theme',
+                                        field: 'science_themes.keyword',
                                         operator: 'OR',
                                         size: 10
                                     })
