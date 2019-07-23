@@ -17,10 +17,13 @@ export default class SearchApplication extends React.Component {
 
         this.state = {
             keys: this.getAllKeyValuePairs()
-        }
+        };
 
         const host = this.getHost(props.esHost);
-        this.searchkit = new Searchkit.SearchkitManager(host);
+        this.searchkit = new Searchkit.SearchkitManager(host, {
+          timeout: 10000
+        });
+
 
         this.searchkit.translateFunction = (key)=> {
             return {"pagination.next":"Next Page", "pagination.previous":"Previous Page"}[key]
@@ -87,10 +90,11 @@ export default class SearchApplication extends React.Component {
     }
 
     buildProjectIdQuery(e) {
-      const BoolMust = Searchkit.BoolMust;
-      const TermQuery = Searchkit.TermQuery;
-      return BoolMust([
-        TermQuery("projects.obj_id.keyword", `projects_${e}`),
+      const BoolShould = Searchkit.BoolShould;
+
+      return BoolShould([
+        {"wildcard": {"projects.obj_id.keyword": `*projects_${e}*`}},
+        {"wildcard": {"projects.title.keyword": `*${e}*`}}
       ])
     }
 
@@ -217,6 +221,17 @@ export default class SearchApplication extends React.Component {
                                 </CollapsiblePanel>
                                 <hr />
 
+                              <CollapsiblePanel title="Science Area">
+                                <Searchkit.RefinementListFilter
+                                  id="science_theme"
+                                  title="Area Name"
+                                  field="science_themes.keyword"
+                                  operator="OR"
+                                  size={10}
+                                />
+                              </CollapsiblePanel>
+                              <hr />
+
                                 <CollapsiblePanel title="Institution">
                                     <Searchkit.RefinementListFilter
                                         id="institution"
@@ -288,11 +303,12 @@ export default class SearchApplication extends React.Component {
                                 <CollapsiblePanel title="Projects" >
                                     <Searchkit.InputFilter
                                         id="project_id_search"
-                                        title="Project ID Filter"
-                                        placeholder="Enter project ID"
+                                        title="Project Filter"
+                                        placeholder="Project ID/Title"
                                         searchOnChange={true}
                                         queryBuilder={this.buildProjectIdQuery.bind(this)}
                                         queryFields={["projects.obj_id.keyword"]}
+                                        prefixQueryFields={["projects.title.keyword"]}
                                     />
                                     <DateRangeFilter
                                         id="projects.actual_start_date"
@@ -314,16 +330,6 @@ export default class SearchApplication extends React.Component {
                                         id="project_title"
                                         title="Project Title"
                                         field="projects.keyword"
-                                        operator="OR"
-                                        size={10}
-                                    />
-                                </CollapsiblePanel>
-                                <hr />
-                                <CollapsiblePanel title="Capability">
-                                    <Searchkit.RefinementListFilter
-                                        id="science_theme"
-                                        title="Science Theme"
-                                        field="science_themes.keyword"
                                         operator="OR"
                                         size={10}
                                     />
