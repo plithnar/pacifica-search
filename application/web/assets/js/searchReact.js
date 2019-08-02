@@ -30200,15 +30200,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_searchkit__ = __webpack_require__(160);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_searchkit___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_searchkit__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__transactionListItem__ = __webpack_require__(157);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__ = __webpack_require__(746);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__ = __webpack_require__(765);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_moment__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_jquery__ = __webpack_require__(766);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_jquery__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transaction_search__ = __webpack_require__(767);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__project_search__ = __webpack_require__(768);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -30224,412 +30217,63 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 
-
-
-
-
 var SIZE = 10000;
 
 var SearchApplication = function (_React$Component) {
-    _inherits(SearchApplication, _React$Component);
+  _inherits(SearchApplication, _React$Component);
 
-    function SearchApplication(props) {
-        _classCallCheck(this, SearchApplication);
+  function SearchApplication(props) {
+    _classCallCheck(this, SearchApplication);
 
-        var _this = _possibleConstructorReturn(this, (SearchApplication.__proto__ || Object.getPrototypeOf(SearchApplication)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (SearchApplication.__proto__ || Object.getPrototypeOf(SearchApplication)).call(this, props));
 
-        _this.state = {
-            keys: _this.getAllKeyValuePairs()
-        };
+    _this.state = {
+      projIds: [],
+      showTransactions: false
+    };
+    return _this;
+  }
 
-        var host = _this.getHost(props.esHost);
-        _this.searchkit = new __WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchkitManager"](host, {
-            timeout: 10000
-        });
-
-        _this.searchkit.translateFunction = function (key) {
-            return { "pagination.next": "Next Page", "pagination.previous": "Previous Page" }[key];
-        };
-
-        _this.searchkit.addDefaultQuery(_this.getDefaultQuery());
-        return _this;
+  _createClass(SearchApplication, [{
+    key: 'updateProjectsForTransactions',
+    value: function updateProjectsForTransactions(projIds) {
+      this.setState({ projIds: projIds });
     }
+  }, {
+    key: 'toggleTransactionsSearch',
+    value: function toggleTransactionsSearch() {
+      this.setState({ showTransactions: !this.state.showTransactions });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var state = this.state;
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.3.1/css/all.css' }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__project_search__["a" /* default */], _extends({ style: { display: state.showTransactions ? 'none' : 'block' }
+        }, this.props, {
+          updateProjsHandler: this.updateProjectsForTransactions.bind(this),
+          showTransactionsHandler: this.toggleTransactionsSearch.bind(this)
+        })),
+        state.showTransactions && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__transaction_search__["a" /* default */], _extends({}, this.props, {
+          projectIds: state.projIds,
+          showProjectsHandler: this.toggleTransactionsSearch.bind(this)
+        }))
+      );
+    }
+  }]);
 
-    _createClass(SearchApplication, [{
-        key: 'getAllKeyValuePairs',
-        value: function getAllKeyValuePairs() {
-            var query = {
-                query: {
-                    term: {
-                        type: "keys"
-                    }
-                },
-                size: SIZE // Temporary to test the scroll logic
-            };
-            var keyArray = {};
-            __WEBPACK_IMPORTED_MODULE_7_jquery__["ajax"]({
-                type: "POST",
-                async: false,
-                url: this.props.esHost + '/_search',
-                data: JSON.stringify(query),
-                contentType: 'application/json'
-
-            }).done(function (data) {
-                var hits = data.hits.hits;
-                hits.forEach(function (hit) {
-                    if (hit._source && hit._source.keyword) {
-                        var key = hit._source.keyword;
-                        var display_name = hit._source.display_name;
-                        if (!Object.keys(keyArray).includes(key)) {
-                            keyArray[key] = { key: key, display_name: display_name };
-                        }
-                    }
-                });
-            });
-            return keyArray;
-        }
-    }, {
-        key: 'getHost',
-        value: function getHost(host) {
-            return host;
-        }
-    }, {
-        key: 'formatDateForDatePicker',
-        value: function formatDateForDatePicker(date) {
-            // convert to proper format for date picker component
-            return __WEBPACK_IMPORTED_MODULE_6_moment___default()(date).format("D MMM YYYY");
-        }
-    }, {
-        key: 'getOneYearFromToday',
-        value: function getOneYearFromToday() {
-            return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
-        }
-    }, {
-        key: 'getDefaultQuery',
-        value: function getDefaultQuery() {
-            var BoolMust = __WEBPACK_IMPORTED_MODULE_2_searchkit__["BoolMust"];
-            var TermQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["TermQuery"];
-
-            return function (query) {
-                return query.addQuery(BoolMust([TermQuery("type", "transactions")]));
-            };
-        }
-    }, {
-        key: 'buildProjectIdQuery',
-        value: function buildProjectIdQuery(e) {
-            var BoolShould = __WEBPACK_IMPORTED_MODULE_2_searchkit__["BoolShould"];
-
-            return BoolShould([{ "wildcard": { "projects.obj_id.keyword": '*projects_' + e + '*' } }, { "wildcard": { "projects.title.keyword": '*' + e + '*' } }]);
-        }
-    }, {
-        key: 'componentDidUpdate',
-        value: function componentDidUpdate() {
-            // put code in here that happens after the component is refreshed
-        }
-    }, {
-        key: 'formatDateForElasticSearch',
-        value: function formatDateForElasticSearch(date) {
-            // convert to proper format for search_date queries
-            return __WEBPACK_IMPORTED_MODULE_6_moment___default()(date).format("YYYY-MM-DDTHH:MM:SS");
-        }
-    }, {
-        key: 'decayingScoreQuery',
-        value: function decayingScoreQuery(scoreFunction, field, scale, origin, decay, query) {
-            if (origin) {
-                return {
-                    function_score: {
-                        query: query
-                    }
-                };
-            } else {
-                return {
-                    function_score: {
-                        query: query
-                    }
-                };
-            }
-        }
-    }, {
-        key: 'buildPanels',
-        value: function buildPanels(panel, level) {
-            var _this2 = this;
-
-            var content = [];
-            //Build child panels
-            Object.keys(panel.panels).forEach(function (panelKey) {
-                content.push(_this2.buildPanels(panel.panels[panelKey], level + 1));
-            });
-            //Build facets
-            Object.keys(panel.facets).forEach(function (facetKey) {
-                content.push(panel.facets[facetKey]);
-            });
-            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'div',
-                { key: panel.panelTitle, className: "level_" + level },
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                    { key: panel.panelTitle, title: panel.panelTitle },
-                    content
-                )
-            );
-        }
-    }, {
-        key: 'buildMetadataFacets',
-        value: function buildMetadataFacets(keys) {
-            var panels = { facets: {}, panels: {}, panelTitle: 'In-Depth Metadata' };
-            Object.keys(keys).forEach(function (key) {
-                var keyText = key;
-                var panelToAdd = panels;
-                keyText = key.split('.').pop();
-                panelToAdd.facets[key] = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                    id: key,
-                    key: key,
-                    title: keyText.replace(/_/g, ' ').toLowerCase().split(' ').map(function (s) {
-                        return s.charAt(0).toUpperCase() + s.substring(1);
-                    }).join(' '),
-                    field: 'key_value_pairs.key_value_hash.' + key + '.keyword',
-                    operator: 'AND',
-                    size: 10,
-                    translations: { '': 'Not Specified' }
-                });
-            });
-            return this.buildPanels(panels, 0);
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var informationText = 'To search multiple terms at once, insert "AND" between them. If a term contains a space, place the term in quotes';
-            var TermQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["TermQuery"];
-
-            var content = this.buildMetadataFacets(this.state.keys);
-
-            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                'div',
-                null,
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.3.1/css/all.css' }),
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                    __WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchkitProvider"],
-                    { searchkit: this.searchkit },
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                        __WEBPACK_IMPORTED_MODULE_2_searchkit__["Layout"],
-                        { size: '1' },
-                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                            __WEBPACK_IMPORTED_MODULE_2_searchkit__["TopBar"],
-                            null,
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchBox"], {
-                                translations: { "searchbox.placeholder": "Search Datasets" },
-                                queryOptions: { "minimum_should_match": "95%" },
-                                queryBuilder: __WEBPACK_IMPORTED_MODULE_2_searchkit__["QueryString"],
-                                auotfocus: true,
-                                searchOnChange: true,
-                                queryFields: ["_all"]
-                            }),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', {
-                                className: 'fas fa-info-circle fa-2x',
-                                style: { marginLeft: '10px', marginTop: '5px', color: 'white' },
-                                datatoggle: 'tooltip',
-                                title: informationText
-                            })
-                        ),
-                        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                            __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutBody"],
-                            null,
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                __WEBPACK_IMPORTED_MODULE_2_searchkit__["SideBar"],
-                                null,
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'Dataset' },
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'release_data',
-                                        title: 'Is Released',
-                                        field: 'release',
-                                        operator: 'AND',
-                                        translations: { "true": "Released Data", "false": "Private Data" }
-                                    }),
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'doi',
-                                        title: 'Has Data DOI',
-                                        field: 'has_doi',
-                                        operator: 'AND',
-                                        translations: { "true": "Yes", "false": "No" }
-                                    }),
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
-                                        id: 'created_date',
-                                        field: 'created_date',
-                                        queryDateFormat: 'YYYY-MM-DDTHH:MM:SS',
-                                        title: 'Upload Date',
-                                        startDate: "1 Jan 2010",
-                                        endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
-                                    })
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'Science Area' },
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'science_theme',
-                                        title: 'Area Name',
-                                        field: 'science_themes.keyword',
-                                        operator: 'OR',
-                                        size: 10
-                                    })
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'Institution' },
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'institution',
-                                        title: 'Institution Name',
-                                        field: 'institutions.keyword',
-                                        operator: 'AND',
-                                        size: 10
-                                    })
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'Instruments' },
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'instruments',
-                                        title: 'Instruments Name',
-                                        field: 'instruments.keyword',
-                                        operator: 'OR',
-                                        size: 10
-                                    })
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'Instrument Groups' },
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'groups',
-                                        title: 'Group Name',
-                                        field: 'groups.keyword',
-                                        operator: 'OR',
-                                        size: 10
-                                    })
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'People' },
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'submitter',
-                                        title: 'Staff Scientists',
-                                        field: 'users.submitter.keyword',
-                                        operator: 'OR',
-                                        size: 10,
-                                        translations: {
-                                            "svc-dms, svc-dms ": "Mass Spec Uploader",
-                                            "svc-nmr1, svc-nmr1 ": "NMR Uploader",
-                                            "svc-quiet1, svc-quiet1 ": "Microscopy Uploader"
-
-                                        }
-                                    }),
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'releaser',
-                                        title: 'Authorized Releaser',
-                                        field: 'users.authorized_releaser.keyword',
-                                        operator: 'OR',
-                                        size: 10,
-                                        translations: {
-                                            "svc-dms, svc-dms ": "Mass Spec Uploader",
-                                            "svc-nmr1, svc-nmr1 ": "NMR Uploader",
-                                            "svc-quiet1, svc-quiet1 ": "Microscopy Uploader"
-
-                                        }
-                                    })
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
-                                    { title: 'Projects' },
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["InputFilter"], {
-                                        id: 'project_id_search',
-                                        title: 'Project Filter',
-                                        placeholder: 'Project ID/Title',
-                                        searchOnChange: true,
-                                        queryBuilder: this.buildProjectIdQuery.bind(this),
-                                        queryFields: ["projects.obj_id.keyword"],
-                                        prefixQueryFields: ["projects.title.keyword"]
-                                    }),
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
-                                        id: 'projects.actual_start_date',
-                                        field: 'projects.actual_start_date',
-                                        queryDateFormat: 'YYYY-MM-DD',
-                                        title: 'Start Date',
-                                        startDate: "1 Jan 2002",
-                                        endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
-                                    }),
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
-                                        id: 'projects.actual_end_date',
-                                        field: 'projects.actual_end_date',
-                                        queryDateFormat: 'YYYY-MM-DD',
-                                        title: 'End Date',
-                                        startDate: "1 Jan 2002",
-                                        endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
-                                    }),
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
-                                        id: 'project_title',
-                                        title: 'Project Title',
-                                        field: 'projects.keyword',
-                                        operator: 'OR',
-                                        size: 10
-                                    })
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
-                                Object.keys(this.state.keys).length > 0 && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    'div',
-                                    null,
-                                    content
-                                )
-                            ),
-                            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutResults"],
-                                null,
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
-                                    null,
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["HitsStats"], { translations: { "hitstats.results_found": "{hitCount} results found" } })
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                                    __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
-                                    null,
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SelectedFilters"], {
-                                        translations: {
-                                            "End Date": "Proposal End Date",
-                                            "Start Date": "Proposal Start Date",
-                                            "Upload Date": "Dataset Upload Date",
-                                            "User Name": "Dataset Author"
-                                        }
-                                    }),
-                                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["ResetFilters"], null)
-                                ),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Hits"], {
-                                    hitsPerPage: 15,
-                                    itemComponent: __WEBPACK_IMPORTED_MODULE_3__transactionListItem__["default"],
-                                    scrollTo: 'body'
-                                }),
-                                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Pagination"], { showNumbers: true })
-                            )
-                        )
-                    )
-                )
-            );
-        }
-    }]);
-
-    return SearchApplication;
+  return SearchApplication;
 }(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
 
 /* harmony default export */ __webpack_exports__["default"] = (SearchApplication);
 
 
 window.startSearchApp = function (esHost) {
-    __WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(SearchApplication, _extends({ esHost: esHost }, this.props)), document.getElementById('searchkit_section'));
+  __WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(SearchApplication, _extends({ esHost: esHost }, this.props)), document.getElementById('searchkit_section'));
 };
 
 /***/ }),
@@ -107037,6 +106681,730 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
+
+/***/ }),
+/* 767 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_searchkit__ = __webpack_require__(160);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_searchkit___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_searchkit__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__transactionListItem__ = __webpack_require__(157);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__ = __webpack_require__(746);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__ = __webpack_require__(765);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_jquery__ = __webpack_require__(766);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_jquery__);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+
+
+
+
+
+
+
+
+
+var SIZE = 10000;
+
+var TransactionSearch = function (_React$Component) {
+  _inherits(TransactionSearch, _React$Component);
+
+  function TransactionSearch(props) {
+    _classCallCheck(this, TransactionSearch);
+
+    var _this = _possibleConstructorReturn(this, (TransactionSearch.__proto__ || Object.getPrototypeOf(TransactionSearch)).call(this, props));
+
+    _this.state = {
+      keys: _this.getAllKeyValuePairs()
+    };
+
+    var host = _this.getHost(props.esHost);
+    _this.searchkit = new __WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchkitManager"](host, {
+      timeout: 10000
+    });
+
+    _this.searchkit.translateFunction = function (key) {
+      return { "pagination.next": "Next Page", "pagination.previous": "Previous Page" }[key];
+    };
+
+    _this.searchkit.addDefaultQuery(_this.getDefaultQuery());
+    _this.searchkit.setQueryProcessor(function (plainQueryObject) {
+
+      console.log(plainQueryObject, _this.props.projectIds);
+      return plainQueryObject;
+    });
+    return _this;
+  }
+
+  _createClass(TransactionSearch, [{
+    key: 'getAllKeyValuePairs',
+    value: function getAllKeyValuePairs() {
+      var query = {
+        query: {
+          term: {
+            type: "keys"
+          }
+        },
+        size: SIZE // Temporary to test the scroll logic
+      };
+      var keyArray = {};
+      __WEBPACK_IMPORTED_MODULE_7_jquery__["ajax"]({
+        type: "POST",
+        async: false,
+        url: this.props.esHost + '/_search',
+        data: JSON.stringify(query),
+        contentType: 'application/json'
+
+      }).done(function (data) {
+        var hits = data.hits.hits;
+        hits.forEach(function (hit) {
+          if (hit._source && hit._source.keyword) {
+            var key = hit._source.keyword;
+            var display_name = hit._source.display_name;
+            if (!Object.keys(keyArray).includes(key)) {
+              keyArray[key] = { key: key, display_name: display_name };
+            }
+          }
+        });
+      });
+      return keyArray;
+    }
+  }, {
+    key: 'getHost',
+    value: function getHost(host) {
+      return host;
+    }
+  }, {
+    key: 'formatDateForDatePicker',
+    value: function formatDateForDatePicker(date) {
+      // convert to proper format for date picker component
+      return __WEBPACK_IMPORTED_MODULE_6_moment___default()(date).format("D MMM YYYY");
+    }
+  }, {
+    key: 'getOneYearFromToday',
+    value: function getOneYearFromToday() {
+      return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+    }
+  }, {
+    key: 'getDefaultQuery',
+    value: function getDefaultQuery() {
+      var BoolMust = __WEBPACK_IMPORTED_MODULE_2_searchkit__["BoolMust"];
+      var TermQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["TermQuery"];
+
+      return function (query) {
+        return query.addQuery(BoolMust([TermQuery("type", "transactions")]));
+      };
+    }
+  }, {
+    key: 'buildProjectIdQuery',
+    value: function buildProjectIdQuery(e) {
+      var BoolShould = __WEBPACK_IMPORTED_MODULE_2_searchkit__["BoolShould"];
+
+      return BoolShould([{ "wildcard": { "projects.obj_id.keyword": '*projects_' + e + '*' } }, { "wildcard": { "projects.title.keyword": '*' + e + '*' } }]);
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      // put code in here that happens after the component is refreshed
+    }
+  }, {
+    key: 'formatDateForElasticSearch',
+    value: function formatDateForElasticSearch(date) {
+      // convert to proper format for search_date queries
+      return __WEBPACK_IMPORTED_MODULE_6_moment___default()(date).format("YYYY-MM-DDTHH:MM:SS");
+    }
+  }, {
+    key: 'decayingScoreQuery',
+    value: function decayingScoreQuery(scoreFunction, field, scale, origin, decay, query) {
+      if (origin) {
+        return {
+          function_score: {
+            query: query
+          }
+        };
+      } else {
+        return {
+          function_score: {
+            query: query
+          }
+        };
+      }
+    }
+  }, {
+    key: 'buildPanels',
+    value: function buildPanels(panel, level) {
+      var _this2 = this;
+
+      var content = [];
+      //Build child panels
+      Object.keys(panel.panels).forEach(function (panelKey) {
+        content.push(_this2.buildPanels(panel.panels[panelKey], level + 1));
+      });
+      //Build facets
+      Object.keys(panel.facets).forEach(function (facetKey) {
+        content.push(panel.facets[facetKey]);
+      });
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        { key: panel.panelTitle, className: "level_" + level },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+          { key: panel.panelTitle, title: panel.panelTitle },
+          content
+        )
+      );
+    }
+  }, {
+    key: 'buildMetadataFacets',
+    value: function buildMetadataFacets(keys) {
+      var panels = { facets: {}, panels: {}, panelTitle: 'In-Depth Metadata' };
+      Object.keys(keys).forEach(function (key) {
+        var keyText = key;
+        var panelToAdd = panels;
+        keyText = key.split('.').pop();
+        panelToAdd.facets[key] = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+          id: key,
+          key: key,
+          title: keyText.replace(/_/g, ' ').toLowerCase().split(' ').map(function (s) {
+            return s.charAt(0).toUpperCase() + s.substring(1);
+          }).join(' '),
+          field: 'key_value_pairs.key_value_hash.' + key + '.keyword',
+          operator: 'AND',
+          size: 10,
+          translations: { '': 'Not Specified' }
+        });
+      });
+      return this.buildPanels(panels, 0);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var informationText = 'To search multiple terms at once, insert "AND" between them. If a term contains a space, place the term in quotes';
+      var TermQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["TermQuery"];
+
+      var content = this.buildMetadataFacets(this.state.keys);
+
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.3.1/css/all.css' }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'button',
+          { onClick: this.props.showProjectsHandler },
+          'Show Projects'
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchkitProvider"],
+          { searchkit: this.searchkit },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            __WEBPACK_IMPORTED_MODULE_2_searchkit__["Layout"],
+            { size: '1' },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              __WEBPACK_IMPORTED_MODULE_2_searchkit__["TopBar"],
+              null,
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchBox"], {
+                translations: { "searchbox.placeholder": "Search Datasets" },
+                queryOptions: { "minimum_should_match": "95%" },
+                queryBuilder: __WEBPACK_IMPORTED_MODULE_2_searchkit__["QueryString"],
+                auotfocus: true,
+                searchOnChange: true,
+                queryFields: ["_all"]
+              }),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', {
+                className: 'fas fa-info-circle fa-2x',
+                style: { marginLeft: '10px', marginTop: '5px', color: 'white' },
+                datatoggle: 'tooltip',
+                title: informationText
+              })
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutBody"],
+              null,
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_2_searchkit__["SideBar"],
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                  { title: 'Dataset' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'release_data',
+                    title: 'Is Released',
+                    field: 'release',
+                    operator: 'AND',
+                    translations: { "true": "Released Data", "false": "Private Data" }
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'doi',
+                    title: 'Has Data DOI',
+                    field: 'has_doi',
+                    operator: 'AND',
+                    translations: { "true": "Yes", "false": "No" }
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
+                    id: 'created_date',
+                    field: 'created_date',
+                    queryDateFormat: 'YYYY-MM-DDTHH:MM:SS',
+                    title: 'Upload Date',
+                    startDate: "1 Jan 2010",
+                    endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
+                  })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                  { title: 'Science Area' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'science_theme',
+                    title: 'Area Name',
+                    field: 'science_themes.keyword',
+                    operator: 'OR',
+                    size: 10
+                  })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                  { title: 'Institution' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'institution',
+                    title: 'Institution Name',
+                    field: 'institutions.keyword',
+                    operator: 'AND',
+                    size: 10
+                  })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                  { title: 'Instruments' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'instruments',
+                    title: 'Instruments Name',
+                    field: 'instruments.keyword',
+                    operator: 'OR',
+                    size: 10
+                  })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                  { title: 'Instrument Groups' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'groups',
+                    title: 'Group Name',
+                    field: 'groups.keyword',
+                    operator: 'OR',
+                    size: 10
+                  })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                  { title: 'People' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'submitter',
+                    title: 'Staff Scientists',
+                    field: 'users.submitter.keyword',
+                    operator: 'OR',
+                    size: 10,
+                    translations: {
+                      "svc-dms, svc-dms ": "Mass Spec Uploader",
+                      "svc-nmr1, svc-nmr1 ": "NMR Uploader",
+                      "svc-quiet1, svc-quiet1 ": "Microscopy Uploader"
+
+                    }
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'releaser',
+                    title: 'Authorized Releaser',
+                    field: 'users.authorized_releaser.keyword',
+                    operator: 'OR',
+                    size: 10,
+                    translations: {
+                      "svc-dms, svc-dms ": "Mass Spec Uploader",
+                      "svc-nmr1, svc-nmr1 ": "NMR Uploader",
+                      "svc-quiet1, svc-quiet1 ": "Microscopy Uploader"
+
+                    }
+                  })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_5__collapsiblePanel__["a" /* default */],
+                  { title: 'Projects' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["InputFilter"], {
+                    id: 'project_id_search',
+                    title: 'Project Filter',
+                    placeholder: 'Project ID/Title',
+                    searchOnChange: true,
+                    queryBuilder: this.buildProjectIdQuery.bind(this),
+                    queryFields: ["projects.obj_id.keyword"],
+                    prefixQueryFields: ["projects.title.keyword"]
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
+                    id: 'projects.actual_start_date',
+                    field: 'projects.actual_start_date',
+                    queryDateFormat: 'YYYY-MM-DD',
+                    title: 'Start Date',
+                    startDate: "1 Jan 2002",
+                    endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
+                    id: 'projects.actual_end_date',
+                    field: 'projects.actual_end_date',
+                    queryDateFormat: 'YYYY-MM-DD',
+                    title: 'End Date',
+                    startDate: "1 Jan 2002",
+                    endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                    id: 'project_title',
+                    title: 'Project Title',
+                    field: 'projects.keyword',
+                    operator: 'OR',
+                    size: 10
+                  })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null),
+                Object.keys(this.state.keys).length > 0 && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  'div',
+                  null,
+                  content
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutResults"],
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["HitsStats"], { translations: { "hitstats.results_found": "{hitCount} results found" } })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_2_searchkit__["ActionBarRow"],
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["SelectedFilters"], {
+                    translations: {
+                      "End Date": "Proposal End Date",
+                      "Start Date": "Proposal Start Date",
+                      "Upload Date": "Dataset Upload Date",
+                      "User Name": "Dataset Author"
+                    }
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["ResetFilters"], null)
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Hits"], {
+                  hitsPerPage: 15,
+                  itemComponent: __WEBPACK_IMPORTED_MODULE_3__transactionListItem__["default"],
+                  scrollTo: 'body'
+                }),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["Pagination"], { showNumbers: true })
+              )
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return TransactionSearch;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+
+/* harmony default export */ __webpack_exports__["a"] = (TransactionSearch);
+
+/***/ }),
+/* 768 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_searchkit__ = __webpack_require__(160);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_searchkit___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_searchkit__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__projectListItem__ = __webpack_require__(769);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dateRangeFilter__ = __webpack_require__(746);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__collapsiblePanel__ = __webpack_require__(765);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_moment___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_moment__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_jquery__ = __webpack_require__(766);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_jquery__);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+
+
+
+
+
+
+
+
+var SIZE = 10000;
+
+var ProjectSearch = function (_React$Component) {
+  _inherits(ProjectSearch, _React$Component);
+
+  function ProjectSearch(props) {
+    _classCallCheck(this, ProjectSearch);
+
+    var _this = _possibleConstructorReturn(this, (ProjectSearch.__proto__ || Object.getPrototypeOf(ProjectSearch)).call(this, props));
+
+    _this.state = {};
+
+    var host = _this.getHost(props.esHost);
+    _this.searchkit = new __WEBPACK_IMPORTED_MODULE_1_searchkit__["SearchkitManager"](host, {
+      timeout: 10000
+    });
+
+    console.log(_this.searchkit, props);
+    _this.searchkit.translateFunction = function (key) {
+      return { "pagination.next": "Next Page", "pagination.previous": "Previous Page" }[key];
+    };
+
+    _this.searchkit.addDefaultQuery(_this.getDefaultQuery());
+    _this.searchkit.setQueryProcessor(function (plainQueryObject) {
+      _this.getAllProjectsQuery(JSON.parse(JSON.stringify(plainQueryObject)));
+      return plainQueryObject;
+    });
+    return _this;
+  }
+
+  _createClass(ProjectSearch, [{
+    key: 'getAllProjectsQuery',
+    value: function getAllProjectsQuery(query) {
+      var _this2 = this;
+
+      query.size = SIZE;
+      __WEBPACK_IMPORTED_MODULE_6_jquery__["ajax"]({
+        type: 'POST',
+        url: this.props.esHost + '/_search',
+        data: JSON.stringify(query),
+        contentType: 'application/json'
+      }).done(function (data) {
+        var projIds = data.hits.hits.map(function (result) {
+          return result._id;
+        });
+        _this2.props.updateProjsHandler(projIds);
+      });
+    }
+  }, {
+    key: 'getHost',
+    value: function getHost(host) {
+      return host;
+    }
+  }, {
+    key: 'formatDateForDatePicker',
+    value: function formatDateForDatePicker(date) {
+      // convert to proper format for date picker component
+      return __WEBPACK_IMPORTED_MODULE_5_moment___default()(date).format("D MMM YYYY");
+    }
+  }, {
+    key: 'getDefaultQuery',
+    value: function getDefaultQuery() {
+      var BoolMust = __WEBPACK_IMPORTED_MODULE_1_searchkit__["BoolMust"];
+      var TermQuery = __WEBPACK_IMPORTED_MODULE_1_searchkit__["TermQuery"];
+
+      return function (query) {
+        return query.addQuery(BoolMust([TermQuery("type", "projects"), { "script": { "script": "doc['transaction_ids'].length > 0" } }]));
+      };
+    }
+  }, {
+    key: 'getOneYearFromToday',
+    value: function getOneYearFromToday() {
+      return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var informationText = "Temp";
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.3.1/css/all.css' }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'button',
+          { onClick: this.props.showTransactionsHandler },
+          'Show Transactions'
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_1_searchkit__["SearchkitProvider"],
+          { searchkit: this.searchkit },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            __WEBPACK_IMPORTED_MODULE_1_searchkit__["Layout"],
+            { size: '1' },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              __WEBPACK_IMPORTED_MODULE_1_searchkit__["TopBar"],
+              null,
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["SearchBox"], {
+                translations: { "searchbox.placeholder": "Search projects" },
+                queryOptions: { "minimum_should_match": "95%" },
+                queryBuilder: __WEBPACK_IMPORTED_MODULE_1_searchkit__["QueryString"],
+                auotfocus: true,
+                searchOnChange: true,
+                queryFields: ["_all"]
+              }),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', {
+                className: 'fas fa-info-circle fa-2x',
+                style: { marginLeft: '10px', marginTop: '5px', color: 'white' },
+                datatoggle: 'tooltip',
+                title: informationText
+              })
+            ),
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              __WEBPACK_IMPORTED_MODULE_1_searchkit__["LayoutBody"],
+              null,
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_searchkit__["SideBar"],
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_4__collapsiblePanel__["a" /* default */],
+                  { title: 'Project Facets' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["RefinementListFilter"], {
+                    id: 'released_project',
+                    title: 'Is Released',
+                    field: 'release',
+                    operator: 'AND',
+                    translations: { "true": "Released Project", "false": "Unreleased Project" }
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__dateRangeFilter__["a" /* default */], {
+                    id: 'actual_start_date',
+                    field: 'actual_start_date',
+                    queryDateFormat: 'YYYY-MM-DD',
+                    title: 'Start Date',
+                    startDate: "1 Jan 2010",
+                    endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__dateRangeFilter__["a" /* default */], {
+                    id: 'actual_end_date',
+                    field: 'actual_end_date',
+                    queryDateFormat: 'YYYY-MM-DD',
+                    title: 'End Date',
+                    startDate: "1 Jan 2010",
+                    endDate: this.formatDateForDatePicker(this.getOneYearFromToday())
+                  })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('hr', null)
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_searchkit__["LayoutResults"],
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_1_searchkit__["ActionBarRow"],
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["HitsStats"], { translations: { "hitstats.results_found": "{hitCount} results found" } })
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_1_searchkit__["ActionBarRow"],
+                  null,
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["SelectedFilters"], {
+                    translations: {
+                      "End Date": "Proposal End Date",
+                      "Start Date": "Proposal Start Date",
+                      "Upload Date": "Dataset Upload Date",
+                      "User Name": "Dataset Author"
+                    }
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["ResetFilters"], null)
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["Hits"], {
+                  hitsPerPage: 15,
+                  itemComponent: __WEBPACK_IMPORTED_MODULE_2__projectListItem__["a" /* default */],
+                  scrollTo: 'body'
+                }),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["Pagination"], { showNumbers: true })
+              )
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return ProjectSearch;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+
+/* harmony default export */ __webpack_exports__["a"] = (ProjectSearch);
+
+/***/ }),
+/* 769 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__itemAbstract__ = __webpack_require__(159);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+
+
+
+var ProjectListItem = function (_Component) {
+    _inherits(ProjectListItem, _Component);
+
+    function ProjectListItem(props) {
+        _classCallCheck(this, ProjectListItem);
+
+        return _possibleConstructorReturn(this, (ProjectListItem.__proto__ || Object.getPrototypeOf(ProjectListItem)).call(this, props));
+    }
+
+    _createClass(ProjectListItem, [{
+        key: 'renderAbstract',
+        value: function renderAbstract(abstractText) {
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__itemAbstract__["default"], { abstractText: abstractText });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var source = this.props.result._source;
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                { className: 'transactionResultHit' },
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'b',
+                    null,
+                    'Project:'
+                ),
+                ' ',
+                source.title,
+                ' (#',
+                source.obj_id.split('_')[1],
+                ') ',
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+                this.renderAbstract(source.abstract)
+            );
+        }
+    }]);
+
+    return ProjectListItem;
+}(__WEBPACK_IMPORTED_MODULE_0_react__["Component"]);
+
+/* harmony default export */ __webpack_exports__["a"] = (ProjectListItem);
 
 /***/ })
 /******/ ]);
