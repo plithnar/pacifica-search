@@ -24,15 +24,18 @@ export default class TransactionSearch extends React.Component {
 
 
     this.searchkit.translateFunction = (key)=> {
-      return {"pagination.next":"Next Page", "pagination.previous":"Previous Page"}[key]
+      if(key.match(/projects_\d+/g)) {
+        return key.replace('projects_', '#');
+      }
+      let translations = {
+        "pagination.next":"Next Page",
+        "pagination.previous":"Previous Page"
+      };
+
+      return translations[key]
     };
 
-    this.searchkit.addDefaultQuery(this.getDefaultQuery());
-    this.searchkit.setQueryProcessor((plainQueryObject) => {
-
-      console.log(plainQueryObject, this.props.projectIds);
-      return plainQueryObject;
-    })
+    this.searchkit.addDefaultQuery(this.getDefaultQuery(this.props.projectIds));
   }
 
   getAllKeyValuePairs() {
@@ -80,13 +83,14 @@ export default class TransactionSearch extends React.Component {
     return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
   }
 
-  getDefaultQuery() {
+  getDefaultQuery(projectIds) {
     const BoolMust = Searchkit.BoolMust;
     const TermQuery = Searchkit.TermQuery;
 
     return (query)=> {
       return query.addQuery( BoolMust([
           TermQuery("type", "transactions"),
+        {'terms':{'projects.obj_id':projectIds}}
         ])
       )}
 
@@ -178,7 +182,7 @@ export default class TransactionSearch extends React.Component {
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 
-        <button onClick={this.props.showProjectsHandler}>Show Projects</button>
+
         <Searchkit.SearchkitProvider searchkit={this.searchkit}>
           <Searchkit.Layout size="1">
             <Searchkit.TopBar>
@@ -196,6 +200,13 @@ export default class TransactionSearch extends React.Component {
                 datatoggle="tooltip"
                 title={informationText}
               />
+              <button
+                class="btn btn-default"
+                style={{marginLeft: '10px'}}
+                onClick={this.props.showProjectsHandler}
+              >
+                Back to Projects
+              </button>
             </Searchkit.TopBar>
             <Searchkit.LayoutBody>
               {/* Facets/Filters */}
@@ -225,7 +236,6 @@ export default class TransactionSearch extends React.Component {
                   />
                 </CollapsiblePanel>
                 <hr />
-
                 <CollapsiblePanel title="Science Area">
                   <Searchkit.RefinementListFilter
                     id="science_theme"
@@ -315,6 +325,15 @@ export default class TransactionSearch extends React.Component {
                     queryFields={["projects.obj_id.keyword"]}
                     prefixQueryFields={["projects.title.keyword"]}
                   />
+                  <div style={{display: "none"}}>
+                  <Searchkit.RefinementListFilter
+                    id="project"
+                    title="Project ID"
+                    field="projects.obj_id.keyword"
+                    operator="AND"
+                    size={10}
+                  />
+                  </div>
                   <DateRangeFilter
                     id="projects.actual_start_date"
                     field="projects.actual_start_date"

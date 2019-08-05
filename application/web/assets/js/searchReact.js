@@ -30237,7 +30237,7 @@ var SearchApplication = function (_React$Component) {
   _createClass(SearchApplication, [{
     key: 'updateProjectsForTransactions',
     value: function updateProjectsForTransactions(projIds) {
-      this.setState({ projIds: projIds });
+      this.setState({ projIds: projIds, showTransactions: projIds.length === 1 });
     }
   }, {
     key: 'toggleTransactionsSearch',
@@ -30253,11 +30253,14 @@ var SearchApplication = function (_React$Component) {
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.3.1/css/all.css' }),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__project_search__["a" /* default */], _extends({ style: { display: state.showTransactions ? 'none' : 'block' }
-        }, this.props, {
-          updateProjsHandler: this.updateProjectsForTransactions.bind(this),
-          showTransactionsHandler: this.toggleTransactionsSearch.bind(this)
-        })),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { style: { display: state.showTransactions ? 'none' : 'block' } },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__project_search__["a" /* default */], _extends({}, this.props, {
+            updateProjsHandler: this.updateProjectsForTransactions.bind(this),
+            showTransactionsHandler: this.toggleTransactionsSearch.bind(this)
+          }))
+        ),
         state.showTransactions && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__transaction_search__["a" /* default */], _extends({}, this.props, {
           projectIds: state.projIds,
           showProjectsHandler: this.toggleTransactionsSearch.bind(this)
@@ -106737,15 +106740,18 @@ var TransactionSearch = function (_React$Component) {
     });
 
     _this.searchkit.translateFunction = function (key) {
-      return { "pagination.next": "Next Page", "pagination.previous": "Previous Page" }[key];
+      if (key.match(/projects_\d+/g)) {
+        return key.replace('projects_', '#');
+      }
+      var translations = {
+        "pagination.next": "Next Page",
+        "pagination.previous": "Previous Page"
+      };
+
+      return translations[key];
     };
 
-    _this.searchkit.addDefaultQuery(_this.getDefaultQuery());
-    _this.searchkit.setQueryProcessor(function (plainQueryObject) {
-
-      console.log(plainQueryObject, _this.props.projectIds);
-      return plainQueryObject;
-    });
+    _this.searchkit.addDefaultQuery(_this.getDefaultQuery(_this.props.projectIds));
     return _this;
   }
 
@@ -106800,12 +106806,12 @@ var TransactionSearch = function (_React$Component) {
     }
   }, {
     key: 'getDefaultQuery',
-    value: function getDefaultQuery() {
+    value: function getDefaultQuery(projectIds) {
       var BoolMust = __WEBPACK_IMPORTED_MODULE_2_searchkit__["BoolMust"];
       var TermQuery = __WEBPACK_IMPORTED_MODULE_2_searchkit__["TermQuery"];
 
       return function (query) {
-        return query.addQuery(BoolMust([TermQuery("type", "transactions")]));
+        return query.addQuery(BoolMust([TermQuery("type", "transactions"), { 'terms': { 'projects.obj_id': projectIds } }]));
       };
     }
   }, {
@@ -106903,11 +106909,6 @@ var TransactionSearch = function (_React$Component) {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.3.1/css/all.css' }),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'button',
-          { onClick: this.props.showProjectsHandler },
-          'Show Projects'
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           __WEBPACK_IMPORTED_MODULE_2_searchkit__["SearchkitProvider"],
           { searchkit: this.searchkit },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -106929,7 +106930,16 @@ var TransactionSearch = function (_React$Component) {
                 style: { marginLeft: '10px', marginTop: '5px', color: 'white' },
                 datatoggle: 'tooltip',
                 title: informationText
-              })
+              }),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'button',
+                {
+                  'class': 'btn btn-default',
+                  style: { marginLeft: '10px' },
+                  onClick: this.props.showProjectsHandler
+                },
+                'Back to Projects'
+              )
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               __WEBPACK_IMPORTED_MODULE_2_searchkit__["LayoutBody"],
@@ -107055,6 +107065,17 @@ var TransactionSearch = function (_React$Component) {
                     queryFields: ["projects.obj_id.keyword"],
                     prefixQueryFields: ["projects.title.keyword"]
                   }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'div',
+                    { style: { display: "none" } },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_searchkit__["RefinementListFilter"], {
+                      id: 'project',
+                      title: 'Project ID',
+                      field: 'projects.obj_id.keyword',
+                      operator: 'AND',
+                      size: 10
+                    })
+                  ),
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__dateRangeFilter__["a" /* default */], {
                     id: 'projects.actual_start_date',
                     field: 'projects.actual_start_date',
@@ -107168,16 +107189,21 @@ var ProjectSearch = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (ProjectSearch.__proto__ || Object.getPrototypeOf(ProjectSearch)).call(this, props));
 
-    _this.state = {};
-
     var host = _this.getHost(props.esHost);
     _this.searchkit = new __WEBPACK_IMPORTED_MODULE_1_searchkit__["SearchkitManager"](host, {
       timeout: 10000
     });
 
-    console.log(_this.searchkit, props);
     _this.searchkit.translateFunction = function (key) {
-      return { "pagination.next": "Next Page", "pagination.previous": "Previous Page" }[key];
+      if (key.match(/projects_\d+/g)) {
+        return key.replace('projects_', '#');
+      }
+      var translations = {
+        "pagination.next": "Next Page",
+        "pagination.previous": "Previous Page"
+      };
+
+      return translations[key];
     };
 
     _this.searchkit.addDefaultQuery(_this.getDefaultQuery());
@@ -107193,7 +107219,8 @@ var ProjectSearch = function (_React$Component) {
     value: function getAllProjectsQuery(query) {
       var _this2 = this;
 
-      query.size = SIZE;
+      query.size = SIZE; // Needs to set to a ludicrously high size so that we can get all the project IDs for the hits.
+      // By doing it like this we only have to query once.
       __WEBPACK_IMPORTED_MODULE_6_jquery__["ajax"]({
         type: 'POST',
         url: this.props.esHost + '/_search',
@@ -107242,11 +107269,6 @@ var ProjectSearch = function (_React$Component) {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://use.fontawesome.com/releases/v5.3.1/css/all.css' }),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('link', { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' }),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'button',
-          { onClick: this.props.showTransactionsHandler },
-          'Show Transactions'
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           __WEBPACK_IMPORTED_MODULE_1_searchkit__["SearchkitProvider"],
           { searchkit: this.searchkit },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -107268,7 +107290,16 @@ var ProjectSearch = function (_React$Component) {
                 style: { marginLeft: '10px', marginTop: '5px', color: 'white' },
                 datatoggle: 'tooltip',
                 title: informationText
-              })
+              }),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'button',
+                {
+                  'class': 'btn btn-default',
+                  style: { marginLeft: '10px' },
+                  onClick: this.props.showTransactionsHandler
+                },
+                'Show Datasets'
+              )
             ),
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               __WEBPACK_IMPORTED_MODULE_1_searchkit__["LayoutBody"],
@@ -107285,6 +107316,28 @@ var ProjectSearch = function (_React$Component) {
                     field: 'release',
                     operator: 'AND',
                     translations: { "true": "Released Project", "false": "Unreleased Project" }
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'div',
+                    { style: { display: "none" } },
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["RefinementListFilter"], {
+                      id: 'project',
+                      title: 'Project ID',
+                      field: 'obj_id.keyword',
+                      operator: 'AND',
+                      size: 10
+                    })
+                  ),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["NumericRefinementListFilter"], {
+                    id: 'transaction_count',
+                    title: '# of Datasets',
+                    field: 'transaction_ids.length',
+                    options: [{ title: "All" }, { title: "Up to 50", from: 1, to: 51 }, { title: "More than 50", from: 51 }]
+                  }),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_searchkit__["RefinementListFilter"], {
+                    id: 'number_datasets',
+                    title: '# Datasets',
+                    field: 'transaction_ids.length'
                   }),
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__dateRangeFilter__["a" /* default */], {
                     id: 'actual_start_date',
@@ -107396,7 +107449,16 @@ var ProjectListItem = function (_Component) {
                 source.obj_id.split('_')[1],
                 ') ',
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
-                this.renderAbstract(source.abstract)
+                this.renderAbstract(source.abstract),
+                ' ',
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    'b',
+                    null,
+                    'Number of Datasets:'
+                ),
+                ' ',
+                source.transaction_ids.length
             );
         }
     }]);

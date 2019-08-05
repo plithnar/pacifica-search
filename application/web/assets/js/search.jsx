@@ -18,7 +18,7 @@ export default class SearchApplication extends React.Component {
     }
 
   updateProjectsForTransactions(projIds) {
-    this.setState({projIds})
+    this.setState({projIds, showTransactions: projIds.length === 1});
   }
   
   toggleTransactionsSearch() {
@@ -32,11 +32,13 @@ export default class SearchApplication extends React.Component {
               <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
               <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 
-                <ProjectSearch style={{display: state.showTransactions ? 'none':'block'}}
+              <div style={{display: state.showTransactions ? 'none':'block'}}>
+                <ProjectSearch
                   {...this.props} 
                   updateProjsHandler={this.updateProjectsForTransactions.bind(this)}
                   showTransactionsHandler={this.toggleTransactionsSearch.bind(this)}
                 />
+              </div>
               {state.showTransactions && (
                 <TransactionSearch 
                   {...this.props} 

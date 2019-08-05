@@ -9,23 +9,24 @@ import * as $ from 'jquery';
 const SIZE = 10000;
 
 export default class ProjectSearch extends React.Component {
-  static allProjectQuery;
-
   constructor(props) {
     super(props);
-
-    this.state = {
-
-    };
 
     const host = this.getHost(props.esHost);
     this.searchkit = new Searchkit.SearchkitManager(host, {
       timeout: 10000
     });
 
-    console.log(this.searchkit, props);
     this.searchkit.translateFunction = (key) => {
-      return {"pagination.next": "Next Page", "pagination.previous":"Previous Page"}[key]
+      if(key.match(/projects_\d+/g)) {
+        return key.replace('projects_', '#');
+      }
+      let translations = {
+        "pagination.next":"Next Page",
+        "pagination.previous":"Previous Page"
+      };
+
+      return translations[key]
     };
 
     this.searchkit.addDefaultQuery(this.getDefaultQuery());
@@ -36,7 +37,8 @@ export default class ProjectSearch extends React.Component {
   }
 
   getAllProjectsQuery(query) {
-    query.size = SIZE;
+    query.size = SIZE; // Needs to set to a ludicrously high size so that we can get all the project IDs for the hits.
+                       // By doing it like this we only have to query once.
     $.ajax({
       type:'POST',
       url: this.props.esHost+'/_search',
@@ -81,7 +83,6 @@ export default class ProjectSearch extends React.Component {
       <div>
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-        <button onClick={this.props.showTransactionsHandler}>Show Transactions</button>
         <Searchkit.SearchkitProvider searchkit={this.searchkit}>
           <Searchkit.Layout size="1">
             <Searchkit.TopBar>
@@ -99,6 +100,13 @@ export default class ProjectSearch extends React.Component {
                 datatoggle="tooltip"
                 title={informationText}
               />
+              <button 
+                class="btn btn-default" 
+                style={{marginLeft: '10px'}} 
+                onClick={this.props.showTransactionsHandler}
+              >
+                Show Datasets
+              </button>
             </Searchkit.TopBar>
             <Searchkit.LayoutBody>
               {/* Facets/Filters */}
@@ -110,6 +118,32 @@ export default class ProjectSearch extends React.Component {
                     field="release"
                     operator="AND"
                     translations={{"true": "Released Project", "false": "Unreleased Project"}}
+                  />
+
+                  <div style={{display: "none"}}>
+                    <Searchkit.RefinementListFilter
+                      id="project"
+                      title="Project ID"
+                      field="obj_id.keyword"
+                      operator="AND"
+                      size={10}
+                    />
+                  </div>
+
+                  <Searchkit.NumericRefinementListFilter
+                    id="transaction_count"
+                    title="# of Datasets"
+                    field="transaction_ids.length"
+                    options={[
+                      {title:"All"},
+                      {title:"Up to 50", from:1, to:51},
+                      {title:"More than 50", from:51}
+                    ]}
+                  />
+                  <Searchkit.RefinementListFilter
+                    id="number_datasets"
+                    title="# Datasets"
+                    field="transaction_ids.length"
                   />
 
                   <DateRangeFilter
