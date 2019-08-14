@@ -7,6 +7,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "antd": "^3.21.4",
     "font-awesome": "^4.6.3",
     "jquery": "^3.3.1",
     "lodash": "^4.17.11",

@@ -30,10 +30,6 @@ export default class ProjectSearch extends React.Component {
     };
 
     this.searchkit.addDefaultQuery(this.getDefaultQuery());
-    this.searchkit.setQueryProcessor((plainQueryObject) => {
-      this.getAllProjectsQuery(JSON.parse(JSON.stringify(plainQueryObject)));
-      return plainQueryObject;
-    })
   }
 
   getAllProjectsQuery(query) {
@@ -59,6 +55,15 @@ export default class ProjectSearch extends React.Component {
     return moment(date).format("D MMM YYYY");
   }
 
+  buildProjectIdQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"obj_id.keyword": `*projects_${e}*`}},
+      {"wildcard": {"title.keyword": `*${e}*`}}
+    ])
+  }
+
   getDefaultQuery() {
     const BoolMust = Searchkit.BoolMust;
     const TermQuery = Searchkit.TermQuery;
@@ -67,6 +72,7 @@ export default class ProjectSearch extends React.Component {
       return query.addQuery(
         BoolMust([
           TermQuery("type","projects"),
+          TermQuery("_index", "pacifica_search_dmlb2000"),
           {"script": {"script": "doc['transaction_ids'].length > 0"}}
         ])
       );
@@ -81,8 +87,6 @@ export default class ProjectSearch extends React.Component {
     var informationText = "Temp";
     return (
       <div>
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
         <Searchkit.SearchkitProvider searchkit={this.searchkit}>
           <Searchkit.Layout size="1">
             <Searchkit.TopBar>
@@ -100,25 +104,11 @@ export default class ProjectSearch extends React.Component {
                 datatoggle="tooltip"
                 title={informationText}
               />
-              <button 
-                class="btn btn-default" 
-                style={{marginLeft: '10px'}} 
-                onClick={this.props.showTransactionsHandler}
-              >
-                Show Datasets
-              </button>
             </Searchkit.TopBar>
             <Searchkit.LayoutBody>
               {/* Facets/Filters */}
               <Searchkit.SideBar>
-                <CollapsiblePanel title="Project Facets">
-                  <Searchkit.RefinementListFilter
-                    id="released_project"
-                    title="Is Released"
-                    field="release"
-                    operator="AND"
-                    translations={{"true": "Released Project", "false": "Unreleased Project"}}
-                  />
+                <CollapsiblePanel title="EMSL Projects">
 
                   <div style={{display: "none"}}>
                     <Searchkit.RefinementListFilter
@@ -129,21 +119,27 @@ export default class ProjectSearch extends React.Component {
                       size={10}
                     />
                   </div>
+                  <Searchkit.InputFilter
+                    id="project_id_search"
+                    title="Project Filter"
+                    placeholder="Project ID/Title"
+                    searchOnChange={true}
+                    queryBuilder={this.buildProjectIdQuery.bind(this)}
+                    queryFields={["projects.obj_id.keyword"]}
+                    prefixQueryFields={["projects.title.keyword"]}
+                  />
 
                   <Searchkit.NumericRefinementListFilter
                     id="transaction_count"
                     title="# of Datasets"
-                    field="transaction_ids.length"
+                    field="transaction_count"
                     options={[
                       {title:"All"},
                       {title:"Up to 50", from:1, to:51},
-                      {title:"More than 50", from:51}
+                      {title:"51 to 400", from:51, to:401},
+                      {title:"401 to 1000", from:401, to:1001},
+                      {title:"More than 1000", from: 1001}
                     ]}
-                  />
-                  <Searchkit.RefinementListFilter
-                    id="number_datasets"
-                    title="# Datasets"
-                    field="transaction_ids.length"
                   />
 
                   <DateRangeFilter
@@ -163,18 +159,72 @@ export default class ProjectSearch extends React.Component {
                     startDate={"1 Jan 2010"}
                     endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
                   />
-
-                  {/*
-                   <Searchkit.RefinementListFilter
-                   id="project_members"
-                   field="users.member_of.display_name"
-                   title="Project Members"
-                   operator="OR"
-                   size={10}
-                   />
-                   */}
                 </CollapsiblePanel>
+                <hr />
+                <CollapsiblePanel title="EMSL Users">
+                  <Searchkit.RefinementListFilter
+                    id="principal_investigator"
+                    field="users.principle_investigator.keyword"
+                    title="Principal Investigators"
+                    operator="OR"
+                    size={10}
+                  />
+                  <Searchkit.RefinementListFilter
+                    id="co_principal_investigator"
+                    field="users.co_principle_investigator.keyword"
+                    title="Co-Principal Investigators"
+                    operator="OR"
+                    size={10}
+                  />
+                  <Searchkit.RefinementListFilter
+                    id="member_of"
+                    field="users.member_of.keyword"
+                    title="Team Members"
+                    operator="OR"
+                    size={10}
+                  />
+                </CollapsiblePanel>
+                <hr />
+                <CollapsiblePanel title="Science Area">
+                  <Searchkit.RefinementListFilter
+                    id="science_theme"
+                    title="Area Name"
+                    field="science_themes.keyword"
+                    operator="OR"
+                    size={10}
+                  />
+                </CollapsiblePanel>
+                <hr />
 
+                <CollapsiblePanel title="Institution">
+                  <Searchkit.RefinementListFilter
+                    id="institution"
+                    title="Institution Name"
+                    field="institutions.keyword"
+                    operator="AND"
+                    size={10}
+                  />
+                </CollapsiblePanel>
+                <hr />
+                <CollapsiblePanel title="Instruments" >
+                  <Searchkit.RefinementListFilter
+                    id="instruments"
+                    title="Instruments Name"
+                    field="instruments.keyword"
+                    operator="OR"
+                    size={10}
+                  />
+                </CollapsiblePanel>
+                <hr />
+                <CollapsiblePanel title="Instrument Groups" >
+                  <Searchkit.RefinementListFilter
+                    id="groups"
+                    title="Group Name"
+                    field="groups.keyword"
+                    operator="OR"
+                    size={10}
+                  />
+                </CollapsiblePanel>
                 <hr />
               </Searchkit.SideBar>
               <Searchkit.LayoutResults>
@@ -194,7 +244,7 @@ export default class ProjectSearch extends React.Component {
                 </Searchkit.ActionBarRow>
                 <Searchkit.Hits
                   hitsPerPage={15}
-                  itemComponent={ProjectListItem}
+                  itemComponent={<ProjectListItem {...this.props} />}
                   scrollTo="body"
                 />
                 <Searchkit.Pagination showNumbers={true} />

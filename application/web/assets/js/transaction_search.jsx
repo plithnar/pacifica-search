@@ -35,7 +35,7 @@ export default class TransactionSearch extends React.Component {
       return translations[key]
     };
 
-    this.searchkit.addDefaultQuery(this.getDefaultQuery(this.props.projectIds));
+    this.searchkit.addDefaultQuery(this.getDefaultQuery(this.props.obj_id));
   }
 
   getAllKeyValuePairs() {
@@ -83,27 +83,20 @@ export default class TransactionSearch extends React.Component {
     return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
   }
 
-  getDefaultQuery(projectIds) {
+  getDefaultQuery(obj_id) {
     const BoolMust = Searchkit.BoolMust;
     const TermQuery = Searchkit.TermQuery;
 
     return (query)=> {
       return query.addQuery( BoolMust([
           TermQuery("type", "transactions"),
-        {'terms':{'projects.obj_id':projectIds}}
+        TermQuery("_index","pacifica_search_dmlb2000"),
+        {'term':{'projects.obj_id':obj_id}}
         ])
       )}
 
   }
 
-  buildProjectIdQuery(e) {
-    const BoolShould = Searchkit.BoolShould;
-
-    return BoolShould([
-      {"wildcard": {"projects.obj_id.keyword": `*projects_${e}*`}},
-      {"wildcard": {"projects.title.keyword": `*${e}*`}}
-    ])
-  }
 
   componentDidUpdate () {
     // put code in here that happens after the component is refreshed
@@ -179,8 +172,6 @@ export default class TransactionSearch extends React.Component {
 
     return(
       <div>
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 
 
         <Searchkit.SearchkitProvider searchkit={this.searchkit}>
@@ -200,13 +191,6 @@ export default class TransactionSearch extends React.Component {
                 datatoggle="tooltip"
                 title={informationText}
               />
-              <button
-                class="btn btn-default"
-                style={{marginLeft: '10px'}}
-                onClick={this.props.showProjectsHandler}
-              >
-                Back to Projects
-              </button>
             </Searchkit.TopBar>
             <Searchkit.LayoutBody>
               {/* Facets/Filters */}
@@ -236,27 +220,7 @@ export default class TransactionSearch extends React.Component {
                   />
                 </CollapsiblePanel>
                 <hr />
-                <CollapsiblePanel title="Science Area">
-                  <Searchkit.RefinementListFilter
-                    id="science_theme"
-                    title="Area Name"
-                    field="science_themes.keyword"
-                    operator="OR"
-                    size={10}
-                  />
-                </CollapsiblePanel>
-                <hr />
 
-                <CollapsiblePanel title="Institution">
-                  <Searchkit.RefinementListFilter
-                    id="institution"
-                    title="Institution Name"
-                    field="institutions.keyword"
-                    operator="AND"
-                    size={10}
-                  />
-                </CollapsiblePanel>
-                <hr />
 
                 <CollapsiblePanel title="Instruments" >
                   <Searchkit.RefinementListFilter
@@ -280,85 +244,6 @@ export default class TransactionSearch extends React.Component {
                 </CollapsiblePanel>
                 <hr />
 
-                <CollapsiblePanel title="People" >
-                  {/* PROJECT TEAM MEMBER FILTER */}
-                  <Searchkit.RefinementListFilter
-                    id="submitter"
-                    title="Staff Scientists"
-                    field="users.submitter.keyword"
-                    operator="OR"
-                    size={10}
-                    translations={
-                                            {
-                                                "svc-dms, svc-dms ": "Mass Spec Uploader",
-                                                "svc-nmr1, svc-nmr1 ": "NMR Uploader",
-                                                "svc-quiet1, svc-quiet1 ": "Microscopy Uploader",
-
-                                            }
-                                        }
-                  />
-                  <Searchkit.RefinementListFilter
-                    id="releaser"
-                    title="Authorized Releaser"
-                    field="users.authorized_releaser.keyword"
-                    operator="OR"
-                    size={10}
-                    translations={
-                                            {
-                                                "svc-dms, svc-dms ": "Mass Spec Uploader",
-                                                "svc-nmr1, svc-nmr1 ": "NMR Uploader",
-                                                "svc-quiet1, svc-quiet1 ": "Microscopy Uploader",
-
-                                            }
-                                        }
-                  />
-                </CollapsiblePanel>
-                <hr />
-
-                <CollapsiblePanel title="Projects" >
-                  <Searchkit.InputFilter
-                    id="project_id_search"
-                    title="Project Filter"
-                    placeholder="Project ID/Title"
-                    searchOnChange={true}
-                    queryBuilder={this.buildProjectIdQuery.bind(this)}
-                    queryFields={["projects.obj_id.keyword"]}
-                    prefixQueryFields={["projects.title.keyword"]}
-                  />
-                  <div style={{display: "none"}}>
-                  <Searchkit.RefinementListFilter
-                    id="project"
-                    title="Project ID"
-                    field="projects.obj_id.keyword"
-                    operator="AND"
-                    size={10}
-                  />
-                  </div>
-                  <DateRangeFilter
-                    id="projects.actual_start_date"
-                    field="projects.actual_start_date"
-                    queryDateFormat="YYYY-MM-DD"
-                    title="Start Date"
-                    startDate={"1 Jan 2002"}
-                    endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
-                  />
-                  <DateRangeFilter
-                    id="projects.actual_end_date"
-                    field="projects.actual_end_date"
-                    queryDateFormat="YYYY-MM-DD"
-                    title="End Date"
-                    startDate={"1 Jan 2002"}
-                    endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
-                  />
-                  <Searchkit.RefinementListFilter
-                    id="project_title"
-                    title="Project Title"
-                    field="projects.keyword"
-                    operator="OR"
-                    size={10}
-                  />
-                </CollapsiblePanel>
-                <hr />
 
                 {Object.keys(this.state.keys).length > 0 && (
                   <div>

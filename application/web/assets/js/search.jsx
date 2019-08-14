@@ -9,43 +9,23 @@ export default class SearchApplication extends React.Component {
 
 
     constructor(props) {
-        super(props);
+      super(props);
 
       this.state = {
         projIds: [],
-        showTransactions: false
+        showTransactions: false,
+        showModal: false
       }
     }
-
-  updateProjectsForTransactions(projIds) {
-    this.setState({projIds, showTransactions: projIds.length === 1});
-  }
   
-  toggleTransactionsSearch() {
-    this.setState({showTransactions: !this.state.showTransactions})
-  }
-
     render() {
-      const state = this.state;
         return(
             <div>
               <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" />
               <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-
-              <div style={{display: state.showTransactions ? 'none':'block'}}>
-                <ProjectSearch
-                  {...this.props} 
-                  updateProjsHandler={this.updateProjectsForTransactions.bind(this)}
-                  showTransactionsHandler={this.toggleTransactionsSearch.bind(this)}
-                />
-              </div>
-              {state.showTransactions && (
-                <TransactionSearch 
-                  {...this.props} 
-                  projectIds={state.projIds}
-                  showProjectsHandler={this.toggleTransactionsSearch.bind(this)}
-                />
-              )}
+              <ProjectSearch
+                {...this.props} 
+              />
             </div>
         );
     }
