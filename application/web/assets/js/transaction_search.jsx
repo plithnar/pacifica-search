@@ -90,7 +90,6 @@ export default class TransactionSearch extends React.Component {
     return (query)=> {
       return query.addQuery( BoolMust([
           TermQuery("type", "transactions"),
-        TermQuery("_index","pacifica_search_dmlb2000"),
         {'term':{'projects.obj_id':obj_id}}
         ])
       )}
@@ -221,10 +220,9 @@ export default class TransactionSearch extends React.Component {
                 </CollapsiblePanel>
                 <hr />
 
-
                 <CollapsiblePanel title="Instruments" >
                   <Searchkit.RefinementListFilter
-                    id="instruments"
+                    id="transaction_instruments"
                     title="Instruments Name"
                     field="instruments.keyword"
                     operator="OR"
@@ -235,7 +233,7 @@ export default class TransactionSearch extends React.Component {
 
                 <CollapsiblePanel title="Instrument Groups" >
                   <Searchkit.RefinementListFilter
-                    id="groups"
+                    id="instrument_groups"
                     title="Group Name"
                     field="groups.keyword"
                     operator="OR"

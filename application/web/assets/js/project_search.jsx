@@ -72,7 +72,6 @@ export default class ProjectSearch extends React.Component {
       return query.addQuery(
         BoolMust([
           TermQuery("type","projects"),
-          TermQuery("_index", "pacifica_search_dmlb2000"),
           {"script": {"script": "doc['transaction_ids'].length > 0"}}
         ])
       );
