@@ -155,6 +155,7 @@ export default class TransactionSearch extends React.Component {
           field={'key_value_pairs.key_value_hash.'+key+'.keyword'}
           operator="AND"
           size={10}
+          orderKey="_term"
           translations={{'': 'Not Specified'}}
         />
       );
@@ -226,6 +227,7 @@ export default class TransactionSearch extends React.Component {
                     title="Instruments Name"
                     field="instruments.keyword"
                     operator="OR"
+                    orderKey="_term"
                     size={10}
                   />
                 </CollapsiblePanel>
@@ -237,6 +239,7 @@ export default class TransactionSearch extends React.Component {
                     title="Group Name"
                     field="groups.keyword"
                     operator="OR"
+                    orderKey="_term"
                     size={10}
                   />
                 </CollapsiblePanel>

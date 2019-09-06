@@ -166,6 +166,7 @@ export default class ProjectSearch extends React.Component {
                     field="users.principle_investigator.keyword"
                     title="Principal Investigators"
                     operator="OR"
+                    orderKey="_term"
                     size={10}
                   />
                   <Searchkit.RefinementListFilter
@@ -173,6 +174,7 @@ export default class ProjectSearch extends React.Component {
                     field="users.co_principle_investigator.keyword"
                     title="Co-Principal Investigators"
                     operator="OR"
+                    orderKey="_term"
                     size={10}
                   />
                   <Searchkit.RefinementListFilter
@@ -180,6 +182,7 @@ export default class ProjectSearch extends React.Component {
                     field="users.member_of.keyword"
                     title="Team Members"
                     operator="OR"
+                    orderKey="_term"
                     size={10}
                   />
                 </CollapsiblePanel>
@@ -190,6 +193,7 @@ export default class ProjectSearch extends React.Component {
                     title="Area Name"
                     field="science_themes.keyword"
                     operator="OR"
+                    orderKey="_term"
                     size={10}
                   />
                 </CollapsiblePanel>
@@ -201,6 +205,7 @@ export default class ProjectSearch extends React.Component {
                     title="Institution Name"
                     field="institutions.keyword"
                     operator="AND"
+                    orderKey="_term"
                     size={10}
                   />
                 </CollapsiblePanel>
@@ -211,6 +216,7 @@ export default class ProjectSearch extends React.Component {
                     title="Instruments Name"
                     field="instruments.keyword"
                     operator="OR"
+                    orderKey="_term"
                     size={10}
                   />
                 </CollapsiblePanel>
@@ -221,6 +227,7 @@ export default class ProjectSearch extends React.Component {
                     title="Group Name"
                     field="groups.keyword"
                     operator="OR"
+                    orderKey="_term"
                     size={10}
                   />
                 </CollapsiblePanel>

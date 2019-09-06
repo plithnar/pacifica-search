@@ -33,7 +33,7 @@ export default class ProjectListItem extends Component {
             <div className="transactionResultHit">
               <b>Project:</b> {source.title} (#{source.obj_id.split('_')[1]}) <br />
               {this.renderAbstract(source.abstract)} <br />
-              <div onClick={this.toggleModal} style={{'color':'#08c'}}>
+              <div onClick={this.toggleModal} style={{'color':'#08c', 'cursor': 'pointer'}}>
                 <b>Number of Datasets:</b> {source.transaction_ids.length}
               </div>
               <Modal
