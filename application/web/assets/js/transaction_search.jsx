@@ -96,7 +96,6 @@ export default class TransactionSearch extends React.Component {
 
   }
 
-
   componentDidUpdate () {
     // put code in here that happens after the component is refreshed
   }
@@ -146,12 +145,12 @@ export default class TransactionSearch extends React.Component {
     Object.keys(keys).forEach((key) => {
       let keyText = key;
       let panelToAdd = panels;
-      keyText = key.split('.').pop();
+      keyText = keys[key].display_name ? keys[key].display_name : key.split('.').pop().replace(/_/g, ' ').toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
       panelToAdd.facets[key] =(
         <Searchkit.RefinementListFilter
           id={key}
           key={key}
-          title={keyText.replace(/_/g, ' ').toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ')}
+          title={keyText}
           field={'key_value_pairs.key_value_hash.'+key+'.keyword'}
           operator="AND"
           size={10}
@@ -172,8 +171,6 @@ export default class TransactionSearch extends React.Component {
 
     return(
       <div>
-
-
         <Searchkit.SearchkitProvider searchkit={this.searchkit}>
           <Searchkit.Layout size="1">
             <Searchkit.TopBar>
