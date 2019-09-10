@@ -175,6 +175,7 @@ export default class TransactionSearch extends React.Component {
           <Searchkit.Layout size="1">
             <Searchkit.TopBar>
               <Searchkit.SearchBox
+                id="datasets_query"
                 translations={{"searchbox.placeholder":"Search Datasets"}}
                 queryOptions={{"minimum_should_match":"95%"}}
                 queryBuilder={Searchkit.QueryString}

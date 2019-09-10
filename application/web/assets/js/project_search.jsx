@@ -90,6 +90,7 @@ export default class ProjectSearch extends React.Component {
           <Searchkit.Layout size="1">
             <Searchkit.TopBar>
               <Searchkit.SearchBox
+                id="project_query"
                 translations={{"searchbox.placeholder":"Search projects"}}
                 queryOptions={{"minimum_should_match":"95%"}}
                 queryBuilder={Searchkit.QueryString}
