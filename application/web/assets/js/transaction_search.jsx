@@ -181,6 +181,7 @@ export default class TransactionSearch extends React.Component {
                 queryBuilder={Searchkit.QueryString}
                 auotfocus={true}
                 searchOnChange={true}
+                searchThrottleTime={750}
                 queryFields={["_all"]}
               />
               <i

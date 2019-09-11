@@ -1,3 +1,8 @@
+.projectResultHit {
+    padding: 10px;
+    border-bottom: black solid;
+}
+
 .transactionResultHit {
     padding: 10px;
     border-bottom: black solid;
@@ -41,7 +46,7 @@
 }
 
 .collapsible-panel.collapsed .collapsible-title::before {
-    content: "\f0da";
+    content: "\f0da" !important;
     font-family: FontAwesome;
     padding-right: 2px;
 }

@@ -13,7 +13,7 @@ export default class ProjectListItem extends Component {
         showModal: false,
         obj_id: source.obj_id,
         projectId: source.obj_id.split('_')[1]
-      }
+      };
 
       this.toggleModal = this.toggleModal.bind(this)
 ;    }
@@ -30,8 +30,11 @@ export default class ProjectListItem extends Component {
     render() {
         const source = this.props.result._source;
         return(
-            <div className="transactionResultHit">
-              <b>Project:</b> {source.title} (#{source.obj_id.split('_')[1]}) <br />
+            <div className="projectResultHit">
+              <a href={`/?project[0]=${source.obj_id}`} >
+                <b>Project:</b> {source.title} (#{source.obj_id.split('_')[1]})
+              </a>
+              <br />
               {this.renderAbstract(source.abstract)} <br />
               <div onClick={this.toggleModal} style={{'color':'#08c', 'cursor': 'pointer'}}>
                 <b>Number of Datasets:</b> {source.transaction_ids.length}

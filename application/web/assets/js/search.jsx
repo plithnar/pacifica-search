@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TransactionSearch from './transaction_search';
 import ProjectSearch from './project_search';
 
 const SIZE = 10000;

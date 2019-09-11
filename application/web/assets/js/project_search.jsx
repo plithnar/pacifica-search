@@ -59,11 +59,11 @@ export default class ProjectSearch extends React.Component {
     const BoolShould = Searchkit.BoolShould;
 
     return BoolShould([
-      {"wildcard": {"obj_id.keyword": `*projects_${e}*`}},
-      {"wildcard": {"title.keyword": `*${e}*`}}
-    ])
+        {"wildcard": {"obj_id.keyword": `projects_${e}*`}},
+        {"wildcard": {"title.keyword.normalize": `*${e}*`}}
+      ])
   }
-
+  
   getDefaultQuery() {
     const BoolMust = Searchkit.BoolMust;
     const TermQuery = Searchkit.TermQuery;
@@ -91,11 +91,12 @@ export default class ProjectSearch extends React.Component {
             <Searchkit.TopBar>
               <Searchkit.SearchBox
                 id="project_query"
-                translations={{"searchbox.placeholder":"Search projects"}}
-                queryOptions={{"minimum_should_match":"95%"}}
+                translations={{"searchbox.placeholder":"Search Projects"}}
+                queryOptions={{"minimum_should_match":"95%", "analyze_wildcard":"true", "fuzziness":"AUTO", 'fuzzy_prefix_length': 2}}
                 queryBuilder={Searchkit.QueryString}
                 auotfocus={true}
                 searchOnChange={true}
+                searchThrottleTime={750}
                 queryFields={["_all"]}
               />
               <i
@@ -125,9 +126,20 @@ export default class ProjectSearch extends React.Component {
                     placeholder="Project ID/Title"
                     searchOnChange={true}
                     queryBuilder={this.buildProjectIdQuery.bind(this)}
+                    queryOptions={{"analyzer": "lowercase"}}
                     queryFields={["projects.obj_id.keyword"]}
                     prefixQueryFields={["projects.title.keyword"]}
                   />
+                  <CollapsiblePanel title="Matching Projects">
+                    <Searchkit.RefinementListFilter
+                      id="project_id"
+                      title="Project ID List"
+                      field="obj_id.keyword"
+                      operator="AND"
+                      orderKey="_term"
+                      size={10}
+                    />
+                  </CollapsiblePanel>
 
                   <Searchkit.NumericRefinementListFilter
                     id="transaction_count"
