@@ -63,7 +63,54 @@ export default class ProjectSearch extends React.Component {
         {"wildcard": {"title.keyword.normalize": `*${e}*`}}
       ])
   }
-  
+
+  buildPIQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"users.principle_investigator.keyword": `*${e}*`}}
+    ])
+  }
+
+  buildCoPIQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"users.co_principle_investigator.keyword": `*${e}*`}}
+    ])
+  }
+
+  buildTeamMemberQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"users.member_of.keyword": `*${e}*`}}
+    ])
+  }
+
+  buildInstitutionQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"institutions.keyword": `*${e}*`}}
+    ])
+  }
+  buildInstrumentQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"instruments.keyword": `*${e}*`}}
+    ])
+  }
+  buildInstrumentGroupQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"groups.keyword": `*${e}*`}}
+    ])
+  }
+
+
   getDefaultQuery() {
     const BoolMust = Searchkit.BoolMust;
     const TermQuery = Searchkit.TermQuery;
@@ -174,6 +221,15 @@ export default class ProjectSearch extends React.Component {
                 </CollapsiblePanel>
                 <hr />
                 <CollapsiblePanel title="EMSL Users">
+                  <Searchkit.InputFilter
+                    id="pi_search"
+                    title="Principal Investigator Search"
+                    placeholder="Principal Investigator Name"
+                    queryBuilder={this.buildPIQuery.bind(this)}
+                    queryFields={["users.principle_investigator.keyword"]}
+                    searchOnChange={true}
+                    searchThrottleTime={750}
+                  />
                   <Searchkit.RefinementListFilter
                     id="principal_investigator"
                     field="users.principle_investigator.keyword"
@@ -182,6 +238,15 @@ export default class ProjectSearch extends React.Component {
                     orderKey="_term"
                     size={10}
                   />
+                  <Searchkit.InputFilter
+                    id="copi_search"
+                    title="Co-Principal Investigator Search"
+                    placeholder="Co-Principal Investigator Name"
+                    queryBuilder={this.buildCoPIQuery.bind(this)}
+                    queryFields={["users.co_principle_investigator.keywor"]}
+                    searchOnChange={true}
+                    searchThrottleTime={750}
+                  />
                   <Searchkit.RefinementListFilter
                     id="co_principal_investigator"
                     field="users.co_principle_investigator.keyword"
@@ -189,6 +254,15 @@ export default class ProjectSearch extends React.Component {
                     operator="OR"
                     orderKey="_term"
                     size={10}
+                  />
+                  <Searchkit.InputFilter
+                    id="member_search"
+                    title="Team Member Search"
+                    placeholder="Team Member Name"
+                    queryBuilder={this.buildTeamMemberQuery.bind(this)}
+                    queryFields={["users.member_of.keyword"]}
+                    searchOnChange={true}
+                    searchThrottleTime={750}
                   />
                   <Searchkit.RefinementListFilter
                     id="member_of"
@@ -213,6 +287,15 @@ export default class ProjectSearch extends React.Component {
                 <hr />
 
                 <CollapsiblePanel title="Institution">
+                  <Searchkit.InputFilter
+                    id="institution_search"
+                    title="Institution Search"
+                    placeholder="Institution Name"
+                    queryBuilder={this.buildInstitutionQuery.bind(this)}
+                    queryFields={["institutions.keyword"]}
+                    searchOnChange={true}
+                    searchThrottleTime={750}
+                  />
                   <Searchkit.RefinementListFilter
                     id="institution"
                     title="Institution Name"
@@ -224,6 +307,15 @@ export default class ProjectSearch extends React.Component {
                 </CollapsiblePanel>
                 <hr />
                 <CollapsiblePanel title="Instruments" >
+                  <Searchkit.InputFilter
+                    id="instrument_search"
+                    title="Instrument Search"
+                    placeholder="Instrument Name"
+                    queryBuilder={this.buildInstrumentQuery.bind(this)}
+                    queryFields={["instruments.keyword"]}
+                    searchOnChange={true}
+                    searchThrottleTime={750}
+                  />
                   <Searchkit.RefinementListFilter
                     id="instruments"
                     title="Instruments Name"
@@ -235,6 +327,15 @@ export default class ProjectSearch extends React.Component {
                 </CollapsiblePanel>
                 <hr />
                 <CollapsiblePanel title="Instrument Groups" >
+                  <Searchkit.InputFilter
+                    id="instrument_group_search"
+                    title="Instrument Group Search"
+                    placeholder="Instrument Group Name"
+                    queryBuilder={this.buildInstrumentGroupQuery.bind(this)}
+                    queryFields={["groups.keyword"]}
+                    searchOnChange={true}
+                    searchThrottleTime={750}
+                  />
                   <Searchkit.RefinementListFilter
                     id="groups"
                     title="Group Name"

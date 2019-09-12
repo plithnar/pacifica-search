@@ -163,6 +163,21 @@ export default class TransactionSearch extends React.Component {
 
   }
 
+  buildInstrumentQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"instruments.keyword": `*${e}*`}}
+    ])
+  }
+  buildInstrumentGroupQuery(e) {
+    const BoolShould = Searchkit.BoolShould;
+
+    return BoolShould([
+      {"wildcard": {"groups.keyword": `*${e}*`}}
+    ])
+  }
+
   render() {
     var informationText = 'To search multiple terms at once, insert "AND" between them. If a term contains a space, place the term in quotes';
     var TermQuery = Searchkit.TermQuery;
@@ -221,6 +236,15 @@ export default class TransactionSearch extends React.Component {
                 <hr />
 
                 <CollapsiblePanel title="Instruments" >
+                  <Searchkit.InputFilter
+                    id="transaction_instrument_search"
+                    title="Instrument Search"
+                    placeholder="Instrument Name"
+                    queryBuilder={this.buildInstrumentQuery.bind(this)}
+                    queryFields={["instruments.keyword"]}
+                    searchOnChange={true}
+                    searchThrottleTime={750}
+                  />
                   <Searchkit.RefinementListFilter
                     id="transaction_instruments"
                     title="Instruments Name"
@@ -233,6 +257,15 @@ export default class TransactionSearch extends React.Component {
                 <hr />
 
                 <CollapsiblePanel title="Instrument Groups" >
+                  <Searchkit.InputFilter
+                    id="transaction_instrument_group_search"
+                    title="Instrument Group Search"
+                    placeholder="Instrument Group Name"
+                    queryBuilder={this.buildInstrumentGroupQuery.bind(this)}
+                    queryFields={["groups.keyword"]}
+                    searchOnChange={true}
+                    searchThrottleTime={750}
+                  />
                   <Searchkit.RefinementListFilter
                     id="instrument_groups"
                     title="Group Name"
