@@ -86,12 +86,17 @@ export default class TransactionSearch extends React.Component {
   getDefaultQuery(obj_id) {
     const BoolMust = Searchkit.BoolMust;
     const TermQuery = Searchkit.TermQuery;
+      const filterQuery = [
+          TermQuery("type", "transactions"),
+          {'term': {"projects.obj": obj_id}}
+      ];
+      if(!this.props.showUnreleased) {
+          filterQuery.push(TermQuery('release', true));
+      }
+      console.log('filterQuery', filterQuery);
 
     return (query)=> {
-      return query.addQuery( BoolMust([
-        TermQuery("type", "transactions"),
-        {'term':{'projects.obj_id':obj_id}}
-        ])
+      return query.addQuery( BoolMust(filterQuery)
       )}
 
   }
