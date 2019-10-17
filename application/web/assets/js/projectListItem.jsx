@@ -14,6 +14,7 @@ export default class ProjectListItem extends Component {
         this.state = {
             showModal: false,
             showMetadataModal: false,
+            showUnreleased: false,
             obj_id: source.obj_id,
             projectId: source.obj_id.split('_')[1],
             releasedTransactions: this.getReleasedTransactions(source.obj_id)
@@ -23,8 +24,12 @@ export default class ProjectListItem extends Component {
         this.toggleMetadataModal = this.toggleMetadataModal.bind(this);
     }
 
+    toggleUnreleasedModal() {
+        this.setState({showUnreleased: true, showModal: !this.state.showModal})
+    }
+
     toggleModal() {
-        this.setState({showModal: !this.state.showModal});
+        this.setState({showModal: !this.state.showModal, showUnreleased: false});
     }
 
     toggleMetadataModal() {
@@ -81,7 +86,6 @@ export default class ProjectListItem extends Component {
 
     render() {
         const source = this.props.result._source;
-        console.log('list item props', this.props);
         return(
             <div className="projectResultHit">
                 <a href={`/?project[0]=${source.obj_id}`} >
@@ -91,7 +95,7 @@ export default class ProjectListItem extends Component {
                 {this.renderAbstract(source.abstract)} <br />
                 <div style={{'display': 'inline-flex'}}>
                     {this.props.showUnreleased && (
-                        <div onClick={this.toggleModal} style={{'color':'#08c', 'cursor': 'pointer', 'marginRight': '50px'}}>
+                        <div onClick={this.toggleUnreleasedModal} style={{'color':'#08c', 'cursor': 'pointer', 'marginRight': '50px'}}>
                             <b>Number of Datasets:</b> {source.transaction_ids.length}
                         </div>
                     )}
@@ -110,7 +114,7 @@ export default class ProjectListItem extends Component {
                     onCancel={this.toggleModal}
                     style={{height:'90vh', overflow:'scroll', top:'5vh'}}
                 >
-                    <TransactionSearch {...this.props} obj_id={this.state.obj_id} />
+                    <TransactionSearch {...this.props} obj_id={this.state.obj_id} showUnreleased={this.state.showUnreleased} />
                 </Modal>
                 <Modal
                     visible={this.state.showMetadataModal}
