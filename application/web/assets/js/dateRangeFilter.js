@@ -60,7 +60,6 @@ class DateRangeAccessor extends FilterBasedAccessor {
     buildSharedQuery(query) {
         if (this.state.hasValue()) {
             let val = this.state.getValue();
-            console.log(val.endDate);
             let min = this.formatQueryDate(val.startDate);
             let max = this.formatQueryDate(val.endDate);
             let rangeFilter = this.fieldContext.wrapFilter(RangeQuery(this.options.field,{
@@ -202,8 +201,8 @@ export default class DateRangeFilter extends SearchkitComponent {
             // Determine if we have clicked on a calendar.  If not, then make sure the calendars are closed.
             var datePicker = $(e.target).closest('.react-datepicker');
             if (datePicker.length == 0) {
-                this.refs.datePickerStart.setOpen(false);
-                this.refs.datePickerEnd.setOpen(false);
+                this.refs.datePickerStart ? this.refs.datePickerStart.setOpen(false) : undefined;
+                this.refs.datePickerEnd ? this.refs.datePickerEnd.setOpen(false) : undefined;
             }
         });
     }

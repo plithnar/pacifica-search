@@ -18,8 +18,8 @@ export default class ProjectMetadata extends Component {
             <div>
                 <ul style={{columns: 3, 'listStyleType': 'none'}}>
                     <li><b>Project Started:</b> {metadata.actual_start_date}</li>
+                    <li><b>Project Estimated End:</b> {metadata.actual_end_date}</li>
                     <li><b>Project Closed:</b> {metadata.closed_date}</li>
-                    <li><b>Project Ended:</b> {metadata.actual_end_date}</li>
                 </ul>
             </div>
         )
@@ -31,27 +31,25 @@ export default class ProjectMetadata extends Component {
             pi_members += users.co_principle_investigator.length;
         }
         return (
-            <div>
-                <tr>
+            <div style={{display: 'inline-flex', width:'100%'}}>
                 {users.principle_investigator.length > 0 && (
-                    <td style={{padding: '0px 25px'}}>
+                    <div style={{padding: '0px 25px',width:'33%'}}>
                         {this.renderMembers(users.principle_investigator, 'Principal Investigators', 1)}
-                    </td>
+                    </div>
                 )}
                 {users.co_principle_investigator && users.co_principle_investigator.length > 0 && (
-                    <td style={{padding: '0px 25px'}}>
+                    <div style={{padding: '0px 25px',width:'33%'}}>
                         {this.renderMembers(users.co_principle_investigator, 'Co-Principal Investigators', 1)}
-                    </td>
+                    </div>
                 )}
                 {users.member_of.length > pi_members && (
-                    <td style={{padding: '0px 25px'}}>
+                    <div style={{padding: '0px 25px',width:'33%'}}>
                         {this.renderMembers(
                             users.member_of.filter((user) => (!users.principle_investigator.map((pi) => (pi.obj_id)).includes(user.obj_id)))
                                 .filter((user) => ((!users.co_principle_investigator) || (users.co_principle_investigator && !users.co_principle_investigator.map((copi) => (copi.obj_id)).includes(user.obj_id)))),
-                            'Other Team Members', 3)}
-                    </td>
+                            'Other Team Members', 2)}
+                    </div>
                 )}
-                </tr>
             </div>
         )
     }
@@ -59,8 +57,8 @@ export default class ProjectMetadata extends Component {
     renderMembers(members, header, columns=3) {
         const content = [];
         const distinctMembers = [...new Set(members.map((member) => (member.display_name)))];
-        distinctMembers.sort().forEach((member) => {
-            content.push(<li>{member}</li>)
+        distinctMembers.sort().forEach((member, index) => {
+            content.push(<li key={index}>{member}</li>)
         });
 
         return (

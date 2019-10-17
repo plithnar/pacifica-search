@@ -20,12 +20,13 @@ export default class ProjectListItem extends Component {
             releasedTransactions: this.getReleasedTransactions(source.obj_id)
         };
 
+        this.toggleUnreleasedModal = this.toggleUnreleasedModal.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
         this.toggleMetadataModal = this.toggleMetadataModal.bind(this);
     }
 
     toggleUnreleasedModal() {
-        this.setState({showUnreleased: true, showModal: !this.state.showModal})
+        this.setState({showModal: !this.state.showModal, showUnreleased: true})
     }
 
     toggleModal() {
@@ -95,11 +96,17 @@ export default class ProjectListItem extends Component {
                 {this.renderAbstract(source.abstract)} <br />
                 <div style={{'display': 'inline-flex'}}>
                     {this.props.showUnreleased && (
-                        <div onClick={this.toggleUnreleasedModal} style={{'color':'#08c', 'cursor': 'pointer', 'marginRight': '50px'}}>
+                        <div
+                            onClick={source.transaction_ids.length > 0 ? this.toggleUnreleasedModal : undefined}
+                            style={source.transaction_ids.length > 0 ? {'color':'#08c', 'cursor': 'pointer', 'marginRight': '50px'} : {}}
+                        >
                             <b>Number of Datasets:</b> {source.transaction_ids.length}
                         </div>
                     )}
-                    <div onClick={this.toggleModal} style={{'color':'#08c', 'cursor': 'pointer'}}>
+                    <div
+                        onClick={this.state.releasedTransactions > 0 ? this.toggleModal : undefined}
+                        style={this.state.releasedTransactions > 0 ? {'color':'#08c', 'cursor': 'pointer'} : {}}
+                    >
                         <b>Number of Released Datasets:</b> {this.state.releasedTransactions}
                     </div>
                 <div onClick={this.toggleMetadataModal} style={{'color':'#08c', 'cursor': 'pointer', 'marginLeft': '50px'}}>
@@ -112,6 +119,7 @@ export default class ProjectListItem extends Component {
                     footer={null}
                     width="80%"
                     onCancel={this.toggleModal}
+                    destroyOnClose={true}
                     style={{height:'90vh', overflow:'scroll', top:'5vh'}}
                 >
                     <TransactionSearch {...this.props} obj_id={this.state.obj_id} showUnreleased={this.state.showUnreleased} />
@@ -122,6 +130,7 @@ export default class ProjectListItem extends Component {
                     footer={null}
                     width="80%"
                     onCancel={this.toggleMetadataModal}
+                    destroyOnClose={true}
                     style={{height:'90vh', overflow:'scroll', top:'5vh'}}
                 >
                     <ProjectMetadata {...this.props} metadata={source} released={this.state.releasedTransactions} />

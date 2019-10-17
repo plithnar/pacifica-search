@@ -35,7 +35,7 @@ export default class TransactionSearch extends React.Component {
       return translations[key]
     };
 
-    this.searchkit.addDefaultQuery(this.getDefaultQuery(this.props.obj_id));
+    this.searchkit.addDefaultQuery(this.getDefaultQuery(this.props.obj_id, this.props.showUnreleased));
   }
 
   getAllKeyValuePairs() {
@@ -83,20 +83,27 @@ export default class TransactionSearch extends React.Component {
     return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
   }
 
-  getDefaultQuery(obj_id) {
+  getDefaultQuery(obj_id, showUnreleased) {
     const BoolMust = Searchkit.BoolMust;
     const TermQuery = Searchkit.TermQuery;
-      const filterQuery = [
-          TermQuery("type", "transactions"),
-          {'term': {"projects.obj": obj_id}}
-      ];
-      if(!this.props.showUnreleased) {
-          filterQuery.push(TermQuery('release', true));
-      }
-      console.log('filterQuery', filterQuery);
-
+    if(!showUnreleased) {
+        return (query) => {
+            return query.addQuery(
+                BoolMust([
+                    TermQuery("type", "transactions"),
+                    TermQuery("release", true),
+                    {'term':{'projects.obj_id':obj_id}}
+                ])
+            )
+        }
+    }
+      
     return (query)=> {
-      return query.addQuery( BoolMust(filterQuery)
+      return query.addQuery(
+          BoolMust([
+              TermQuery("type", "transactions"),
+              {'term':{'projects.obj_id':obj_id}}
+          ])
       )}
 
   }
