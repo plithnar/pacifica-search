@@ -30,6 +30,6 @@ export default class SearchApplication extends React.Component {
     }
 }
 
-window.startSearchApp = function(esHost) {
-    ReactDOM.render(<SearchApplication esHost={esHost} {...this.props} />, document.getElementById('searchkit_section'));
+window.startSearchApp = function(esHost, show_unreleased) {
+    ReactDOM.render(<SearchApplication esHost={esHost} showUnreleased={show_unreleased} {...this.props} />, document.getElementById('searchkit_section'));
 };

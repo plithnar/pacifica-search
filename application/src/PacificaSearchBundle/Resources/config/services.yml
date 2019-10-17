@@ -22,6 +22,7 @@ services:
         arguments:
             - "%elasticsearch_host%"
             - "%metadata_host%"
+            - "%show_unreleased%"
             - "@templating"
 
     PacificaSearchBundle\Controller\FileTreeController:

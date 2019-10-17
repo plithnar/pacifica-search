@@ -29,6 +29,7 @@
 
     <script>
         var esHost = '{{ elastic_search_host }}';
-        window.startSearchApp(esHost);
+        var show_unreleased = '{{ show_unreleased }}';
+        window.startSearchApp(esHost, !!show_unreleased);
     </script>
 {% endblock %}

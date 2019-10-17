@@ -89,7 +89,7 @@ export default class TransactionSearch extends React.Component {
 
     return (query)=> {
       return query.addQuery( BoolMust([
-          TermQuery("type", "transactions"),
+        TermQuery("type", "transactions"),
         {'term':{'projects.obj_id':obj_id}}
         ])
       )}

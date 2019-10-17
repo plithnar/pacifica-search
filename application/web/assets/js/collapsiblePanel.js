@@ -6,7 +6,10 @@ export default class CollapsiblePanel extends React.Component {
     constructor(props) {
         super(props);
         // set state collapsed = true
-        this.state = {collapsed: true};
+        this.state = {
+            collapsed: props.collapsed !== undefined ? props.collapsed : true,
+            titleColor: props.titleColor ? props.titleColor: '#000'
+        };
 
         // This binding is necessary to make `this` work in the callback
         this.toggleDisplay = this.toggleDisplay.bind(this);
@@ -30,7 +33,7 @@ export default class CollapsiblePanel extends React.Component {
         }
         return (
             <div className={classname}>
-                <div className={"collapsible-title"} onClick={this.toggleDisplay}>{this.props.title}</div>
+                <div className={"collapsible-title"} style={{color: this.state.titleColor}} onClick={this.toggleDisplay}>{this.props.title}</div>
                 <div className={"collapsible-body"}>
                     {this.props.children}
                 </div>

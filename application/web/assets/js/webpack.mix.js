@@ -6,4 +6,5 @@ mix.react([
   'itemAbstract.jsx',
   'transaction_search.jsx',
   'project_search.jsx',
+  'project_metadata.jsx',
   'search.jsx',], 'searchReact.js');
