@@ -19,7 +19,7 @@ export default class ProjectMetadata extends Component {
                 <ul style={{columns: 3, 'listStyleType': 'none'}}>
                     <li><b>Project Started:</b> {metadata.actual_start_date}</li>
                     <li><b>Project Estimated End:</b> {metadata.actual_end_date}</li>
-                    <li><b>Project Closed:</b> {metadata.closed_date}</li>
+                    <li><b>Project Closed:</b> {metadata.closed_date ? metadata.closed_date : 'Currently Active'}</li>
                 </ul>
             </div>
         )
@@ -108,11 +108,9 @@ export default class ProjectMetadata extends Component {
                     {this.renderAbstract(metadata.abstract)}
                     <br />
                     <ul style={{columns: 2, 'listStyleType': 'none'}}>
-                        {this.props.showUnreleased && (
-                            <li>
-                                <b>Number of Datasets:</b> {metadata.transaction_ids.length}
-                            </li>
-                        )}
+                        <li>
+                            <b>Number of Datasets:</b> {metadata.transaction_ids.length}
+                        </li>
                         <li>
                             <b>Number of Released Datasets:</b> {this.props.released}
                         </li>
