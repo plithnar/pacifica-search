@@ -99,13 +99,13 @@ export default class ProjectListItem extends Component {
                         onClick={this.props.showUnreleased && source.transaction_ids.length > 0 ? this.toggleUnreleasedModal : undefined}
                         style={this.props.showUnreleased && source.transaction_ids.length > 0 ? {'color':'#08c', 'cursor': 'pointer'} : {}}
                     >
-                        <b>Number of Datasets:</b> {source.transaction_ids.length}
+                        <b># Archived Datasets:</b> {source.transaction_ids.length}
                     </div>
                     <div
                         onClick={this.state.releasedTransactions > 0 ? this.toggleModal : undefined}
                         style={this.state.releasedTransactions > 0 ? {'color':'#08c', 'cursor': 'pointer', 'marginLeft': '50px'} : {'marginLeft': '50px'}}
                     >
-                        <b>Number of Released Datasets:</b> {this.state.releasedTransactions}
+                        <b># Open Access Datasets:</b> {this.state.releasedTransactions}
                     </div>
                 <div onClick={this.toggleMetadataModal} style={{'color':'#08c', 'cursor': 'pointer', 'marginLeft': '50px'}}>
                     <b>Explore Project Metadata</b>

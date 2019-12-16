@@ -109,10 +109,10 @@ export default class ProjectMetadata extends Component {
                     <br />
                     <ul style={{columns: 2, 'listStyleType': 'none'}}>
                         <li>
-                            <b>Number of Datasets:</b> {metadata.transaction_ids.length}
+                            <b># Archived Datasets:</b> {metadata.transaction_ids.length}
                         </li>
                         <li>
-                            <b>Number of Released Datasets:</b> {this.props.released}
+                            <b># Open Access Datasets:</b> {this.props.released}
                         </li>
                     </ul>
                     <br />

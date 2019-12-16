@@ -130,7 +130,16 @@ export default class ProjectSearch extends React.Component {
   }
 
   render() {
-    var informationText = "Temp";
+    var informationText = `The following special characters are supported:
+        + signifies AND operation
+      | signifies OR operation
+      - negates a single token
+      " wraps a number of tokens to signify a phrase
+      * at the end of a term signifies a prefix query
+      ( and ) signify precedence
+      ~N after a word signifies edit distance (fuzziness)
+      ~N after a phrase signifies slop amount
+      In order to search for any of these special characters, they will need to be escaped with \\\\.`;
     return (
       <div>
         <Searchkit.SearchkitProvider searchkit={this.searchkit}>
@@ -190,10 +199,11 @@ export default class ProjectSearch extends React.Component {
 
                   <Searchkit.NumericRefinementListFilter
                     id="transaction_count"
-                    title="# of Datasets"
+                    title="# Archived Datasets"
                     field="transaction_count"
                     options={[
                       {title:"All"},
+                      {title:"No Datasets", from:0, to:1},
                       {title:"Up to 50", from:1, to:51},
                       {title:"51 to 400", from:51, to:401},
                       {title:"401 to 1000", from:401, to:1001},
