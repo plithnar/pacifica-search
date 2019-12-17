@@ -18,6 +18,10 @@
     z-index: 1;
 }
 
+.sk-layout__filters {
+    flex: 0 0 270px !important;
+}
+
 .sk-layout__body {
     margin: 5px auto 0;
     min-width: 600px;

@@ -129,6 +129,14 @@ export default class ProjectSearch extends React.Component {
     return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
   }
 
+    getToday() {
+        return new Date();
+    }
+
+    getOneYearAgoFromToday() {
+        return new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+    }
+
   render() {
     var informationText = `The following special characters are supported:
         + signifies AND operation
@@ -164,9 +172,8 @@ export default class ProjectSearch extends React.Component {
             </Searchkit.TopBar>
             <Searchkit.LayoutBody>
               {/* Facets/Filters */}
-              <Searchkit.SideBar>
+              <Searchkit.SideBar style={{flex: '0 0 270px !important'}}>
                 <CollapsiblePanel title="EMSL Projects">
-
                   <div style={{display: "none"}}>
                     <Searchkit.RefinementListFilter
                       id="project"
@@ -220,14 +227,22 @@ export default class ProjectSearch extends React.Component {
                     endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
                   />
 
-                  <DateRangeFilter
-                    id="actual_end_date"
-                    field="actual_end_date"
-                    queryDateFormat="YYYY-MM-DD"
-                    title="End Date"
-                    startDate={"1 Jan 2010"}
-                    endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
-                  />
+                    <DateRangeFilter
+                        id="actual_end_date"
+                        field="actual_end_date"
+                        queryDateFormat="YYYY-MM-DD"
+                        title="End Date"
+                        startDate={"1 Jan 2010"}
+                        endDate={this.formatDateForDatePicker(this.getOneYearFromToday())}
+                    />
+                    <DateRangeFilter
+                        id="closed_date"
+                        field="closed_date"
+                        queryDateFormat="YYYY-MM-DD"
+                        title="Closed Date"
+                        startDate={this.formatDateForDatePicker(this.getOneYearAgoFromToday())}
+                        endDate={this.formatDateForDatePicker(this.getToday())}
+                    />
                 </CollapsiblePanel>
                 <hr />
                 <CollapsiblePanel title="EMSL Users">
@@ -360,6 +375,16 @@ export default class ProjectSearch extends React.Component {
               <Searchkit.LayoutResults>
                 <Searchkit.ActionBarRow>
                   <Searchkit.HitsStats translations={{"hitstats.results_found":"{hitCount} results found"}}/>
+                    <Searchkit.SortingSelector options={[
+                        {label: "Most Recently Started", field: "actual_start_date", order:"desc", defaultOption:true},
+                        {label: "Least Recently Started", field: "actual_start_date", order:"asc"},
+                        {label: "Most Recently Closed", field: "closed_date", order:"desc"},
+                        {label: "Least Recently Closed", field: "closed_date", order:"asc"},
+                        {label: "Most Open Access Datasets", field: "transaction_count", order:"desc"},
+                        {label: "Least Open Access Datasets", field: "transaction_count", order:"asc"},
+                        {label: "Most Archived Datasets", field: "transaction_count", order:"desc"},
+                        {label: "Least Archived Datasets", field: "transaction_count", order:"asc"}
+                    ]} />
                 </Searchkit.ActionBarRow>
                 <Searchkit.ActionBarRow>
                   <Searchkit.SelectedFilters
