@@ -26,27 +26,27 @@ export default class ProjectMetadata extends Component {
     }
 
     renderUsers(users) {
-        let pi_members = users.principle_investigator.length;
-        if(users.co_principle_investigator) {
-            pi_members += users.co_principle_investigator.length;
+        let pi_members = users.principal_investigator.length;
+        if(users.co_principal_investigator) {
+            pi_members += users.co_principal_investigator.length;
         }
         return (
             <div style={{display: 'inline-flex', width:'100%'}}>
-                {users.principle_investigator.length > 0 && (
+                {users.principal_investigator.length > 0 && (
                     <div style={{padding: '0px 25px',width:'33%'}}>
-                        {this.renderMembers(users.principle_investigator, 'Principal Investigators', 1)}
+                        {this.renderMembers(users.principal_investigator, 'Principal Investigators', 1)}
                     </div>
                 )}
-                {users.co_principle_investigator && users.co_principle_investigator.length > 0 && (
+                {users.co_principal_investigator && users.co_principal_investigator.length > 0 && (
                     <div style={{padding: '0px 25px',width:'33%'}}>
-                        {this.renderMembers(users.co_principle_investigator, 'Co-Principal Investigators', 1)}
+                        {this.renderMembers(users.co_principal_investigator, 'Co-Principal Investigators', 1)}
                     </div>
                 )}
                 {users.member_of.length > pi_members && (
                     <div style={{padding: '0px 25px',width:'33%'}}>
                         {this.renderMembers(
-                            users.member_of.filter((user) => (!users.principle_investigator.map((pi) => (pi.obj_id)).includes(user.obj_id)))
-                                .filter((user) => ((!users.co_principle_investigator) || (users.co_principle_investigator && !users.co_principle_investigator.map((copi) => (copi.obj_id)).includes(user.obj_id)))),
+                            users.member_of.filter((user) => (!users.principal_investigator.map((pi) => (pi.obj_id)).includes(user.obj_id)))
+                                .filter((user) => ((!users.co_principal_investigator) || (users.co_principal_investigator && !users.co_principal_investigator.map((copi) => (copi.obj_id)).includes(user.obj_id)))),
                             'Other Team Members', 2)}
                     </div>
                 )}

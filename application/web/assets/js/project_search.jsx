@@ -68,7 +68,7 @@ export default class ProjectSearch extends React.Component {
     const BoolShould = Searchkit.BoolShould;
 
     return BoolShould([
-      {"wildcard": {"users.principle_investigator.keyword": `*${e}*`}}
+      {"wildcard": {"users.principal_investigator.keyword": `*${e}*`}}
     ])
   }
 
@@ -76,7 +76,7 @@ export default class ProjectSearch extends React.Component {
     const BoolShould = Searchkit.BoolShould;
 
     return BoolShould([
-      {"wildcard": {"users.co_principle_investigator.keyword": `*${e}*`}}
+      {"wildcard": {"users.co_principal_investigator.keyword": `*${e}*`}}
     ])
   }
 
@@ -251,13 +251,13 @@ export default class ProjectSearch extends React.Component {
                     title="Principal Investigator Search"
                     placeholder="Principal Investigator Name"
                     queryBuilder={this.buildPIQuery.bind(this)}
-                    queryFields={["users.principle_investigator.keyword"]}
+                    queryFields={["users.principal_investigator.keyword"]}
                     searchOnChange={true}
                     searchThrottleTime={750}
                   />
                   <Searchkit.RefinementListFilter
                     id="principal_investigator"
-                    field="users.principle_investigator.keyword"
+                    field="users.principal_investigator.keyword"
                     title="Principal Investigators"
                     operator="OR"
                     orderKey="_term"
@@ -268,13 +268,13 @@ export default class ProjectSearch extends React.Component {
                     title="Co-Principal Investigator Search"
                     placeholder="Co-Principal Investigator Name"
                     queryBuilder={this.buildCoPIQuery.bind(this)}
-                    queryFields={["users.co_principle_investigator.keywor"]}
+                    queryFields={["users.co_principal_investigator.keywor"]}
                     searchOnChange={true}
                     searchThrottleTime={750}
                   />
                   <Searchkit.RefinementListFilter
                     id="co_principal_investigator"
-                    field="users.co_principle_investigator.keyword"
+                    field="users.co_principal_investigator.keyword"
                     title="Co-Principal Investigators"
                     operator="OR"
                     orderKey="_term"
