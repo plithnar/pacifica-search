@@ -49,7 +49,7 @@ export default class ProjectListItem extends Component {
         }).done((resp) => {
             released = resp.hits.total;
         });
-        return released;
+        return typeof released === 'number' ? released : released.value;
     }
 
     buildQueryStructure(proj_id) {
