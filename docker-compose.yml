@@ -64,7 +64,7 @@ services:
      volumes:
        - $HOME/.ssh/tunnel-config:/root/.ssh:ro
      ports:
-       - 9201:9201
+       - 9200:9200
      environment:
        ELASTICDB_PORT: tcp://elasticdb:9200
        TUNNEL_HOST: pacifica-tunnel
@@ -81,11 +81,11 @@ services:
       build:
         context: ./docker/tunnel
       volumes:
-        - $HOME/.ssh/tunnel-config:/root/.ssh:ro
+        - $HOME/.ssh/tunnel-config:/root/ssh:ro
       environment:
         ELASTICDB_PORT: tcp://elasticdb:9200
         TUNNEL_HOST: pacifica-tunnel
-        REMOTE_HOST: core-0-dev.my.emsl.pnl.gov
+        REMOTE_HOST: myemsl-dev-mgmt.emsl.pnl.gov
         LOCAL_PORT: 8121
         REMOTE_PORT: 8121
 
@@ -95,11 +95,11 @@ services:
       build:
         context: ./docker/tunnel
       volumes:
-        - $HOME/.ssh/tunnel-config:/root/.ssh:ro
+        - $HOME/.ssh/tunnel-config:/root/ssh:ro
       environment:
         ELASTICDB_PORT: tcp://elasticdb:9200
         TUNNEL_HOST: pacifica-tunnel
-        REMOTE_HOST: core-0-dev.my.emsl.pnl.gov
+        REMOTE_HOST: myemsl-dev-mgmt.emsl.pnl.gov
         LOCAL_PORT: 8181
         REMOTE_PORT: 8181
 

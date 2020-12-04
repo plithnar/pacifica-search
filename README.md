@@ -29,14 +29,29 @@ Now that you've got Composer and the Symfony installer set up, let Composer do i
 
 Next, run Composer to install everything from your `composer.json` file
 
-    $ composer install
+    $ php composer.phar install
 
 Composer will run for a few minutes and install a bunch of new stuff into a newly created `vendor` directory, including all the workings for Symfony.
 
-You will also need to run Composer inside the `application` directory
+### Set up tunnel to remote server
+Create subdirectory tunnel-config
+in the local .ssh directory
 
-    $ cd application
-    $ composer install
+Populate tunnel-config with appropriate ssh keys naming them as
+
+    tunnel_id_rsa		tunnel_id_rsa.pub
+
+Create config file in tunnel-config with the following contents:
+
+    Host pacifica-tunnel
+        HostName myemsl-dev-mgmt.emsl.pnl.gov
+        IdentityFile /root/.ssh/tunnel_id_rsa
+        User root
+        ForwardAgent yes
+        TCPKeepAlive yes
+        ConnectTimeout 5
+        ServerAliveCountMax 10
+        ServerAliveInterval 15
 
 ### Bring up the Docker instances
 From your new `search` directory, run `docker-compose` to bring up your containers
@@ -44,36 +59,6 @@ From your new `search` directory, run `docker-compose` to bring up your containe
     $ docker-compose up --build
 
 This will run them non-daemonized so that you can see what they are doing in your console window. Add the `-d` option to the end of the command to run them as detached.
-
-### Updating the Search React system
-If you need to make updates to the React system for the Search UI, you will need to perform the following steps:
-
-#### Installing Node Version Manager and proper version of Node
-To install or update nvm, you should run the [install script](https://github.com/nvm-sh/nvm/blob/v0.37.0/install.sh). To do that, you may either download and run the script manually, or use the following cURL or Wget command:
-
-    $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.0/install.sh | bash
-    $ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.0/install.sh | bash
-
-Running either of the above commands downloads a script and runs it. The script clones the nvm repository to \~/.nvm, and attempts to add the source lines from the snippet below to the correct profile file (\~/.bash_profile, \~/.zshrc, \~/.profile, or \~/.bashrc).
-
-
-    $ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
-Once the NVM has been installed, you will need to change your running version of node to version 11.15.0
-
-    $ nvm install 11.15.0
-    $ nvm use 11.15.0
-    
-#### Install NPM packages
-Navigate to the Javascript section of the project. From the top level directory, perform the following commands:
-
-    $ cd application/web/assets/js
-    $ npm install
-    
-#### Run the 'watch' script to start Laravel watching for changes
-Once the packages have been installed, the following command will start up Laravel. This process will watch for code changes on the appropriate files, and generate a new ReactJS file for the system to use when rendering the UI.
-
-    $ npm run watch
 
 ### Check out your new stack
 Visit [http://127.0.0.1/](http://127.0.0.1/) in your browser to load the Pacifica Search app.
