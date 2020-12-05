@@ -19,7 +19,7 @@ parameters:
     secret: ThisTokenIsNotSoSecretChangeIt
 
     # Values below are for the Pacifica Search project
-    elasticsearch_host: '127.0.0.1:9201'
+    elasticsearch_host: 'https://esapidev.my.emsl.pnl.gov/'
     elasticsearch_index: 'pacifica_search'
     metadata_host: 'search_metadataserver:8121'
 

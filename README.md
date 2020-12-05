@@ -6,32 +6,35 @@ This stack is intended to be co-located with the remainder of the Pacifica compo
 
 ## Setting up the stack components
 
+### Clone or use existing pacifica distribution
+
+    git clone git@github.com:pacifica/pacifica.git <local Pacifica directory>
+
 ### Pull Source as Submodule into Pacifica
 Change into your Pacifica main directory and pull this project in as a submodule.
 
     $ cd <local Pacifica directory>
-    $ git submodule add https://github.com/kauberry/pacifica-search.git search
-
-### Install Composer
-If you haven't already installed Composer (the dependency manager for PHP), do so by running the following in your terminal.
-
-    $ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-    $ php -r "if (hash_file('SHA384', 'composer-setup.php') === '669656bab3166a7aff8a7506b8cb2d1c292f042046c5a994c43155c0be6190fa0355160742ab2e1c88d40d5be660b410') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-    $ php composer-setup.php
-    $ php -r "unlink('composer-setup.php');"
-
-See the [Composer download site](https://getcomposer.org/download/) for more detailed instructions.
+    $ git submodule add git@github.com:mvaliev/pacifica-search.git search
 
 ### Install Symfony dependencies with Composer
-Now that you've got Composer and the Symfony installer set up, let Composer do its thing. First change to the directory into which you pulled the project code.
+Change into
+application subdirectory
 
-    $ cd search
+    cd <local Pacifica directory>/search/application
+    
+and install Composer following instructions 
+from  '[Composer download site](https://getcomposer.org/download/) 
 
 Next, run Composer to install everything from your `composer.json` file
 
     $ php composer.phar install
 
 Composer will run for a few minutes and install a bunch of new stuff into a newly created `vendor` directory, including all the workings for Symfony.
+
+### Install javascript dependencies
+
+    cd <local Pacifica directory>/search/application/web/assets/js/
+    npm install
 
 ### Set up tunnel to remote server
 Create subdirectory tunnel-config
