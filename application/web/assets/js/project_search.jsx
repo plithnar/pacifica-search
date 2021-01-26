@@ -14,7 +14,8 @@ export default class ProjectSearch extends React.Component {
 
     const host = this.getHost(props.esHost);
     this.searchkit = new Searchkit.SearchkitManager(host, {
-      timeout: 10000
+      timeout: 10000,
+      searchUrlPath : "_search?rest_total_hits_as_int=true"
     });
 
     this.searchkit.translateFunction = (key) => {
