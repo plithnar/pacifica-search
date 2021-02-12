@@ -61,7 +61,10 @@ export default class ProjectSearch extends React.Component {
 
     return BoolShould([
         {"wildcard": {"obj_id.keyword": `projects_${e}*`}},
-        {"wildcard": {"title.keyword.normalize": `*${e}*`}}
+      //Lower (normalized) case search does not work
+      //Switching to case sensitive  (Marat)
+      // {"wildcard": {"title.keyword.normalize": `*${e}*`}}
+        {"wildcard": {"title.keyword": `*${e}*`}}
       ])
   }
 
@@ -120,7 +123,8 @@ export default class ProjectSearch extends React.Component {
       return query.addQuery(
         BoolMust([
           TermQuery("type","projects"),
-          {"script": {"script": "doc['transaction_ids'].length > 0"}}
+          // Temporary fix to enable a filter (Marat)
+          // {"script": {"script": "doc['transaction_ids'].length > 0"}}
         ])
       );
     };
@@ -192,7 +196,8 @@ export default class ProjectSearch extends React.Component {
                     queryBuilder={this.buildProjectIdQuery.bind(this)}
                     queryOptions={{"analyzer": "lowercase"}}
                     queryFields={["projects.obj_id.keyword"]}
-                    prefixQueryFields={["projects.title.keyword"]}
+                      // Temporary fix to enable filter (Marat)
+                      // prefixQueryFields={["projects.title.keyword"]}
                   />
                   <CollapsiblePanel title="Matching Projects">
                     <Searchkit.RefinementListFilter
