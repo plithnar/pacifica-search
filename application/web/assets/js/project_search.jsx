@@ -166,7 +166,7 @@ export default class ProjectSearch extends React.Component {
                 auotfocus={true}
                 searchOnChange={true}
                 searchThrottleTime={750}
-                queryFields={["_all"]}
+                queryFields={["*"]}
               />
               <i
                 className="fas fa-info-circle fa-2x"
