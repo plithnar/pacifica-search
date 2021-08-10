@@ -96,8 +96,8 @@ export default class ProjectListItem extends Component {
                 {this.renderAbstract(source.abstract)} <br />
                 <div style={{'display': 'inline-flex'}}>
                     <div
-                        onClick={this.props.showUnreleased && source.transaction_ids.length > 0 ? this.toggleUnreleasedModal : undefined}
-                        style={this.props.showUnreleased && source.transaction_ids.length > 0 ? {'color':'#08c', 'cursor': 'pointer'} : {}}
+                        onClick={this.toggleUnreleasedModal}
+                        style={{'color':'#08c', 'cursor': 'pointer'}}
                     >
                         <b># Archived Datasets:</b> {source.transaction_ids.length}
                     </div>
@@ -118,7 +118,7 @@ export default class ProjectListItem extends Component {
                     width="80%"
                     onCancel={this.toggleModal}
                     destroyOnClose={true}
-                    style={{height:'90vh', overflow:'scroll', top:'5vh'}}
+                    style={{top:'5vh'}}
                 >
                     <TransactionSearch {...this.props} obj_id={this.state.obj_id} showUnreleased={this.state.showUnreleased} />
                 </Modal>
@@ -129,7 +129,7 @@ export default class ProjectListItem extends Component {
                     width="80%"
                     onCancel={this.toggleMetadataModal}
                     destroyOnClose={true}
-                    style={{height:'90vh', overflow:'scroll', top:'5vh'}}
+                    style={{top:'5vh'}}
                 >
                     <ProjectMetadata {...this.props} metadata={source} released={this.state.releasedTransactions} />
                 </Modal>

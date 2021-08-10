@@ -19,7 +19,8 @@ export default class TransactionSearch extends React.Component {
 
     const host = this.getHost(props.esHost);
     this.searchkit = new Searchkit.SearchkitManager(host, {
-      timeout: 10000
+      timeout: 10000,
+      searchUrlPath : "_search?rest_total_hits_as_int=true"
     });
 
 
@@ -51,7 +52,7 @@ export default class TransactionSearch extends React.Component {
     $.ajax({
       type:"POST",
       async: false,
-      url: this.props.esHost + '/_search',
+      url: this.props.esHost + '/_search?rest_total_hits_as_int=true',
       data: JSON.stringify(query),
       contentType:'application/json'
 
