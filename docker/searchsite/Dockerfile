@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
         intl \
         opcache
 
+RUN apt-get install nodejs npm -y
 WORKDIR /var/www/html
 RUN npm install webpack webpack-cli -g
 WORKDIR /var/www/html/web/assets/js
