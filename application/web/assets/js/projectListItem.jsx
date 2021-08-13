@@ -87,6 +87,7 @@ export default class ProjectListItem extends Component {
 
     render() {
         const source = this.props.result._source;
+        debugger;
         return(
             <div className="projectResultHit">
                 <a href={`/?project[0]=${source.obj_id}`} >
@@ -96,8 +97,8 @@ export default class ProjectListItem extends Component {
                 {this.renderAbstract(source.abstract)} <br />
                 <div style={{'display': 'inline-flex'}}>
                     <div
-                        onClick={this.toggleUnreleasedModal}
-                        style={{'color':'#08c', 'cursor': 'pointer'}}
+                        onClick={this.props.showUnreleased && source.transaction_ids.length > 0 ? this.toggleUnreleasedModal : undefined}
+                        style={this.props.showUnreleased && source.transaction_ids.length > 0 ? {'color':'#08c', 'cursor': 'pointer'} : {}}
                     >
                         <b># Archived Datasets:</b> {source.transaction_ids.length}
                     </div>
