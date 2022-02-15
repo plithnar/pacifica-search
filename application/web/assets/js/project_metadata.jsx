@@ -32,7 +32,7 @@ export default class ProjectMetadata extends Component {
         }
         return (
             <div style={{display: 'inline-flex', width:'100%'}}>
-                {users.principal_investigator.length > 0 && (
+                {users.principal_investigator && users.principal_investigator.length > 0 && (
                     <div style={{padding: '0px 25px',width:'33%'}}>
                         {this.renderMembers(users.principal_investigator, 'Principal Investigators', 1)}
                     </div>
@@ -42,7 +42,7 @@ export default class ProjectMetadata extends Component {
                         {this.renderMembers(users.co_principal_investigator, 'Co-Principal Investigators', 1)}
                     </div>
                 )}
-                {users.member_of.length > pi_members && (
+                {users.member_of && users.member_of.length > pi_members && (
                     <div style={{padding: '0px 25px',width:'33%'}}>
                         {this.renderMembers(
                             users.member_of.filter((user) => (!users.principal_investigator.map((pi) => (pi.obj_id)).includes(user.obj_id)))
@@ -78,7 +78,7 @@ export default class ProjectMetadata extends Component {
     renderInstruments(metadata) {
         return (
             <div>
-                {metadata.instruments.length > 0 && (
+                {metadata.instruments && metadata.instruments.length > 0 && (
                     this.renderMembers(metadata.instruments)
                 )}
             </div>
@@ -88,7 +88,7 @@ export default class ProjectMetadata extends Component {
     renderInstitutions(metadata) {
         return (
             <div>
-                {metadata.institutions.length > 0 && (
+                {metadata.institutions && metadata.institutions.length > 0 && (
                     this.renderMembers(metadata.institutions)
                 )}
             </div>
