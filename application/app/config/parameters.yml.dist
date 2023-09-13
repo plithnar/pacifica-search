@@ -16,7 +16,7 @@ parameters:
     mailer_password: ~
 
     # A secret key that's used to generate certain security-related tokens
-    secret: ThisTokenIsNotSoSecretChangeIt
+    secret: ffd91ee7cad11dc0deac8c38c637f82093825d2d
 
     # Values below are for the Pacifica Search project
     elasticsearch_host: 'https://esapidev.my.emsl.pnl.gov/'
