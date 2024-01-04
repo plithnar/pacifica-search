@@ -87,7 +87,6 @@ export default class ProjectListItem extends Component {
 
     render() {
         const source = this.props.result._source;
-        debugger;
         return(
             <div className="projectResultHit">
                 <a href={`/?project[0]=${source.obj_id}`} >

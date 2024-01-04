@@ -42,7 +42,7 @@ export default class ProjectMetadata extends Component {
                         {this.renderMembers(users.co_principal_investigator, 'Co-Principal Investigators', 1)}
                     </div>
                 )}
-                {users.member_of && users.member_of.length > pi_members && (
+                {(users.member_of && users.member_of.length > pi_members) && (
                     <div style={{padding: '0px 25px',width:'33%'}}>
                         {this.renderMembers(
                             users.member_of.filter((user) => (!users.principal_investigator.map((pi) => (pi.obj_id)).includes(user.obj_id)))
