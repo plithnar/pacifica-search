@@ -124,7 +124,9 @@ label.bold_label {
 
 .themed {
     display: block;
-    width: 100%;
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .themed label {
@@ -308,7 +310,7 @@ button:hover, .buttons input[type="button"]:hover {
 
 .page_header {
     width: 100%;
-    background-color: rgb(113, 149, 0);
+    background-color: rgb(17,19,74);
     padding-top: 0.25em;
     position: relative;
 }
@@ -332,6 +334,7 @@ button:hover, .buttons input[type="button"]:hover {
 }
 
 .graphic_logo span .site_slogan {
+    display: none;
     text-transform: uppercase;
     color: #FDA508;
     font-size: 16px;
@@ -353,7 +356,7 @@ button:hover, .buttons input[type="button"]:hover {
     color: white;
     padding: 0.25em;
     padding-left: 0.5em;
-    background-color: rgb(83, 105, 43);
+    background-color: rgb(29,58,130);
     margin-top: 0px;
     font-weight: normal;
     border-radius: 0px 0px 8px 8px;

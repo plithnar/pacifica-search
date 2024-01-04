@@ -1,3 +1,8 @@
+.ant-modal-content {
+    height: 90vh;
+    overflow: auto;
+}
+
 .projectResultHit {
     padding: 10px;
     border-bottom: black solid;
@@ -14,7 +19,7 @@
 
 .sk-layout__top-bar {
     position: relative;
-    background: rgb(83, 105, 43);
+    background: rgb(29,58,130);
     z-index: 1;
 }
 
@@ -32,17 +37,17 @@
 }
 
 .sk-toggle-option {
-    color: rgb(113, 149, 0);
+    color: rgb(17,19,74);
 }
 
 .sk-refinement-list__view-more-action {
-    color: rgb(113, 149, 0);
+    color: rgb(17,19,74);
 }
 
 .sk-toggle-option.is-active {
     color: #fff;
-    background-color: rgb(113, 149, 0);
-    border-color: rgb(113, 149, 0);
+    background-color: rgb(17,19,74);
+    border-color: rgb(17,19,74);
 }
 
 .collapsible-panel.collapsed {
